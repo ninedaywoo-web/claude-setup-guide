@@ -1,10 +1,10 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "published_at": "2026-10-12",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "仓库公开，查看和下载无需申请或登录",
-    "更新脚本匿名检查，保留逐步带做与用户确认更新"
+    "收到仓库链接后直接读取带做入口，减少重复询问用途",
+    "浏览器人机验证完成后由 AI 继续操作，减少让用户找入口和截图"
   ]
 }

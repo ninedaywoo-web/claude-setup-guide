@@ -1,10 +1,10 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "published_at": "2026-10-12",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "阅读版按原文档拆为六份独立 PDF",
-    "购买前主动提醒 IP 检测和购号网站入口"
+    "仓库公开，查看和下载无需申请或登录",
+    "更新脚本匿名检查，保留逐步带做与用户确认更新"
   ]
 }

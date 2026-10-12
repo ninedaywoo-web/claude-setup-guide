@@ -10,7 +10,7 @@ AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指
 
 想自己看，打开[教程首页](references/00-start.md)，或者阅读随交付包提供的分篇 PDF。每篇原文档对应一份 PDF，共六份：使用说明与目录、网络部署、浏览器与 iPhone 配置、Apple 账号与内购、退款申诉与清理、AI 带做指南。Markdown 和 PDF 是同一套内容的两种阅读方式。
 
-本仓库是私有项目。要从 GitHub 下载或检查更新，需要博主给你的 GitHub 账号访问权限；拿到离线 ZIP 后，即使暂时访问不了 GitHub，也可以继续本地带做。
+本仓库已公开。任何人都可以直接查看、下载和检查更新，不需要申请访问权限，也不需要登录 GitHub。你可以把仓库链接交给能读取 GitHub 的 AI，让它从 SKILL.md 开始；暂时无法联网时，继续使用已下载的本地教程。
 
 ## 安装成 Skill
 
@@ -26,11 +26,11 @@ AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指
 python3 scripts/update.py check
 ```
 
-私有仓库可使用已经登录的 GitHub CLI（`gh auth login`），或本机的 `GH_TOKEN` / `GITHUB_TOKEN` 环境变量。不要把 token 发给 AI、写入教程或提交到仓库。只有浏览器登录不会自动授予本地脚本访问权限。
+更新脚本默认匿名访问公开仓库，无需 GitHub 账号、token 或 GitHub CLI。
 
 同意更新后，让 AI 执行检查结果中的命令；命令锁定刚才检查的提交，避免检查后又更新到别的版本。若本地改过课程文件，脚本会停止覆盖，先保留你的改动。
 
-更新脚本需要 Python 3.9+，不需额外 Python 包。没有 Python 时，可由 AI 通过有权限的 GitHub 连接检查 `version.json`，再按你确认的版本下载完整 ZIP 并保留进度。
+更新脚本需要 Python 3.9+，不需额外 Python 包。没有 Python 时，可由 AI 直接读取公开仓库中的 `version.json`，再按你确认的版本下载完整 ZIP 并保留进度。
 
 ## 文件说明
 

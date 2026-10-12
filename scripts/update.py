@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check a private GitHub guide; apply only a user-approved, pinned commit."""
+"""Check a public GitHub guide; apply only a user-approved, pinned commit."""
 import argparse, base64, hashlib, io, json, os, re, shutil, stat, subprocess, sys, tempfile, urllib.request, zipfile
 from pathlib import Path, PurePosixPath
 REPO = 'ninedaywoo-web/claude-setup-guide'
@@ -106,7 +106,7 @@ def check(root,auth):
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('action',choices=['check','apply']);ap.add_argument('--commit');args=ap.parse_args()
     try:
-        auth=token()
+        auth=None  # Public repository: no login or credential lookup required.
         if args.action=='check':result=check(ROOT,auth)
         else:
             if not args.commit or not re.fullmatch('[a-f0-9]{40}',args.commit):raise UpdateError('请使用刚才检查到并经用户同意的完整提交 SHA。')
@@ -121,7 +121,7 @@ def main():
     except UpdateError as e:result={'status':'not_updated','message':str(e)}
     except Exception:
         # Never log headers, credentials, response bodies, or credential-helper stderr.
-        result={'status':'unavailable','message':'本次无法检查或下载更新。请核对网络与私有仓库访问权限；可用 gh auth login 登录。继续使用本地教程。'}
+        result={'status':'unavailable','message':'本次无法检查或下载更新。请稍后重试，或从公开仓库下载最新 ZIP。继续使用本地教程。'}
     print(json.dumps(result,ensure_ascii=False,indent=2))
     return 0 if result['status'] in {'current','update_available','updated'} else 2
 if __name__=='__main__':sys.exit(main())

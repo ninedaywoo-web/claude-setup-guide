@@ -9,7 +9,7 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Karing
 
 ## 启动与恢复
 
-1. 以本文件所在目录为项目根目录。读 `version.json`。每次新对话开始或恢复时，执行 `python3 scripts/update.py check`（工作目录为项目根目录）。同一轮不重复检查。没有 Python、网络或私有仓库授权时继续本地教程，简短说明本次未检查更新，不能把失败说成已是最新版。
+1. 以本文件所在目录为项目根目录。读 `version.json`。每次新对话开始或恢复时，执行 `python3 scripts/update.py check`（工作目录为项目根目录）。同一轮不重复检查。没有 Python 或暂时无法联网时继续本地教程，简短说明本次未检查更新，不能把失败说成已是最新版。公开仓库无需申请访问或登录。
 2. 有新版本时展示版本及更新摘要，推荐更新，并问用户是否更新；未答复或拒绝就继续当前版本。明确同意后才执行返回的 `python3 scripts/update.py apply --commit <已检查的提交>`。成功后重新读取本文件和变更章节。不要自行运行远程脚本。
 3. **在第一次带做前完整阅读** `references/01-network.md`（纯净魔法从零部署）与 `references/02-browser-iphone.md`（指纹浏览器与 iPhone 网络配置）。两篇必须都通读，长文分段读至末尾，不能以检索片段、目录、摘要或 PDF 文字抽取代替全文。图片在相关步骤打开查看。
 4. 阅读 `references/00-start.md` 和 `references/05-ai-walkthrough.md`。恢复时读取 `.local/progress.md`（如存在），结合本轮上下文确认进度。更新涉及前两篇时重新完整读取。

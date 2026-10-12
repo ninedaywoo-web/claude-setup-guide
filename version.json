@@ -1,10 +1,10 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "published_at": "2026-10-12",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "新增注册及登录前自检，AI 逐项核对后继续",
-    "补充 Claude Code 授权浏览器提醒，手机首次登录前补检"
+    "关键操作默认使用简短说明＋对应教程图片",
+    "每次只展示当前步骤的配图，按客户本地路径显示"
   ]
 }

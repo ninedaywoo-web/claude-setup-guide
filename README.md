@@ -8,7 +8,7 @@
 
 AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指纹浏览器与 iPhone 网络配置](references/02-browser-iphone.md)，再了解你的设备和进度，每次只带一小步。做完发截图或口述结果即可。Apple、退款和申诉在需要时再读。
 
-想自己看，打开[教程首页](references/00-start.md)，或者阅读随交付包提供的 PDF。Markdown 和 PDF 是同一套内容的两种阅读方式。
+想自己看，打开[教程首页](references/00-start.md)，或者阅读随交付包提供的分篇 PDF。每篇原文档对应一份 PDF，共六份：使用说明与目录、网络部署、浏览器与 iPhone 配置、Apple 账号与内购、退款申诉与清理、AI 带做指南。Markdown 和 PDF 是同一套内容的两种阅读方式。
 
 本仓库是私有项目。要从 GitHub 下载或检查更新，需要博主给你的 GitHub 账号访问权限；拿到离线 ZIP 后，即使暂时访问不了 GitHub，也可以继续本地带做。
 

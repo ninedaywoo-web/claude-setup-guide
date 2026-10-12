@@ -1,11 +1,10 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "published_at": "2026-10-12",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "本地图文教程与 51 张配图",
-    "网络与浏览器两篇必须先通读",
-    "逐步带做、进度恢复、确认后更新"
+    "阅读版按原文档拆为六份独立 PDF",
+    "购买前主动提醒 IP 检测和购号网站入口"
   ]
 }

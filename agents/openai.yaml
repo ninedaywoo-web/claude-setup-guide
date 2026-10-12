@@ -1,0 +1,6 @@
+interface:
+  display_name: "Claude 从零带做"
+  short_description: "先通读网络与浏览器教程，再逐步带你完成配置、账号准备和订阅"
+  default_prompt: "请使用 $claude-setup-guide，读取完整配套教程，从我当前的进度一步步带我操作。"
+policy:
+  allow_implicit_invocation: true

@@ -1,2 +1,45 @@
-# claude-setup-guide
-Claude 客户交付教程与 AI 逐步带做 Skill，包含完整离线图文资料。
+# Claude Max 防封奶妈级教程
+
+这是客户交付的离线图文教程和 AI 带做 Skill。正文、51 张配图均在项目内，不需要打开在线文档。
+
+## 开始使用
+
+下载完整项目并解压，把整个文件夹交给 Codex 或其他能读取本地文件的 AI。打开 [SKILL.md](SKILL.md)，AI 就知道该做什么，不需要自己写长提示词。只上传 SKILL.md 单个文件会缺少配套教程，请保留完整目录。
+
+AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指纹浏览器与 iPhone 网络配置](references/02-browser-iphone.md)，再了解你的设备和进度，每次只带一小步。做完发截图或口述结果即可。Apple、退款和申诉在需要时再读。
+
+想自己看，打开[教程首页](references/00-start.md)，或者阅读随交付包提供的 PDF。Markdown 和 PDF 是同一套内容的两种阅读方式。
+
+本仓库是私有项目。要从 GitHub 下载或检查更新，需要博主给你的 GitHub 账号访问权限；拿到离线 ZIP 后，即使暂时访问不了 GitHub，也可以继续本地带做。
+
+## 安装成 Skill
+
+可以直接把项目文件夹交给 AI，无需安装。若希望在 Codex 中长期使用，可让 Codex 将整个 `claude-setup-guide` 目录安装到自己的 `~/.agents/skills/` 下，再用 `$claude-setup-guide` 开始。安装位置已有同名目录时先检查，不覆盖已有进度。
+
+## 更新
+
+每次 AI 开始或恢复带做，会检查一次版本。有更新时展示摘要、建议更新并询问你；你同意后才更新。不会定时后台运行。更新保留 `.local/` 中的进度，并留下一份旧版本备份。检查失败时继续本地内容。
+
+手动检查：
+
+```bash
+python3 scripts/update.py check
+```
+
+私有仓库可使用已经登录的 GitHub CLI（`gh auth login`），或本机的 `GH_TOKEN` / `GITHUB_TOKEN` 环境变量。不要把 token 发给 AI、写入教程或提交到仓库。只有浏览器登录不会自动授予本地脚本访问权限。
+
+同意更新后，让 AI 执行检查结果中的命令；命令锁定刚才检查的提交，避免检查后又更新到别的版本。若本地改过课程文件，脚本会停止覆盖，先保留你的改动。
+
+更新脚本需要 Python 3.9+，不需额外 Python 包。没有 Python 时，可由 AI 通过有权限的 GitHub 连接检查 `version.json`，再按你确认的版本下载完整 ZIP 并保留进度。
+
+## 文件说明
+
+- `SKILL.md`：AI 的带做入口。
+- `references/`：六篇本地说明与完整图文教程。
+- `assets/images/`：本地配图。
+- `assets/progress-template.md`：进度模板。
+- `scripts/update.py`：检查更新及经确认后的更新。
+- `version.json`、`CHANGELOG.md`：版本与更新记录。
+- `.local/`：使用者自己的进度与设置，不上传。
+
+价格、库存和软件界面随时间变化，AI 到选购阶段会查询当时信息。遇到解决不了的问题，或对 AI 的回答不满意，可以去问博主。

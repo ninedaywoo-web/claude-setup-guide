@@ -1,5 +1,12 @@
 # 更新记录
 
+## 1.0.8 · 2026-10-12
+
+- VPS 备选先接近 DMIT Premium 优化线路，再按网络用途选配置，最后列价格，不按十美元预算换普通线路。
+- 明确搬瓦工 USCA_9 的 1 GB 档（49.99 美元/季）、AKILE LAXPremium-Mini，以及仅硬件接近的 VoyraCloud Cloud Standard。
+- 两款 1 GB 套餐不因 DMIT 为 2 GB 而自动升级；说明 AKILE Mini 的 500 GB 月流量，按需求再比较升级。
+- AKILE 链接改为官网首页，移除推广和预选套餐参数；标明配置差异与缺货处理。
+
 ## 1.0.7 · 2026-10-12
 
 - 新增 AKILE Cloud 推荐链接。

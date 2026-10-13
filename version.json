@@ -1,10 +1,10 @@
 {
-  "version": "1.0.7",
+  "version": "1.0.8",
   "published_at": "2026-10-12",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "新增 AKILE Cloud 推荐入口",
-    "DMIT 缺货时按搬瓦工、AKILE Cloud、VoyraCloud 的顺序推荐，同步总说明与 AI 带做指南"
+    "DMIT 缺货时优先搬瓦工 USCA_9 1GB（49.99 美元/季），其次 AKILE LAXPremium-Mini（79.99 元/月）",
+    "先匹配优化线路与网络用途，不强制升级至 2GB；AKILE 使用无推广参数的官网入口"
   ]
 }

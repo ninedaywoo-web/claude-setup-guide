@@ -42,7 +42,8 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Karing
 VPS → SSH / 3x-ui / VLESS + Reality → Karing → AdsPower 本机 HTTP 入口 → 邮箱及 Claude → 按需 iPhone / Apple 内购 → 按需 Claude Code。
 
 - VPS 是可 SSH 登录、可安装 Linux 程序的服务器。DMIT 缺货时，按搬瓦工（质量优先）→ AKILE Cloud → VoyraCloud 的顺序对照备选；入口见 references/01-network.md，不改成机场订阅、成品代理或共享节点。CN2 GIA 是线路名，不是部署必需的软件或套餐关键词。
-- 基准是文档 DMIT LAX.AN5.Pro.TINY：1 vCPU、2 GB、20 GB、独立 IPv4、1000 GB、1 Gbps、9.99 美元/月。购买时重查官网，不把他家最低价直接当成同等方案。
+- 基准是文档 DMIT LAX.AN5.Pro.TINY：1 vCPU、2 GB、20 GB、独立 IPv4、1000 GB、1 Gbps、9.99 美元/月。选型先匹配洛杉矶及接近 DMIT Premium 的大陆优化线路，再对照 CPU、内存、磁盘、独立 IPv4、流量与带宽，最后列价格，不以十美元预算筛选。具体套餐和差异见 references/01-network.md；没有完全一致的方案就说明差别，不称“同款”。
+- 备选优先核对搬瓦工 USCA_9 的 1 GB 档（49.99 美元/季）、AKILE LAXPremium-Mini（1 GB、500 GB/月、79.99 元/月）。这两款按单人网络用途选择，不为对齐 DMIT 的 2 GB 自动升级；用户需要 AKILE 1 TB 流量时才比较同线路 Starter。VoyraCloud Cloud Standard 仅作硬件接近的第三备选，当前未核实同级优化线路。匹配套餐缺货时继续核对同级候选；不因便宜或有货切换普通线路，也不自动购买远超需要的大套餐。用户选定不同线路或接受带宽差异后再继续。AKILE 入口使用 https://akile.ai/，不使用推广参数或预选套餐链接。
 - 用户选好商家后、付款前，按带做指南 3.1 查 Claude Code 当前官方要求和该商家的两档实际费用，比较“文档推荐套餐”与“预留云端运行的套餐”，再问一次要不要预留。默认不升级，不把云端部署说成防封保证，不擅自换地区或线路。这里只做选型，云端安装不是当前已交付流程。
 - VLESS 链接交给 Karing；AdsPower 填 Karing 实际开放的本机 HTTP 地址与端口。SSH 凭据、VLESS 参数、浏览器 HTTP 代理不是同一套配置。禁止照抄截图中的 IP、端口、密码。
 - Mac 部署前核对 Karing 与服务端 Xray 的 REALITY 版本兼容情况。出现 `reality verification failed` 时，执行 `references/01-network.md` 第十节：先核对参数、服务状态及旧代理干扰，再按实际证据采用历史成功组合；不凭单条报错自动降级或换客户端。参数使用导出链接或读取配置，不看截图手抄公钥。

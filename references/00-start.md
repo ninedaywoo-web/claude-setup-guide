@@ -32,7 +32,7 @@ Ping0 的风控值越低表示该站评估的风险越低，与前面 Claude 检
 
 ### 2.2 [指纹浏览器与 iPhone 网络配置](02-browser-iphone.md)
 
-AdsPower、本机 HTTP 代理、邮箱与 Claude 注册，以及 iPhone 网络、时区和客户端检查。
+AdsPower、本机 HTTP 代理、邮箱与 Claude 注册，以及 iPhone 镜像带做、网络、时区和客户端检查。手机首次注册、登录或订阅前，优先由 Codex Computer Use 操作镜像导入节点；镜像问题先排查修复，小火箭使用「全局路由 → 代理」并完成手机独立验收。
 
 ### 2.3 [Apple 账号、礼品卡与内购](03-apple.md)
 

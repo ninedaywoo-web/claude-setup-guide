@@ -1,14 +1,12 @@
 {
-  "version": "1.0.9",
+  "version": "1.0.10",
   "published_at": "2026-10-13",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "强化 Mac 与 iPhone 时区提醒和核验：关闭自动设置、手动选节点城市、关闭定位服务的设定时区，并复查实际城市",
-    "新增调用时每天最多检查一次更新，并在回答末尾提醒已有新版",
-    "支持 check --force 立即重查，修正旧版本误报更新并保留用户确认与进度备份",
-    "新增 Ping0 节点检测入口及检测凭证记录流程",
-    "区分 Ping0 风控值与 Claude 检测分数，记录实际结果与脱敏截图",
-    "移除 VoyraCloud；DMIT 缺货首推搬瓦工，AKILE 与 Hostinger KVM 1 并列推荐"
+    "新增手机注册、登录和订阅前的网络必检关卡，不再只在内购时触发",
+    "优先由 Codex Computer Use 操作 iPhone 镜像导入节点，镜像不可用先尽可能排查修复",
+    "明确小火箭全局路由选择代理并开启 VPN，独立验收手机出口、DNS、IPv6、App 路径与断线行为",
+    "同步带做流程、自检、Apple 订阅入口和进度模板，未完成项先修复或补检"
   ]
 }

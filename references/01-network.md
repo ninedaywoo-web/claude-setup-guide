@@ -160,8 +160,7 @@ DMIT 的机器以坚如磐石著称。你买完配置好之后，只要按时续
 选择DMIT 9.99$/月（洛杉矶优化线路）。也就比机场贵了一倍，但是能享受到稳定快速的网络，我觉得还是蛮值的。但是 DMIT 经常缺货，备选按下面的顺序推荐：
 
 1. [搬瓦工](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9)：质量优先，先看这家。
-2. [AKILE Cloud](https://akile.ai/)：第二备选。
-3. [VoyraCloud](https://www.voyracloud.com/?ref_code=KZJXH37H)：第三备选。
+2. 并列备选：[AKILE Cloud](https://akile.ai/) 的 LAXPremium-Mini 与 [Hostinger](https://www.hostinger.com/vps-hosting) 的 KVM 1。Hostinger 的美国机房及线路差异见下面的套餐对照。
 
 下面以 DMIT 为例，依次完成套餐选择、系统选择、下单和 SSH 登录。
 
@@ -183,37 +182,39 @@ DMIT 的机器以坚如磐石著称。你买完配置好之后，只要按时续
 
 **截图基准：**DMIT 洛杉矶 → AN5 → Premium → LAX.AN5.Pro.TINY，9.99 美元/月；1 vCPU、2 GB 内存、20 GB SSD、1 个 IPv4、1000 GB 流量（截图标注双向计量）、1 Gbps 带宽。
 
-**选择顺序：线路接近优先，其次配置匹配，最后列价格。**商家顺序仍是搬瓦工 → AKILE Cloud → VoyraCloud。DMIT 的 9.99 美元是原套餐价格，不是备选预算上限；不为凑十美元而降低配置或换成普通线路。
+**选择顺序：线路接近优先，其次配置匹配，最后列价格。**DMIT 缺货时最推荐搬瓦工，其次并列推荐 AKILE Cloud 与 Hostinger KVM 1；不再给这两家排先后。Hostinger 是已选定的备选，但当前未核实与 DMIT Premium 同级的大陆优化线路，需要说明差异和实测结果。DMIT 的 9.99 美元是原套餐价格，不是备选预算上限；不为凑十美元而降低配置或换成普通线路。
 
-下面是 2026 年 10 月 12 日核对官网后选出的对照套餐。没有一家与 DMIT 每项完全一致，表中明确列出差别。库存、价格、付款周期和续费金额在购买前重新核对。
+下面的搬瓦工与 AKILE 套餐于 2026 年 10 月 12 日核对官网，Hostinger KVM 1 于 2026 年 10 月 13 日核对官网。没有一家与 DMIT 每项完全一致，表中明确列出差别。库存、价格、付款周期和续费金额在购买前重新核对。
 
 | 商家与选择路径 | 线路及配置对照 | 本次页面价格与状态 |
 | --- | --- | --- |
 | [搬瓦工：E-Commerce VPS → Los Angeles → USCA_9 → 1 GB 档](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9) | 页面标注电信 CN2 GIA、移动 CMIN2、China Unicom Premium。2 vCPU / 1 GB / 20 GB SSD；1 TB/月，2.5 Gbps。比 DMIT 少 1 GB 内存，磁盘和流量相近；用于当前仅提供网络的教程，联通线路以官网具体说明为准。 | 49.99 美元/季。页面提供 Order 入口，购买前核实可下单状态。这是已选定的第一推荐，不为对齐 2 GB 自动改推 89.99 美元/季档。 |
-| [AKILE Cloud 官网](https://akile.ai/)：云服务器 → 美国 → LAX Premium → LAXPremium-Mini | 页面标注联通 9929、移动 CMIN2、电信 CN2 GIA。1 vCPU / 1 GB / 20 GB；1 个 IPv4，500 GB/月，200 Mbps。比 DMIT 少 1 GB 内存，月流量为一半，带宽也较低；用于当前仅提供网络的教程。 | 79.99 元/月；本次显示售罄。这是已选定的第二推荐，购买时重查库存。 |
-| [VoyraCloud：Cloud VPS → Standard → Los Angeles](https://www.voyracloud.com/pricing) | 2 vCPU / 2 GB / 40 GB；1 TB，200 Mbps。硬件接近，但本次官网定价页和 Cloud VPS 产品页未提供与 DMIT Premium 对等的大陆优化线路说明。 | 常规月付标价 9 美元；年付优惠显示折合 7.2 美元/月。仅作为硬件接近的第三备选，不能称为同级优化线路替代。 |
+| [AKILE Cloud 官网](https://akile.ai/)：云服务器 → 美国 → LAX Premium → LAXPremium-Mini | 页面标注联通 9929、移动 CMIN2、电信 CN2 GIA。1 vCPU / 1 GB / 20 GB；1 个 IPv4，500 GB/月，200 Mbps。比 DMIT 少 1 GB 内存，月流量为一半，带宽也较低；用于当前仅提供网络的教程。 | 79.99 元/月；本次显示售罄。这是与 Hostinger KVM 1 并列的备选，购买时重查库存。 |
+| [Hostinger 官网](https://www.hostinger.com/vps-hosting)：VPS hosting → KVM 1 → 美国 Phoenix 或 Boston | 1 vCPU / 4 GB / 50 GB NVMe；独立 IP、root 权限；4 TB 流量、1 Gbps。比 DMIT 多 2 GB 内存、磁盘和流量更多；美国 VPS 没有洛杉矶选项，当前未核实同级大陆优化线路。 | 与 AKILE LAXPremium-Mini 并列推荐。官网提供该套餐展示，尚未验收结账与具体机房库存。月付首期 $9.99，续费 $19.49/月；首购 12 个月 $83.88（$6.99/月），按年续费 $155.88（$12.99/月）；首购 24 个月 $155.76（$6.49/月），按两年续费 $287.76（$11.99/月）。以上整期金额按展示单价计算、税费另计，长周期一次预付，购买前重查。 |
 
 AKILE 使用官网首页入口，不附推广参数或预选套餐参数。进入后按上表路径选择 LAX Premium，不沿用之前链接里的 LAX4837-Standard。LAXPro 页面仅标注“三网优化”，本次未核实与 Premium 相同的具体线路，因此默认仍选 Premium Mini。LAX4837、LAX Lite、住宅 IP 等标签不能代替 Premium 优化线路的核对。
+
+Hostinger 的机房位置以[官方支持文档](https://www.hostinger.com/support/1583267-where-are-hostinger-servers-located/)为依据，价格周期以[官网 VPS 价格页](https://www.hostinger.com/pricing/vps-hosting)为依据。默认采用 KVM 1，不因内存较多而自动换 KVM 2。连接后按浏览器章节记录 Ping0 节点检测凭证，并检查实际出口、延迟、丢包和晚高峰表现；hostname 或第三方评分不能单独证明 IP 纯净、独享或线路稳定。
 
 搬瓦工 1 GB 档和 AKILE Premium Mini 是本教程选定的网络用途套餐，通常够单人运行代理节点，不要求硬件与 DMIT 每项相同。AKILE Mini 月流量为 500 GB；用户明确需要 1 TB 时，再比较同线路的 LAXPremium-Starter（2 vCPU / 2 GB / 20 GB、200 Mbps、149.99 元/月，本次也显示售罄）。不为凑 2 GB 自动升级；在 VPS 上运行 Claude Code 的需求另按下节比较。
 
 **给 AI：**按下面顺序完成选型，并向用户给出一个首选套餐及官网入口。
 
 1. 先确认缺货的具体 DMIT 套餐，以洛杉矶 AN5 Premium 为基准，优先找大陆优化线路接近的 VPS，再以 DMIT 的 1 vCPU、2 GB 内存、20 GB 磁盘、独立 IPv4、1000 GB 月流量和 1 Gbps 标称带宽逐项说明差别；这组数值是对照基准，不是所有备选必须达到的硬性下限。CPU 核数和标称带宽不代表实际体验完全相同，流量计量方式也要核对。
-2. 依次核对搬瓦工、AKILE Cloud、VoyraCloud。搬瓦工 1 GB 档和 AKILE Premium Mini 是本教程已确定的网络用途选择，说明内存、流量、带宽差异，不再强制升级至 2 GB。其他候选资源高于基准可对照；低于基准或线路未明确时，标出具体差异并让用户选择，不能直接称“同等配置”。VoyraCloud 目前不满足已核实的同级优化线路条件，不因它便宜就自动推荐购买。CN2 GIA 等是选线路的依据，不是需要另外购买的机场节点或安装的软件。
+2. 先核对搬瓦工；其次并列展示 AKILE LAXPremium-Mini 和 Hostinger KVM 1，说明各自线路、配置、费用和库存，按用户选择继续。Hostinger 的线路差异保留在对照中，不能称同级优化线路，也不自动降为第三推荐。搬瓦工 1 GB 档和 AKILE Premium Mini 是本教程已确定的网络用途选择，说明内存、流量、带宽差异，不再强制升级至 2 GB。其他候选资源高于基准可对照；低于基准或线路未明确时，标出具体差异并让用户选择，不能直接称“同等配置”。CN2 GIA 等是选线路的依据，不是需要另外购买的机场节点或安装的软件。
 3. 推荐格式为“商家与套餐、官网入口和选择路径、线路、配置差异、库存、价格与付款周期”。价格用于告知费用，不用于把配置或线路降档；不先让用户在“十美元预算”和“线路质量”之间选择，除非用户主动提出预算限制。
 4. 匹配套餐缺货时，继续核对同商家同级套餐或下一商家，不在已选套餐之外自动降低内存、磁盘或线路，也不改成远超需求的大套餐。找不到满足条件且有货的方案，就说明缺口，让用户决定等待补货或接受明确的配置差异。页面只有 Order 按钮不等于已验收库存。
 5. 用户已经明确选定商家或接受某项差异时，按其选择继续；购买前重新核对 Linux 系统、SSH / 管理权限和独立 IPv4。不要购买机场订阅或成品代理。
 
-**选好商家后，先比较两档费用，再决定是否预留云端运行**
+**选好商家后，先核对云端运行要求，再按需比较费用**
 
 后续文档可能会更新在 VPS 上运行 Claude Code 的方案，把程序和项目放在服务器上，让运行环境和网络出口保持稳定。这对 VPS 的性能有要求，尤其是内存，费用可能会高一些。
 
 截至 2026 年 10 月 12 日，[Claude Code 官方系统要求](https://code.claude.com/docs/en/setup#system-requirements)是 4 GB 及以上内存、x64 或 ARM64 处理器，支持 Debian 10+、Ubuntu 20.04+ 等系统。1 GB、2 GB VPS 低于这项内存要求。Claude Code 在自己电脑上运行、VPS 只负责网络时，不需要因此升级 VPS。
 
-**给 AI：**用户选好商家后、购买套餐前，先查当前官方运行要求，再在这家商家里找保留所选优化线路、满足运行要求且资源不过度增加的套餐或内存升级项，配置确定后再列费用。保留已选地区和线路条件，分别列出“文档推荐套餐”和“预留云端运行的套餐”的配置、实际付款金额、付款周期与差价，查完再问用户是否需要。选 DMIT 就查 DMIT，选搬瓦工就查搬瓦工，选 AKILE Cloud 就查 AKILE Cloud，选 VoyraCloud 就查 VoyraCloud。
+**给 AI：**用户选好商家后、购买套餐前，先查当前官方运行要求，再在这家商家里找保留所选优化线路、满足运行要求且资源不过度增加的套餐或内存升级项，配置确定后再列费用。保留已选地区和线路条件，分别列出“文档推荐套餐”和“预留云端运行的套餐”的配置、实际付款金额、付款周期与差价，查完再问用户是否需要。选 DMIT 就查 DMIT，选搬瓦工就查搬瓦工，选 AKILE Cloud 就查 AKILE Cloud，选 Hostinger 就查 Hostinger。
 
-“文档推荐套餐”以本教程 DMIT 截图配置为对照，不是网站最便宜的套餐。用户不需要预留，或暂时不确定，就继续文档推荐套餐，搬瓦工和 AKILE 继续上表已选定的 1 GB 网络套餐，其他商家按已选配置继续，不反复劝升级。若要同时跑浏览器、Docker、项目构建或多个会话，再按实际任务估算额外资源。
+“文档推荐套餐”以本教程 DMIT 截图配置为对照，不是网站最便宜的套餐。用户不需要预留，或暂时不确定，就继续文档推荐套餐，搬瓦工和 AKILE 继续上表已选定的 1 GB 网络套餐，Hostinger 继续 KVM 1，不反复劝升级。KVM 1 已有 4 GB 内存；购买前核对当前官方要求，若已满足就说明无需为内存升级，不为凑出两档而强推 KVM 2。若要同时跑浏览器、Docker、项目构建或多个会话，再按实际任务估算额外资源并比较升级。
 
 ### （二）选系统
 

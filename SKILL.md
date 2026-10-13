@@ -9,8 +9,8 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Karing
 
 ## 启动与恢复
 
-1. 以本文件所在目录为项目根目录。读 `version.json`。每次新对话开始或恢复时，执行 `python3 scripts/update.py check`（工作目录为项目根目录）。同一轮不重复检查。没有 Python 或暂时无法联网时继续本地教程，简短说明本次未检查更新，不能把失败说成已是最新版。公开仓库无需申请访问或登录。
-2. 有新版本时展示版本及更新摘要，推荐更新，并问用户是否更新；未答复或拒绝就继续当前版本。明确同意后才执行返回的 `python3 scripts/update.py apply --commit <已检查的提交>`。成功后重新读取本文件和变更章节。不要自行运行远程脚本。
+1. 以本文件所在目录为项目根目录。读 `version.json`。每次客户调用本项目（新对话开始、恢复带做，或连续带做距离上次检查已满 24 小时后的首轮），执行 `python3 scripts/update.py check`（工作目录为项目根目录）。脚本在 `.local/update-check.json` 保存结果；24 小时内重复调用复用缓存，满 24 小时后下次调用才重新联网，不安装后台程序。同一轮不重复检查。客户要求立即检查时运行 `python3 scripts/update.py check --force`。没有 Python 时由 AI 读取远端 `version.json`，记录检查时间并比较数字版本；无法联网时继续本地教程，简短说明本次未能检查，不能说已是最新版。公开仓库无需申请访问或登录。
+2. 返回 `update_available` 时，先完成客户当前这一步的回答，在本次调用的首个实质回答末尾单独一行展示脚本返回的 `update_notice`，例如“已有最新更新（v1.0.10），建议更新。”必要时补充更新摘要，不能只在工具输出中显示。同一次连续带做不在每条回复重复提醒；下次调用即使复用缓存，仍在首个回答末尾提醒。`current`、`local_ahead` 或检查失败时不编造新版提醒；失败的缓存结果也不能说当前已是最新版。更新提醒不阻断带做。客户未同意或拒绝就继续本地版本；明确同意后才执行返回的 `python3 scripts/update.py apply --commit <已检查的提交>`。成功后停止旧版提醒，重新读取本文件和变更章节；本地版本变化会使旧检查缓存失效。不要自行运行远程脚本。
 3. **在第一次带做前完整阅读** `references/01-network.md`（纯净魔法从零部署）与 `references/02-browser-iphone.md`（指纹浏览器与 iPhone 网络配置）。两篇必须都通读，长文分段读至末尾，不能以检索片段、目录、摘要或 PDF 文字抽取代替全文。图片在相关步骤打开查看，并按下方“图文带做”规则展示给用户。
 4. 阅读 `references/00-start.md` 和 `references/05-ai-walkthrough.md`。恢复时读取 `.local/progress.md`（如存在），结合本轮上下文确认进度。更新涉及前两篇时重新完整读取。
 5. 从对话判断设备和当前进度。完全从零时只问：“你用的是 Mac 还是 Windows？VPS 买了吗？”邮箱、iPhone、付款信息在相应阶段再问。
@@ -41,10 +41,10 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Karing
 
 VPS → SSH / 3x-ui / VLESS + Reality → Karing → AdsPower 本机 HTTP 入口 → 邮箱及 Claude → 按需 iPhone / Apple 内购 → 按需 Claude Code。
 
-- VPS 是可 SSH 登录、可安装 Linux 程序的服务器。DMIT 缺货时，按搬瓦工（质量优先）→ AKILE Cloud → VoyraCloud 的顺序对照备选；入口见 references/01-network.md，不改成机场订阅、成品代理或共享节点。CN2 GIA 是线路名，不是部署必需的软件或套餐关键词。
+- VPS 是可 SSH 登录、可安装 Linux 程序的服务器。DMIT 缺货时，最推荐搬瓦工；其次并列推荐 AKILE Cloud 与 Hostinger KVM 1；入口见 references/01-network.md，不改成机场订阅、成品代理或共享节点。CN2 GIA 是线路名，不是部署必需的软件或套餐关键词。
 - 基准是文档 DMIT LAX.AN5.Pro.TINY：1 vCPU、2 GB、20 GB、独立 IPv4、1000 GB、1 Gbps、9.99 美元/月。选型先匹配洛杉矶及接近 DMIT Premium 的大陆优化线路，再对照 CPU、内存、磁盘、独立 IPv4、流量与带宽，最后列价格，不以十美元预算筛选。具体套餐和差异见 references/01-network.md；没有完全一致的方案就说明差别，不称“同款”。
-- 备选优先核对搬瓦工 USCA_9 的 1 GB 档（49.99 美元/季）、AKILE LAXPremium-Mini（1 GB、500 GB/月、79.99 元/月）。这两款按单人网络用途选择，不为对齐 DMIT 的 2 GB 自动升级；用户需要 AKILE 1 TB 流量时才比较同线路 Starter。VoyraCloud Cloud Standard 仅作硬件接近的第三备选，当前未核实同级优化线路。匹配套餐缺货时继续核对同级候选；不因便宜或有货切换普通线路，也不自动购买远超需要的大套餐。用户选定不同线路或接受带宽差异后再继续。AKILE 入口使用 https://akile.ai/，不使用推广参数或预选套餐链接。
-- 用户选好商家后、付款前，按带做指南 3.1 查 Claude Code 当前官方要求和该商家的两档实际费用，比较“文档推荐套餐”与“预留云端运行的套餐”，再问一次要不要预留。默认不升级，不把云端部署说成防封保证，不擅自换地区或线路。这里只做选型，云端安装不是当前已交付流程。
+- 备选采用搬瓦工 USCA_9 的 1 GB 档（49.99 美元/季）；AKILE LAXPremium-Mini（1 GB、500 GB/月、79.99 元/月）与 Hostinger KVM 1（1 vCPU、4 GB、50 GB NVMe、4 TB、1 Gbps、独立 IP 与 root 权限）并列推荐。搬瓦工与 AKILE 的这两款 1 GB 套餐按单人网络用途选择，不为对齐 DMIT 的 2 GB 自动升级；用户需要 AKILE 1 TB 流量时才比较同线路 Starter。匹配套餐缺货时继续核对同级候选；不因便宜或有货切换普通线路，也不自动购买远超需要的大套餐。用户选定不同线路或接受带宽差异后再继续。AKILE 入口使用 https://akile.ai/，Hostinger 入口使用 https://www.hostinger.com/vps-hosting，均不使用推广参数。Hostinger 选美国 Phoenix 或 Boston，当前未核实与 DMIT Premium 同级的大陆优化线路，需说明差异并实测；按用户选择继续，不自动把它排到 AKILE 之后或升级至 KVM 2。Hostinger 首购和续费按实际周期核对，详见套餐对照。
+- 用户选好商家后、付款前，按带做指南 3.1 查 Claude Code 当前官方要求和该商家的两档实际费用，比较“文档推荐套餐”与“预留云端运行的套餐”，再问一次要不要预留。默认不升级，不把云端部署说成防封保证，不擅自换地区或线路。推荐套餐已满足当前运行要求时，直接说明无需升级；Hostinger 默认 KVM 1，只有额外负载需要更多资源时再比较升级，不强制凑出两档。这里只做选型，云端安装不是当前已交付流程。
 - VLESS 链接交给 Karing；AdsPower 填 Karing 实际开放的本机 HTTP 地址与端口。SSH 凭据、VLESS 参数、浏览器 HTTP 代理不是同一套配置。禁止照抄截图中的 IP、端口、密码。
 - Mac 部署前核对 Karing 与服务端 Xray 的 REALITY 版本兼容情况。出现 `reality verification failed` 时，执行 `references/01-network.md` 第十节：先核对参数、服务状态及旧代理干扰，再按实际证据采用历史成功组合；不凭单条报错自动降级或换客户端。参数使用导出链接或读取配置，不看截图手抄公钥。
 - Mac 用 Karing 与 AdsPower 路线。Windows 根据对应客户端确认 HTTP 入口。浏览器内核用当前稳定版，不强制 146，不改回比特浏览器。
@@ -54,6 +54,8 @@ VPS → SSH / 3x-ui / VLESS + Reality → Karing → AdsPower 本机 HTTP 入口
 ## 注册与登录前自检
 
 进入 Claude 注册、已有账号登录、手机首次登录或 Claude Code 首次授权前，读取并执行 `references/06-before-login.md`。先向用户展示简短清单和“让 AI 帮我检查 / 我提供截图供 AI 核对”选项；已有明确检查指令则直接执行。逐项核对指纹浏览器、电脑与手机时区、IP 检测评分、IPv6、WebRTC、DNS、实际出口和断线行为，记录实际结果，完成适用项目后再继续。没测到的项目不能写通过；手机暂不使用时记录待首次登录前补检。
+
+**时区必须主动强调并逐项确认。**按自检章节分别检查 Mac 与 iPhone：自动设置时区／自动设置已关闭、手动城市与实际节点地区一致、定位服务 → 系统服务 →「设定时区」已关闭；再返回日期与时间页面复查城市，并单独检查浏览器实际时区。不要只问“改好时区了吗”或凭一次显示洛杉矶判通过；未看到的开关记“未验证”，适用设备三项和复查完成后才通过。手机首次登录或订阅前补检，电脑结果不能代替手机。具体路径见浏览器与 iPhone 章节，不要求关闭整个定位服务或 Mac 自动校时，不把时区差异说成确定的封号原因。
 
 Claude Code 默认浏览器打开授权页时，提醒用户在输入账号前把完整授权链接转到已配置并检查过的指纹浏览器；默认就是该环境则不必搬链接。网页授权后另行验证终端请求路径。
 

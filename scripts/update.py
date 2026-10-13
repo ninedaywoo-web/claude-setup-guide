@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """Check a public GitHub guide; apply only a user-approved, pinned commit."""
-import argparse, base64, hashlib, io, json, os, re, shutil, stat, subprocess, sys, tempfile, urllib.request, zipfile
+import argparse, base64, hashlib, io, json, math, os, re, shutil, stat, subprocess, sys, tempfile, time, urllib.request, zipfile
+from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 REPO = 'ninedaywoo-web/claude-setup-guide'
 ROOT = Path(__file__).resolve().parents[1]
 LIMIT = 250 * 1024 * 1024
+CHECK_INTERVAL = 24 * 60 * 60
+CACHE_SCHEMA = 1
+CACHE_PATH = Path('.local/update-check.json')
 class UpdateError(Exception): pass
 class Redirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
@@ -96,18 +100,114 @@ def replace_package(root,new):
         raise
     return backup
 
-def check(root,auth):
-    local=json.loads((root/'version.json').read_text())
-    commit=request('git/ref/heads/main',auth)['object']['sha']
-    remote=file_json('version.json',commit,auth)
-    changed=remote['version']!=local['version']
-    return {'status':'update_available' if changed else 'current','local_version':local['version'],'remote_version':remote['version'],'commit':commit,'summary':remote.get('summary',[]),'recommendation':'建议更新；请先询问用户。' if changed else '当前版本与远端版本一致。','apply_command':f'python3 scripts/update.py apply --commit {commit}' if changed else None}
+def version_parts(value):
+    if not isinstance(value,str) or not re.fullmatch(r'\d+(?:\.\d+){0,2}',value):
+        raise UpdateError('版本号格式不支持，请使用数字版本号，例如 1.0.9。')
+    parts=tuple(int(part) for part in value.split('.'))
+    return parts+(0,)*(3-len(parts))
+
+def version_result(local_version,remote,commit):
+    if not isinstance(commit,str) or not re.fullmatch('[a-f0-9]{40}',commit):
+        raise UpdateError('远端提交标识无效，未生成更新命令。')
+    if remote.get('repository',REPO)!=REPO:
+        raise UpdateError('仓库标识不一致。')
+    local_parts=version_parts(local_version)
+    remote_version=remote['version']
+    remote_parts=version_parts(remote_version)
+    status='update_available' if remote_parts>local_parts else 'local_ahead' if remote_parts<local_parts else 'current'
+    summary=remote.get('summary',[])
+    if not isinstance(summary,list) or not all(isinstance(item,str) for item in summary):
+        raise UpdateError('远端更新摘要格式无效。')
+    recommendations={
+        'update_available':'建议更新；用户同意后再更新。',
+        'local_ahead':'本地版本高于远端版本，无需更新，不建议回退。',
+        'current':'当前版本与远端版本一致。',
+    }
+    return {
+        'status':status,'local_version':local_version,'remote_version':remote_version,
+        'commit':commit,'summary':summary,'recommendation':recommendations[status],
+        'update_notice':f'已有最新更新（v{remote_version}），建议更新。' if status=='update_available' else None,
+        'apply_command':f'python3 scripts/update.py apply --commit {commit}' if status=='update_available' else None,
+    }
+
+def failed_check(local_version,status='unavailable'):
+    return {
+        'status':status,'local_version':local_version,'update_notice':None,'apply_command':None,
+        'message':'本次未能检查更新。继续使用本地教程；可运行 python3 scripts/update.py check --force 重试。',
+    }
+
+def cached_check(root,local_version,now):
+    try:
+        record=json.loads((root/CACHE_PATH).read_text())
+        if record['schema']!=CACHE_SCHEMA or record['repository']!=REPO or record['local_version']!=local_version:
+            return None
+        checked_at=record['checked_at']
+        if isinstance(checked_at,bool) or not isinstance(checked_at,(int,float)) or not math.isfinite(checked_at):
+            return None
+        if not 0<=now-checked_at<CHECK_INTERVAL:
+            return None
+        previous=record['result']
+        if previous['status'] in {'current','update_available','local_ahead'}:
+            # Rebuild the notice and command; never execute instructions stored in a cache.
+            result=version_result(local_version,{'version':previous['remote_version'],'summary':previous['summary']},previous['commit'])
+            if result['status']!=previous['status']:
+                return None
+        elif previous['status'] in {'unavailable','not_updated'}:
+            result=failed_check(local_version,previous['status'])
+        else:
+            return None
+        return result,checked_at
+    except (OSError,ValueError,TypeError,KeyError,UpdateError):
+        return None
+
+def cache_check(root,local_version,result,checked_at):
+    cache=root/CACHE_PATH
+    temporary=None
+    try:
+        cache.parent.mkdir(parents=True,exist_ok=True)
+        record={'schema':CACHE_SCHEMA,'repository':REPO,'local_version':local_version,'checked_at':checked_at,'result':result}
+        with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8',prefix='.update-check-',suffix='.json',dir=cache.parent,delete=False) as out:
+            temporary=Path(out.name)
+            json.dump(record,out,ensure_ascii=False,indent=2)
+            out.write('\n')
+        temporary.replace(cache)
+        return True
+    except OSError:
+        return False
+    finally:
+        if temporary is not None:
+            try:temporary.unlink(missing_ok=True)
+            except OSError:pass
+
+def check(root,auth,force=False,now=None):
+    local_version=json.loads((root/'version.json').read_text())['version']
+    now=time.time() if now is None else now
+    saved=None if force else cached_check(root,local_version,now)
+    if saved is not None:
+        result,checked_at=saved
+        cache_saved=True
+    else:
+        try:
+            commit=request('git/ref/heads/main',auth)['object']['sha']
+            remote=file_json('version.json',commit,auth)
+            result=version_result(local_version,remote,commit)
+        except UpdateError:
+            result=failed_check(local_version,'not_updated')
+        except Exception:
+            # Do not expose remote responses, credentials, or network errors.
+            result=failed_check(local_version)
+        checked_at=now
+        cache_saved=cache_check(root,local_version,result,checked_at)
+    return dict(result,cached=saved is not None,cache_saved=cache_saved,
+                checked_at=datetime.fromtimestamp(checked_at,timezone.utc).isoformat(),
+                next_check_at=datetime.fromtimestamp(checked_at+CHECK_INTERVAL,timezone.utc).isoformat())
 
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('action',choices=['check','apply']);ap.add_argument('--commit');args=ap.parse_args()
+    ap=argparse.ArgumentParser();ap.add_argument('action',choices=['check','apply']);ap.add_argument('--commit');ap.add_argument('--force',action='store_true',help='check 时忽略 24 小时缓存，立即重新联网');args=ap.parse_args()
+    if args.force and args.action!='check':ap.error('--force 仅适用于 check。')
     try:
         auth=None  # Public repository: no login or credential lookup required.
-        if args.action=='check':result=check(ROOT,auth)
+        if args.action=='check':result=check(ROOT,auth,force=args.force)
         else:
             if not args.commit or not re.fullmatch('[a-f0-9]{40}',args.commit):raise UpdateError('请使用刚才检查到并经用户同意的完整提交 SHA。')
             meta=file_json('version.json',args.commit,auth)
@@ -123,5 +223,5 @@ def main():
         # Never log headers, credentials, response bodies, or credential-helper stderr.
         result={'status':'unavailable','message':'本次无法检查或下载更新。请稍后重试，或从公开仓库下载最新 ZIP。继续使用本地教程。'}
     print(json.dumps(result,ensure_ascii=False,indent=2))
-    return 0 if result['status'] in {'current','update_available','updated'} else 2
+    return 0 if result['status'] in {'current','local_ahead','update_available','updated'} else 2
 if __name__=='__main__':sys.exit(main())

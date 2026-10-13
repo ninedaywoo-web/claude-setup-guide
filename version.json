@@ -1,10 +1,14 @@
 {
-  "version": "1.0.8",
-  "published_at": "2026-10-12",
+  "version": "1.0.9",
+  "published_at": "2026-10-13",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "DMIT 缺货时优先搬瓦工 USCA_9 1GB（49.99 美元/季），其次 AKILE LAXPremium-Mini（79.99 元/月）",
-    "先匹配优化线路与网络用途，不强制升级至 2GB；AKILE 使用无推广参数的官网入口"
+    "强化 Mac 与 iPhone 时区提醒和核验：关闭自动设置、手动选节点城市、关闭定位服务的设定时区，并复查实际城市",
+    "新增调用时每天最多检查一次更新，并在回答末尾提醒已有新版",
+    "支持 check --force 立即重查，修正旧版本误报更新并保留用户确认与进度备份",
+    "新增 Ping0 节点检测入口及检测凭证记录流程",
+    "区分 Ping0 风控值与 Claude 检测分数，记录实际结果与脱敏截图",
+    "移除 VoyraCloud；DMIT 缺货首推搬瓦工，AKILE 与 Hostinger KVM 1 并列推荐"
   ]
 }

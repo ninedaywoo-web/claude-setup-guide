@@ -13,7 +13,98 @@ class UpdateTests(unittest.TestCase):
    with patch.object(u,'request',return_value={'object':{'sha':'a'*40}}),patch.object(u,'file_json',return_value={'version':'1.1.0','summary':['新增']}):
     self.assertEqual(u.check(p,None)['status'],'update_available')
    with patch.object(u,'request',return_value={'object':{'sha':'a'*40}}),patch.object(u,'file_json',return_value={'version':'1.0.0'}):
-    self.assertEqual(u.check(p,None)['status'],'current')
+    self.assertEqual(u.check(p,None,force=True)['status'],'current')
+ def test_version_order_and_no_downgrade(self):
+  for local,remote,status in [('1.0.9','1.0.10','update_available'),('1.0.10','1.0.9','local_ahead'),('1.0.9','1.0.9','current')]:
+   with self.subTest(local=local,remote=remote):
+    result=u.version_result(local,{'version':remote},'a'*40)
+    self.assertEqual(result['status'],status)
+    if status=='update_available':
+     self.assertEqual(result['update_notice'],'已有最新更新（v1.0.10），建议更新。')
+     self.assertTrue(result['apply_command'].endswith('a'*40))
+    else:
+     self.assertIsNone(result['update_notice']);self.assertIsNone(result['apply_command'])
+ def test_cache_reused_until_24_hours_then_refreshed(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d);package(p,'1.0.0')
+   with patch.object(u,'request',return_value={'object':{'sha':'a'*40}}) as request,patch.object(u,'file_json',return_value={'version':'1.1.0','summary':['新增']}):
+    fresh=u.check(p,None,now=100000)
+    cached=u.check(p,None,now=100000+u.CHECK_INTERVAL-1)
+    self.assertFalse(fresh['cached']);self.assertTrue(cached['cached'])
+    self.assertEqual(request.call_count,1)
+    self.assertEqual(cached['update_notice'],fresh['update_notice'])
+    self.assertEqual(cached['checked_at'],fresh['checked_at'])
+    expired=u.check(p,None,now=100000+u.CHECK_INTERVAL)
+    self.assertFalse(expired['cached']);self.assertEqual(request.call_count,2)
+ def test_force_refresh_and_rebuild_cached_command(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d);package(p,'1.0.0')
+   with patch.object(u,'request',return_value={'object':{'sha':'a'*40}}) as request,patch.object(u,'file_json',return_value={'version':'1.1.0'}):
+    u.check(p,None,now=100000)
+    record=json.loads((p/u.CACHE_PATH).read_text())
+    record['result']['apply_command']='do not execute this cached command'
+    record['result']['update_notice']='untrusted cached notice'
+    (p/u.CACHE_PATH).write_text(json.dumps(record))
+    cached=u.check(p,None,now=100001)
+    self.assertEqual(cached['apply_command'],'python3 scripts/update.py apply --commit '+'a'*40)
+    self.assertEqual(cached['update_notice'],'已有最新更新（v1.1.0），建议更新。')
+    self.assertEqual(request.call_count,1)
+    self.assertFalse(u.check(p,None,force=True,now=100002)['cached'])
+    self.assertEqual(request.call_count,2)
+ def test_failed_check_cached_without_false_current_or_secret(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d);package(p,'1.0.0')
+   with patch.object(u,'request',side_effect=OSError('private-error-details')) as request:
+    fresh=u.check(p,None,now=100000)
+    cached=u.check(p,None,now=100001)
+    self.assertEqual(fresh['status'],'unavailable');self.assertEqual(cached['status'],'unavailable')
+    self.assertTrue(cached['cached']);self.assertEqual(request.call_count,1)
+    self.assertIsNone(cached['update_notice']);self.assertIsNone(cached['apply_command'])
+    self.assertNotIn('private-error-details',json.dumps(fresh))
+    self.assertIn('--force',fresh['message'])
+    u.check(p,None,force=True,now=100002);self.assertEqual(request.call_count,2)
+ def test_invalid_cache_refetched(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d);package(p,'1.0.0')
+   with patch.object(u,'request',return_value={'object':{'sha':'a'*40}}),patch.object(u,'file_json',return_value={'version':'1.1.0'}):
+    u.check(p,None,now=100000)
+   original=json.loads((p/u.CACHE_PATH).read_text())
+   invalid=[]
+   for key,value in [('repository','wrong/repo'),('schema',999),('checked_at',100002),('checked_at',float('nan'))]:
+    record=json.loads(json.dumps(original));record[key]=value;invalid.append(json.dumps(record))
+   record=json.loads(json.dumps(original));record['result']['commit']='not-a-commit';invalid.append(json.dumps(record))
+   invalid.append('invalid json')
+   for value in invalid:
+    with self.subTest(cache=value):
+     (p/u.CACHE_PATH).write_text(value)
+     with patch.object(u,'request',return_value={'object':{'sha':'b'*40}}) as request,patch.object(u,'file_json',return_value={'version':'1.2.0'}):
+      result=u.check(p,None,now=100001)
+      self.assertFalse(result['cached']);self.assertEqual(request.call_count,1)
+      self.assertEqual(result['remote_version'],'1.2.0')
+ def test_update_preserves_progress_and_invalidates_old_cache(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d)/'old';q=Path(d)/'new';package(p,'1.0.0');package(q,'1.1.0')
+   with patch.object(u,'request',return_value={'object':{'sha':'a'*40}}),patch.object(u,'file_json',return_value={'version':'1.1.0'}):
+    u.check(p,None,now=100000)
+   (p/'.local/progress.md').write_text('进度')
+   u.replace_package(p,q)
+   with patch.object(u,'request',return_value={'object':{'sha':'a'*40}}) as request,patch.object(u,'file_json',return_value={'version':'1.1.0'}):
+    result=u.check(p,None,now=100001)
+    self.assertFalse(result['cached']);self.assertEqual(result['status'],'current')
+    self.assertIsNone(result['update_notice']);self.assertEqual(request.call_count,1)
+   self.assertEqual((p/'.local/progress.md').read_text(),'进度')
+ def test_cache_write_failure_does_not_hide_network_result(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d);package(p,'1.0.0')
+   with patch.object(u,'request',return_value={'object':{'sha':'a'*40}}),patch.object(u,'file_json',return_value={'version':'1.1.0'}),patch.object(Path,'mkdir',side_effect=OSError('read only')):
+    result=u.check(p,None,now=100000)
+   self.assertEqual(result['status'],'update_available');self.assertFalse(result['cache_saved'])
+ def test_invalid_remote_sha_never_generates_apply_command(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d);package(p,'1.0.0')
+   with patch.object(u,'request',return_value={'object':{'sha':'bad-sha'}}),patch.object(u,'file_json',return_value={'version':'1.1.0'}):
+    result=u.check(p,None,now=100000)
+   self.assertEqual(result['status'],'not_updated');self.assertIsNone(result['apply_command'])
  def test_progress_and_backup(self):
   with tempfile.TemporaryDirectory() as d:
    p=Path(d)/'old';q=Path(d)/'new';package(p,'1');package(q,'2');(p/'.local').mkdir();(p/'.local/progress.md').write_text('进度')

@@ -146,7 +146,7 @@
 
 先自查。余额够不够（别忘了税）？登的是不是正确的账号？设置里的“屏幕使用时间”有没有限制 App 内购买？这几项我都中招过。
 
-自查都没问题，就找苹果客服。在浏览器里先登录 id.apple.com，再开一个标签页打开 getsupport.apple.com，依次选 App Store → 订阅和购买 → 无法购买，然后发起在线聊天。
+自查都没问题，进入[Apple 购买受限：Codex 带办人工支持](07-apple-purchase-support.md)。用户希望代办时，由 Codex 操作本机 Chrome，优先走 **Get Support → App Store → Subscriptions & Purchases → Unable to purchase → Continue → Get more help → Live Chat**，按当前页面选择对应入口；备用入口和完整聊天流程见该章。
 
 ![](../assets/images/apple/18.jpg)
 
@@ -154,13 +154,13 @@
 
 用英文说清楚情况就行，不用写得很复杂，意思到了就好：
 
-I'm using a legitimate Apple Gift Card with sufficient balance, but I get a "Cannot Complete Purchase" error when subscribing in the App Store. Could you help check if there's a purchase restriction on my account?
+I’m trying to purchase a subscription in the App Store, but I receive "Cannot Complete Purchase." Could you please review the purchase attempt and check whether there is a purchase restriction on my Apple Account?
 
-我用的是一张正规的苹果礼品卡，余额充足，但在 App Store 订阅时出现“无法完成购买”的错误。你能帮我查查我的账户是否有购买限制吗？
+我在 App Store 订阅时出现“无法完成购买”的错误。请帮我复核这次购买尝试，并查一下账户是否有购买限制。付款来源和余额核实后，再补充对应事实。
 
-英文不好就用翻译工具，客服很耐心。
+Codex 负责起草、读取并回复客服消息，用户负责登录、登录验证码、Support PIN 的生成和输入，以及本人核验。沟通用用户确认的事实，具体分工与可复制提示词见[人工支持章节](07-apple-purchase-support.md)。
 
-客服一般会要一个 4 位数的支持 PIN 码，用来确认账号是你本人的。生成方法：在 id.apple.com 的“登录与安全”里拉到最底下，点“支持 PIN 码”，再点生成。PIN 有时效，生成后尽快发给客服。我遇到过两次，都是聊天当场就解决了。
+客服可能要求一个 4 位数的 Support PIN。保留聊天窗口，另开 [account.apple.com](https://account.apple.com/)，用户登录同一个账户，在页面底部找到 Support PIN → Generate PIN，并亲自将 PIN 输入当前官方客服聊天窗口。随后由 Codex 继续沟通，问清处理结果、等待时长与起点、期间的购买安排和到期跟进方式。常见经验为 72 小时，具体按本次客服确认安排；记录明确的重试日期与时区，付款后再核对权益。
 
 这里也能看出为什么我一直推荐自己注册账号：账号是你本人的，找客服时才说得清楚。用买来的号，连身份都证明不了。
 

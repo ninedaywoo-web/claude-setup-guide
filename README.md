@@ -14,6 +14,8 @@ AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指
 
 准备在 iPhone 使用 Claude 或通过 App Store 订阅时，AI 会主动进入手机网络配置关卡，优先用 Codex Computer Use 操作 iPhone 镜像完成节点导入和设置。镜像有问题先尽可能排查修复，确认无法使用才采用替代方式。小火箭默认使用「全局路由 → 代理」并开启 VPN，手机网络和时区单独验收后再继续；电脑检查结果不能代替手机。
 
+Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-apple-purchase-support.md)，由 Codex 进入官方客服并沟通购买问题，用户完成登录和 Support PIN 输入；客服答复、等待起点、具体重试时间和到期跟进记入本机进度。
+
 想自己看，打开[教程首页](references/00-start.md)，或者阅读随交付包提供的分篇 PDF。每篇原文档对应一份 PDF，共六份：使用说明与目录、网络部署、浏览器与 iPhone 配置、Apple 账号与内购、退款申诉与清理、AI 带做指南。Markdown 和 PDF 是同一套内容的两种阅读方式。
 
 本仓库已公开。任何人都可以直接查看、下载和检查更新，不需要申请访问权限，也不需要登录 GitHub。你可以把仓库链接交给能读取 GitHub 的 AI，让它从 SKILL.md 开始；暂时无法联网时，继续使用已下载的本地教程。
@@ -57,7 +59,7 @@ python3 scripts/update.py check --force
 ## 文件说明
 
 - `SKILL.md`：AI 的带做入口。
-- `references/`：六篇本地说明与完整图文教程。
+- `references/`：本地说明与完整图文教程，包含登录前自检和 Apple 人工支持带办。
 - `assets/images/`：本地配图。
 - `assets/progress-template.md`：进度模板。
 - `scripts/update.py`：24 小时检查缓存、回答末尾提醒文本及经确认后的更新；`check --force` 可立即重查。

@@ -1,5 +1,7 @@
 # Claude 退款、封号申诉与旧账号清理
 
+App Store 提示无法购买或购买未完成时，先按[Apple 购买受限人工支持](07-apple-purchase-support.md)请求 Apple 复核。下面的封号申诉处理 Claude 账号；Apple 退款处理已经发生的订阅订单，按实际问题选择对应流程。
+
 ## 退款申请
 
 **Claude 被封后，Apple 退款完整流程**

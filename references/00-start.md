@@ -38,6 +38,8 @@ AdsPower、本机 HTTP 代理、邮箱与 Claude 注册，以及 iPhone 镜像�
 
 Apple 账号准备、App Store 登录、礼品卡充值和 App 内订阅。
 
+购买未完成、无法购买或需要 Apple 复核时，进入[Apple 购买受限人工支持](07-apple-purchase-support.md)：Codex 负责官方入口与客服沟通，用户负责登录和 Support PIN 输入，记录处理答复与具体重试安排。
+
 ### 2.4 [退款、封号申诉与旧账号清理](04-recovery.md)
 
 按付款渠道申请退款、准备申诉资料，以及备份和清理登录残留。“退出旧账号”的独立操作段落待补充。

@@ -1,10 +1,10 @@
 {
-  "version": "1.0.5",
+  "version": "1.0.6",
   "published_at": "2026-10-12",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "关键操作默认使用简短说明＋对应教程图片",
-    "每次只展示当前步骤的配图，按客户本地路径显示"
+    "新增 Karing REALITY 握手失败排查和已验证的修复案例",
+    "部署前核对版本兼容性；先核对参数和旧代理干扰，再修复并实测"
   ]
 }

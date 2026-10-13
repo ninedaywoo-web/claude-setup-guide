@@ -45,6 +45,7 @@ VPS → SSH / 3x-ui / VLESS + Reality → Karing → AdsPower 本机 HTTP 入口
 - 基准是文档 DMIT LAX.AN5.Pro.TINY：1 vCPU、2 GB、20 GB、独立 IPv4、1000 GB、1 Gbps、9.99 美元/月。购买时重查官网，不把他家最低价直接当成同等方案。
 - 用户选好商家后、付款前，按带做指南 3.1 查 Claude Code 当前官方要求和该商家的两档实际费用，比较“文档推荐套餐”与“预留云端运行的套餐”，再问一次要不要预留。默认不升级，不把云端部署说成防封保证，不擅自换地区或线路。这里只做选型，云端安装不是当前已交付流程。
 - VLESS 链接交给 Karing；AdsPower 填 Karing 实际开放的本机 HTTP 地址与端口。SSH 凭据、VLESS 参数、浏览器 HTTP 代理不是同一套配置。禁止照抄截图中的 IP、端口、密码。
+- Mac 部署前核对 Karing 与服务端 Xray 的 REALITY 版本兼容情况。出现 `reality verification failed` 时，执行 `references/01-network.md` 第十节：先核对参数、服务状态及旧代理干扰，再按实际证据采用历史成功组合；不凭单条报错自动降级或换客户端。参数使用导出链接或读取配置，不看截图手抄公钥。
 - Mac 用 Karing 与 AdsPower 路线。Windows 根据对应客户端确认 HTTP 入口。浏览器内核用当前稳定版，不强制 146，不改回比特浏览器。
 - 检查实际出口、IPv6 / DNS / WebRTC、时区语言和断线行为。浏览器、手机、Claude Code 分开验证；节点中断和 Karing 关闭分别检查。仅有代理检测成功或浏览器登录成功不算整条链路完成。
 - 完成某阶段必须有实际观察结果，不凭“应该可以”记录成功。

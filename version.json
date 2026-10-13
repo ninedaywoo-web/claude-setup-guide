@@ -1,10 +1,10 @@
 {
-  "version": "1.0.6",
+  "version": "1.0.7",
   "published_at": "2026-10-12",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "新增 Karing REALITY 握手失败排查和已验证的修复案例",
-    "部署前核对版本兼容性；先核对参数和旧代理干扰，再修复并实测"
+    "新增 AKILE Cloud 推荐入口",
+    "DMIT 缺货时按搬瓦工、AKILE Cloud、VoyraCloud 的顺序推荐，同步总说明与 AI 带做指南"
   ]
 }

@@ -41,7 +41,7 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Karing
 
 VPS → SSH / 3x-ui / VLESS + Reality → Karing → AdsPower 本机 HTTP 入口 → 邮箱及 Claude → 按需 iPhone / Apple 内购 → 按需 Claude Code。
 
-- VPS 是可 SSH 登录、可安装 Linux 程序的服务器。DMIT 缺货时可对照搬瓦工或 VoyraCloud，不改成机场订阅、成品代理或共享节点。CN2 GIA 是线路名，不是部署必需的软件或套餐关键词。
+- VPS 是可 SSH 登录、可安装 Linux 程序的服务器。DMIT 缺货时，按搬瓦工（质量优先）→ AKILE Cloud → VoyraCloud 的顺序对照备选；入口见 references/01-network.md，不改成机场订阅、成品代理或共享节点。CN2 GIA 是线路名，不是部署必需的软件或套餐关键词。
 - 基准是文档 DMIT LAX.AN5.Pro.TINY：1 vCPU、2 GB、20 GB、独立 IPv4、1000 GB、1 Gbps、9.99 美元/月。购买时重查官网，不把他家最低价直接当成同等方案。
 - 用户选好商家后、付款前，按带做指南 3.1 查 Claude Code 当前官方要求和该商家的两档实际费用，比较“文档推荐套餐”与“预留云端运行的套餐”，再问一次要不要预留。默认不升级，不把云端部署说成防封保证，不擅自换地区或线路。这里只做选型，云端安装不是当前已交付流程。
 - VLESS 链接交给 Karing；AdsPower 填 Karing 实际开放的本机 HTTP 地址与端口。SSH 凭据、VLESS 参数、浏览器 HTTP 代理不是同一套配置。禁止照抄截图中的 IP、端口、密码。

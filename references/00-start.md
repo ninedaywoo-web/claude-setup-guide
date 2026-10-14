@@ -10,7 +10,7 @@
 
 ### 1.1 Claude IP 纯净度检测
 
-[打开检测网站](https://ip.net.coffee/claude/)。使用计划注册时的网络检测，文档建议达到 80 分以上再注册。
+[打开检测网站](https://ip.net.coffee/claude/)。使用计划注册时的网络检测，文档建议分数约 80 或更高，结合其余检查再登录。
 
 ### 1.2 账号购买网站
 
@@ -24,6 +24,16 @@
 
 Ping0 的风控值越低表示该站评估的风险越低，与前面 Claude 检测的“80 分以上”不是同一个量表。它的结果作为辅助证据，仍需完成实际出口、IPv6、DNS、WebRTC 和断线行为检查。
 
+### 1.4 Scamalytics 风险对照
+
+[打开 Scamalytics](https://scamalytics.com/ip)，查询当前代理出口 IP，建议风险值低于 10。三站分别记录：NetCoffee 约 80 分或更高；Ping0 风险值低于 30 可接受参考、优先低于 25；Scamalytics 低于 10。不能将高分和低风险数值直接平均。
+
+### 1.5 Google 账号与默认交付路线
+
+开始时先确认有没有自己可用的 Google 账号；没有则从[购号网站](https://chuhai91.cc)选择商家标明的美区 Google 账号。交付串和 2FA 使用方法见[Google 账号准备](08-google-account.md)。账号由用户自己保管，不发给 AI。
+
+默认顺序：账号与设备准备 → VPS → Karing（系统代理关闭、TUN＋全局开启）→ AdsPower → iPhone 镜像与小火箭全局代理 → Apple 账户／礼品卡检查及新号约两天等待 → 手机 Google 登录 → 可选电脑免费使用约两天 → 手机订阅 Pro → 电脑同一账号权益与对话验收。手机主要用于登录和订阅，Claude Code 教学不在交付范围。
+
 ## 2. 配置教程
 
 ### 2.1 [纯净魔法从零部署](01-network.md)
@@ -36,7 +46,7 @@ AdsPower、本机 HTTP 代理、邮箱与 Claude 注册，以及 iPhone 镜像�
 
 ### 2.3 [Apple 账号、礼品卡与内购](03-apple.md)
 
-Apple 账号准备、App Store 登录、礼品卡充值和 App 内订阅。网络自检通过后，单独确认账户新旧；根据客户反馈，新注册或刚接手的成品号建议先正常使用一到两天，再充值和订阅。
+Apple 账号准备、App Store 登录、礼品卡充值和 App 内订阅。网络自检通过后，单独确认账户新旧；根据客户反馈，新注册或刚接手的成品号建议先正常使用约两天，再充值和订阅。
 
 购买未完成、无法购买或需要 Apple 复核时，进入[Apple 购买受限人工支持](07-apple-purchase-support.md)：Codex 负责官方入口与客服沟通，用户负责登录和 Support PIN 输入，记录处理答复与具体重试安排。
 

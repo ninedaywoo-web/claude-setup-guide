@@ -1,12 +1,11 @@
 {
-  "version": "1.0.13",
+  "version": "1.0.14",
   "published_at": "2026-10-14",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "统一电脑 TUN＋全局、关闭系统代理，浏览器配置后直接进入手机",
-    "提前准备 Google 账号，补齐交付字段及 2FA 操作；Apple 新号建议等待约两天",
-    "默认手机 Google 登录、先 Pro、可选免费体验约两天，电脑权益与对话验收后完成交付",
-    "纳入 NetCoffee、Ping0、Scamalytics 三站参考值和分项检查；Claude Code 教学移出主线"
+    "明确核对电脑、iPhone 和 AdsPower 三处时区规则一致，并对应 VPS 出口地区",
+    "补充简体中文交流，以及电脑手机可一起改英文、提前说明使用不便的语言建议",
+    "小火箭代理模式作为本教程默认路线，明确选择其他模式时仍按实际网络路径验收"
   ]
 }

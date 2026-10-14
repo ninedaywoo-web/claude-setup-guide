@@ -1,10 +1,10 @@
 {
-  "version": "1.0.15",
+  "version": "1.0.16",
   "published_at": "2026-10-14",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "新增搬瓦工注册与 AKILE 套餐选购图解、两份可保存的 PDF",
-    "购买 VPS 时主动展示当前步骤图片，用户完成注册验证与付款后继续部署"
+    "修复部署时过早关闭旧 VPN 导致 Codex 失联的问题：先保留旧连接单独测通新节点，再切换复验",
+    "冲突排查和断线测试前，明确提醒用户如何手动恢复旧连接"
   ]
 }

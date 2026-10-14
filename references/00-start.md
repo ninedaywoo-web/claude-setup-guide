@@ -36,7 +36,7 @@ AdsPower、本机 HTTP 代理、邮箱与 Claude 注册，以及 iPhone 镜像�
 
 ### 2.3 [Apple 账号、礼品卡与内购](03-apple.md)
 
-Apple 账号准备、App Store 登录、礼品卡充值和 App 内订阅。
+Apple 账号准备、App Store 登录、礼品卡充值和 App 内订阅。网络自检通过后，单独确认账户新旧；根据客户反馈，新注册或刚接手的成品号建议先正常使用一到两天，再充值和订阅。
 
 购买未完成、无法购买或需要 Apple 复核时，进入[Apple 购买受限人工支持](07-apple-purchase-support.md)：Codex 负责官方入口与客服沟通，用户负责登录和 Support PIN 输入，记录处理答复与具体重试安排。
 

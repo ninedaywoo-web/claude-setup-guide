@@ -89,6 +89,8 @@ Support PIN 的官方步骤见 [Apple 账户确认说明](https://support.apple.
 
 > Thank you. Has this purchase attempt been escalated for review? How long should I wait, and when does the waiting period start? Should I pause purchase attempts during that time? Will I receive a notification, or should I retry after the waiting period? If it still fails, how should I follow up using this case number?
 
+新账户充值和订阅前的一到两天使用建议，与本次购买受限后的等待是两回事。已经购买受限时，按本次客服安排处理，不重新套用新号等待。
+
 常见经验是等待 **72 小时**，也有较长等待的情况；本次时长、起点、是否暂停购买、是否通知和到期操作，按当前客服确认的内容填写。客服只说“等 72 小时”时补问起点；给出范围时记录原范围并确认建议何时重试。
 
 将起点和用户实际使用的时区写清楚，换算出具体重试日期和时间，再向用户复述。客服没有确认的安排留作待问项。结束前请用户在本机保存案件号与脱敏聊天凭证，进度只保存其本机路径。

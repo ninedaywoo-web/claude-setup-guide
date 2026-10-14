@@ -24,6 +24,8 @@ Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-
 
 本仓库已公开。任何人都可以直接查看、下载和检查更新，不需要申请访问权限，也不需要登录 GitHub。你可以把仓库链接交给能读取 GitHub 的 AI，让它从 SKILL.md 开始；暂时无法联网时，继续使用已下载的本地教程。
 
+购买 VPS 时，AI 会按所选商家主动展示[搬瓦工注册与 AKILE 选购图解](references/09-vps-purchase.md)。也可直接保存[搬瓦工注册 PDF](assets/vps-purchase/bandwagon-registration.pdf) 和 [VPS 选购 PDF](assets/vps-purchase/vps-purchase-guide.pdf)。
+
 ## 安装成 Skill
 
 可以直接把项目文件夹交给 AI，无需安装。若希望在 Codex 中长期使用，可让 Codex 将整个 `claude-setup-guide` 目录安装到自己的 `~/.agents/skills/` 下，再用 `$claude-setup-guide` 开始。安装位置已有同名目录时先检查，不覆盖已有进度。

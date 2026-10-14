@@ -1,11 +1,10 @@
 {
-  "version": "1.0.14",
+  "version": "1.0.15",
   "published_at": "2026-10-14",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "明确核对电脑、iPhone 和 AdsPower 三处时区规则一致，并对应 VPS 出口地区",
-    "补充简体中文交流，以及电脑手机可一起改英文、提前说明使用不便的语言建议",
-    "小火箭代理模式作为本教程默认路线，明确选择其他模式时仍按实际网络路径验收"
+    "新增搬瓦工注册与 AKILE 套餐选购图解、两份可保存的 PDF",
+    "购买 VPS 时主动展示当前步骤图片，用户完成注册验证与付款后继续部署"
   ]
 }

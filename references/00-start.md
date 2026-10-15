@@ -36,7 +36,7 @@ Ping0 的风控值越低表示该站评估的风险越低，与前面 Claude 检
 
 开始时先确认有没有自己可用的 Google 账号；没有则提供[原有购号网站](https://chuhai91.cc)及 [Google 账号补充渠道 GmailBuy](https://gmailbuy.com/)，选择商家标明的美区 Google 账号。交付串和 2FA 使用方法见[Google 账号准备](08-google-account.md)。账号由用户自己保管，不发给 AI。
 
-默认顺序：账号与设备准备 → VPS → Karing（系统代理关闭、TUN＋全局开启）→ AdsPower → iPhone 镜像与小火箭全局代理 → Apple 账户／礼品卡检查及新号约两天等待 → 手机 Google 登录 → 可选电脑免费使用约两天 → 手机订阅 Pro → 电脑同一账号权益与对话验收。手机主要用于登录和订阅，Claude Code 教学不在交付范围。
+默认顺序：账号与设备准备 → VPS → Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 按平台带做 iPhone 小火箭全局代理 → Apple 账户／礼品卡检查及新号约两天等待 → 手机 Google 登录 → 可选电脑免费使用约两天 → 手机订阅 Pro → 电脑同一账号权益与对话验收。手机主要用于登录和订阅，Claude Code 教学不在交付范围。
 
 ## 2. 配置教程
 
@@ -46,7 +46,7 @@ Ping0 的风控值越低表示该站评估的风险越低，与前面 Claude 检
 
 ### 2.2 [指纹浏览器与 iPhone 网络配置](02-browser-iphone.md)
 
-AdsPower、本机 HTTP 代理、邮箱与 Claude 注册，以及 iPhone 镜像带做、网络、时区和客户端检查。手机首次注册、登录或订阅前，优先由 Codex Computer Use 操作镜像导入节点；镜像问题先排查修复，小火箭默认使用「全局路由 → 代理」并完成手机独立验收。
+AdsPower、本机 HTTP 代理、邮箱与 Claude 注册，以及 iPhone 镜像带做、网络、时区和客户端检查。手机首次注册、登录或订阅前，Mac 优先由 Codex Computer Use 操作镜像导入节点并排查镜像问题；Windows 默认图解和截图带做，小火箭默认使用「全局路由 → 代理」并完成手机独立验收。
 
 ### 2.3 [Apple 账号、礼品卡与内购](03-apple.md)
 
@@ -61,6 +61,10 @@ Apple 账号准备、App Store 登录、礼品卡充值和 App 内订阅。网�
 ### 2.5 [注册／登录前自检](06-before-login.md)
 
 在注册、登录 Claude 或授权 Claude Code 前，让 AI 核对浏览器、电脑与手机时区、IP 检测评分、IPv6、WebRTC、DNS 和断线行为；未完成的先补齐。
+
+### 2.6 [Windows 专门流程](10-windows.md)
+
+Windows 本机连接 Linux VPS，默认用 v2rayN 与 AdsPower。先保留旧 VPN 测新节点，再切换 TUN＋全局，检查实际出口与 Codex 新回复。Windows＋iPhone 用图解带做；仅 Android 先确认订阅途径。真实 Windows 整机验收仍待完成。
 
 ## 3. 给 AI 的带做说明
 

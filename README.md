@@ -1,6 +1,6 @@
 # Claude Max 防封奶妈级教程
 
-这是客户交付的离线图文教程和 AI 带做 Skill。正文、51 张配图均在项目内，不需要打开在线文档。
+这是客户交付的离线图文教程和 AI 带做 Skill。正文、57 张配图及 2 份 VPS 图解 PDF 均在项目内，不需要打开在线文档。
 
 ## 给 AI 的入口
 
@@ -10,11 +10,11 @@
 
 下载完整项目并解压，把整个文件夹交给 Codex 或其他能读取本地文件的 AI。打开 [SKILL.md](SKILL.md)，AI 就知道该做什么，不需要自己写长提示词。只上传 SKILL.md 单个文件会缺少配套教程，请保留完整目录。
 
-本次交付默认采用：前面确认 Google 账号 → VPS 与 Karing（系统代理关闭、TUN＋全局开启）→ AdsPower → 手机小火箭全局代理 → Apple 账户准备 → 手机 Google 登录并订阅 Pro → 回电脑验收权益与正常对话。手机主要用于登录和订阅，Claude Code 安装与使用教学不在本次交付内。没有 Google 账号时，按[账号与两步验证说明](references/08-google-account.md)准备。
+本次交付默认采用：前面确认 Google 账号 → VPS 与 Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 手机小火箭全局代理 → Apple 账户准备 → 手机 Google 登录并订阅 Pro → 回电脑验收权益与正常对话。手机主要用于登录和订阅，Claude Code 安装与使用教学不在本次交付内。没有 Google 账号时，按[账号与两步验证说明](references/08-google-account.md)准备。
 
 AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指纹浏览器与 iPhone 网络配置](references/02-browser-iphone.md)，再了解你的设备和进度，每次只带一小步。做完发截图或口述结果即可。Apple、退款和申诉在需要时再读。
 
-准备在 iPhone 使用 Claude 或通过 App Store 订阅时，AI 会主动进入手机网络配置关卡，优先用 Codex Computer Use 操作 iPhone 镜像完成节点导入和设置。镜像有问题先尽可能排查修复，确认无法使用才采用替代方式。小火箭默认使用「全局路由 → 代理」并开启 VPN，手机网络和时区单独验收后再继续；电脑检查结果不能代替手机。
+准备在 iPhone 使用 Claude 或通过 App Store 订阅时，AI 会主动进入手机网络配置关卡，Mac 优先用 Codex Computer Use 操作 iPhone 镜像，镜像有问题先排查；Windows 默认图解与截图带做，不要求 Apple 原生镜像。小火箭默认使用「全局路由 → 代理」并开启 VPN，手机网络和时区单独验收后再继续；电脑检查结果不能代替手机。
 
 Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-apple-purchase-support.md)，由 Codex 进入官方客服并沟通购买问题，用户完成登录和 Support PIN 输入；客服答复、等待起点、具体重试时间和到期跟进记入本机进度。
 
@@ -25,6 +25,8 @@ Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-
 本仓库已公开。任何人都可以直接查看、下载和检查更新，不需要申请访问权限，也不需要登录 GitHub。你可以把仓库链接交给能读取 GitHub 的 AI，让它从 SKILL.md 开始；暂时无法联网时，继续使用已下载的本地教程。
 
 购买 VPS 时，AI 会按所选商家主动展示[搬瓦工注册与 AKILE 选购图解](references/09-vps-purchase.md)。也可直接保存[搬瓦工注册 PDF](assets/vps-purchase/bandwagon-registration.pdf) 和 [VPS 选购 PDF](assets/vps-purchase/vps-purchase-guide.pdf)。
+
+Windows 用户还会读取 [Windows 专门流程](references/10-windows.md)：先保留旧 VPN 测试新节点，再切换到 TUN＋全局并复验；只有 Android 时先确认订阅途径。Windows 真实整机交付验收仍待完成，本次发布不代表已实测跑通。
 
 ## 安装成 Skill
 

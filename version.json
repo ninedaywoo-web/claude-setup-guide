@@ -1,10 +1,11 @@
 {
-  "version": "1.0.17",
+  "version": "1.0.18",
   "published_at": "2026-10-14",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "新增 Google 账号补充购买渠道 GmailBuy 与 Apple ID 补充渠道 xintaikeji，保留原有渠道",
-    "首页、AI 购买提醒和对应账号准备步骤按账号类型展示补充入口"
+    "补齐 Windows 专门流程：v2rayN、保留旧 VPN 单独测试、TUN＋全局切换与实际出口复验",
+    "区分 Windows 与 Mac 的手机带做、时区和权限路径，加入重启恢复及故障回落验收",
+    "Windows 真实整机交付尚待实测；保留现有账号渠道及各版本更新机制"
   ]
 }

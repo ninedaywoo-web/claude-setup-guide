@@ -1,6 +1,6 @@
 # 本项目的 AI 入口
 
-正式教程源为公开仓库 `ninedaywoo-web/claude-setup-guide`，后续更新发布到这里。客户读取和下载不需要邀请码或申请权限。组织私有副本和激活码开通方案已停用，不作为教程更新目标。
+正式教程源为公开仓库 `ninedaywoo-web/claude-setup-guide`，后续更新发布到这里。公开版客户读取和下载不需要邀请码或申请权限。另有组织私有交付版 `ninedaywoo-course/claude-setup-guide`，按用户指定同步教程正文，保留其独立版本与鉴权更新机制；领取服务另行维护。
 
 用户要照教程开始或继续配置时，读取 SKILL.md 并按其执行。开始前必须完整阅读 references/01-network.md 和 references/02-browser-iphone.md，其余章节按阶段读。
 

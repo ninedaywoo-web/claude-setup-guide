@@ -1,5 +1,11 @@
 # 更新记录
 
+## 1.0.18 · 2026-10-14
+
+- 补齐 Windows 专门流程：v2rayN、保留旧 VPN 单独测试、TUN＋全局切换与实际出口复验。
+- 区分 Windows 与 Mac 的手机带做、时区和权限路径，加入重启恢复及故障回落验收。
+- Windows 真实整机交付尚待实测；保留现有账号渠道及各版本更新机制。
+
 ## 1.0.17 · 2026-10-14
 
 - 新增 Google 账号补充渠道 https://gmailbuy.com/ 与 Apple ID 补充渠道 https://xintaikeji.eu.org/，保留原有购号网站。

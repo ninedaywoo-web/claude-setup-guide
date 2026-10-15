@@ -1,5 +1,11 @@
 # 更新记录
 
+## 1.0.17 · 2026-10-14
+
+- 新增 Google 账号补充渠道 https://gmailbuy.com/ 与 Apple ID 补充渠道 https://xintaikeji.eu.org/，保留原有购号网站。
+- 同步教程首页、AI 主动提醒及 Google／Apple 账号准备步骤，按所需账号类型展示对应入口。
+- 本次不改变 Windows 配置流程；Windows 完善方案另行讨论与实测。
+
 ## 1.0.16 · 2026-10-14
 
 - 客户阅读版按当前正文重新生成十篇独立 PDF，另附两份原始 VPS 圈注 PDF；标注版本日期，本地打包交付，旧 PDF 已备份。

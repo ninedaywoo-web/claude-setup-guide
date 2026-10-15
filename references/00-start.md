@@ -14,7 +14,11 @@
 
 ### 1.2 账号购买网站
 
-[打开账号网站](https://chuhai91.cc)。具体可购买的账号以网站在售情况为准。
+- 原有综合账号渠道：[chuhai91](https://chuhai91.cc)。
+- Google 账号补充渠道：[GmailBuy](https://gmailbuy.com/)。
+- Apple ID 补充渠道：[xintaikeji](https://xintaikeji.eu.org/)。
+
+原有渠道保留，后两项作为补充。AI 按用户当前需要的账号类型提供对应链接；已有可用账号就复用，不要求重复购买。商品地区、交付字段、价格、库存和售后以实际商品页为准。
 
 ### 1.3 Ping0 节点检测凭证
 
@@ -30,7 +34,7 @@ Ping0 的风控值越低表示该站评估的风险越低，与前面 Claude 检
 
 ### 1.5 Google 账号与默认交付路线
 
-开始时先确认有没有自己可用的 Google 账号；没有则从[购号网站](https://chuhai91.cc)选择商家标明的美区 Google 账号。交付串和 2FA 使用方法见[Google 账号准备](08-google-account.md)。账号由用户自己保管，不发给 AI。
+开始时先确认有没有自己可用的 Google 账号；没有则提供[原有购号网站](https://chuhai91.cc)及 [Google 账号补充渠道 GmailBuy](https://gmailbuy.com/)，选择商家标明的美区 Google 账号。交付串和 2FA 使用方法见[Google 账号准备](08-google-account.md)。账号由用户自己保管，不发给 AI。
 
 默认顺序：账号与设备准备 → VPS → Karing（系统代理关闭、TUN＋全局开启）→ AdsPower → iPhone 镜像与小火箭全局代理 → Apple 账户／礼品卡检查及新号约两天等待 → 手机 Google 登录 → 可选电脑免费使用约两天 → 手机订阅 Pro → 电脑同一账号权益与对话验收。手机主要用于登录和订阅，Claude Code 教学不在交付范围。
 

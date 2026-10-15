@@ -1,10 +1,10 @@
 {
   "files": {
     ".gitignore": "29d98e57738b3097cf43d3f351df9be6766d48a0b522393e1b5437a9587988f0",
-    "AGENTS.md": "46bef98e8b7ce92186840be011cbada836b2675f7702eb8624c616c51ed7dbb4",
-    "CHANGELOG.md": "384bd9363157183cbbb4051fc442acb4fba70cb680e8ea65be8e39edc92a9919",
-    "README.md": "5db202ad1e9ce72dd6eb4215d0080bbd0835b053bc03e1a1523b9e385ce0d4d9",
-    "SKILL.md": "451bed342e4473ff7e4f8304bb0de6d8c87c24e8277843931e3b6efd1f92a99e",
+    "AGENTS.md": "51ee1129c413e2c6e5fde68129d2f5377bcb63a37cce79e4de2c87ee7ee08091",
+    "CHANGELOG.md": "296290212a2ec10412e238c30a5cd07c54770c961e0a64e5010accb3725236fa",
+    "README.md": "b2c7f9c5ee33d44c5bd51922b45a98f1e9e93d986b6127c26ff4bf5b29a8d2c7",
+    "SKILL.md": "bb0a72a4308668fdf99821e7d898e147579989795934d2949079b63027febdd5",
     "agents/openai.yaml": "77f7b07e49ad3a01d1cd9f61e5ef30867346474bb53a4af6b77a84ad6cf22014",
     "assets/images/apple/01.jpg": "f8c3ef0157153840a111cdc2654e4da8f5ddf5079502e4f28921e879f5ea1f19",
     "assets/images/apple/02.jpg": "4517e514a089d19e643323f24efd06ea843339019c3760c36029037d49eba28e",
@@ -69,21 +69,24 @@
     "docs/superpowers/specs/2026-10-13-apple-purchase-support-design.md": "fda812ba2477ac840a75e440d74f31c6bebfcbaefdd1939a37f7e05d2b67488d",
     "docs/superpowers/specs/2026-10-13-iphone-network-gate-design.md": "ee5ffae0658105f63752b44a5e621aaf94bc22456926d44e14c10f837f7a0afe",
     "docs/superpowers/specs/2026-10-13-update-notification-design.md": "35484633b13f14c772efffc39a296d2a227feb0e2e3f000294384e98b4ea50e5",
+    "docs/superpowers/specs/2026-10-15-link-start-design.md": "bb75efc8c785941316cc541ed250628ba3cb3a0b72e7c3bd95877c784daacd62",
     "references/00-start.md": "dab18763c46cfba3194ff0eff5b9455e94d61f566e287d15a1f1b9b6a5109421",
     "references/01-network.md": "12b9338962408b4c0c9ce6419c6966ea9da487c084a9e854418755c237609211",
     "references/02-browser-iphone.md": "0d24976a66e08683ef818b4746b8e65159f294aa1ffd37dd56036193719117f1",
     "references/03-apple.md": "0a9101a6b66588d6cb9ec41008b856082a717fe4f73d2c2f8bd732fa1ab8530e",
     "references/04-recovery.md": "88b06c6aa7cc05da6db1eebb7618d86b92fcd34b045b9d8be78836b755c7edd6",
-    "references/05-ai-walkthrough.md": "3f99d56214aa9bcc6d723d728b98bfcc9cd5540a29d5271a27203060c9bf853c",
+    "references/05-ai-walkthrough.md": "96fb93bb9050669e120199d75f83a84cc87300ddabd36d3ec40e95096087d312",
     "references/06-before-login.md": "6fc5a84f653f74e8ab765107b56115d0abae2f99300e4b358b24806ca238d1ed",
     "references/07-apple-purchase-support.md": "0555c775a8333e39a71782028d538c95f00a7748881506cc4ae0e979f9fecd0e",
     "references/08-google-account.md": "96c311a842a49d797480339dcbb09455b3101ed2393279d452b5849ffd5e351c",
     "references/09-vps-purchase.md": "17ee8d18993a8482617178aed9a0f499cd2545922cd9622d810979b9b21d0a24",
     "references/10-windows.md": "ad75e383b2c69667c4215d7ff7fc3d736ff4f3750f1d138f6cfee0c67ff36653",
     "references/11-android-web-pay.md": "31e0044b61d4be0757bff075cc7b62b9d4963df188a825664112d61bedefbc5c",
+    "references/12-latest-start.md": "945a25fc1a0175d539895810d449ce2ce1aa7d969186efa36af9bdd8086905a1",
     "scripts/manifest.py": "921c592e346658380b8f17c60980fb080f9356cb6ad5be690298520a765eac1d",
-    "scripts/update.py": "63cf3d90571dce6f5cc6bd2a5f607436edc8884f5e1a2c29b055f98dcce49057",
+    "scripts/update.py": "3ab376f966933d8242f6d76f3742e1835c0864fcc0267269f9d602630f038be0",
+    "tests/test_start.py": "d813d8ac97cf1f97a83f4b175a393c554f8549200f6ba6ac9e5c65852650c487",
     "tests/test_update.py": "1cd9fa34ede185cb77543e5d2be097d6b7e2e9be09ce12ce35e11eb31ab366ff",
-    "version.json": "bf0bbe36eef09ef40dabdcc9f902611290e005d4ae91f865a6dc57e91887d708"
+    "version.json": "99c0189a011fc44f95f1ffe49a8c0b23ef0c67d119f532fdbcabe0f63d24feed"
   }
 }

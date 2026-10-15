@@ -202,12 +202,66 @@ def check(root,auth,force=False,now=None):
                 checked_at=datetime.fromtimestamp(checked_at,timezone.utc).isoformat(),
                 next_check_at=datetime.fromtimestamp(checked_at+CHECK_INTERVAL,timezone.utc).isoformat())
 
+def latest_commit(auth):
+    commit=request('git/ref/heads/main',auth)['object']['sha']
+    if not isinstance(commit,str) or not re.fullmatch('[a-f0-9]{40}',commit):
+        raise UpdateError('远端提交标识无效，暂停带做。')
+    return commit
+
+def start_latest(destination,auth=None,progress_from=None):
+    """Fresh link delivery: always download, never reuse a local version/cache."""
+    dest=Path(destination).expanduser().absolute()
+    if dest.exists() or dest.is_symlink():
+        raise UpdateError('目标目录已存在，请选择新目录；旧教程和进度不覆盖。')
+    source=None
+    if progress_from is not None:
+        source=Path(progress_from).expanduser().absolute()/'.local'
+        if not source.is_dir() or source.is_symlink():
+            raise UpdateError('原进度目录不存在或为符号链接，暂停迁移。')
+        if any(p.is_symlink() or not (p.is_file() or p.is_dir()) for p in source.rglob('*')):
+            raise UpdateError('原进度包含链接或特殊文件，暂停迁移；原文件保持不变。')
+        if source==dest or source in dest.parents:
+            raise UpdateError('新教程目录不能位于原进度目录内。')
+    dest.parent.mkdir(parents=True,exist_ok=True)
+    for attempt in range(3):
+        commit=latest_commit(auth)
+        meta=file_json('version.json',commit,auth)
+        if meta.get('repository')!=REPO:
+            raise UpdateError('仓库标识不一致，暂停带做。')
+        version_parts(meta['version'])
+        expected=file_json('manifest.json',commit,auth)
+        data=request('zipball/'+commit,auth,binary=True)
+        with tempfile.TemporaryDirectory(prefix='.guide-start-',dir=dest.parent) as work:
+            new=Path(work)/'content';new.mkdir();extract_archive(data,new)
+            if json.loads((new/'version.json').read_text())!=meta or json.loads((new/'manifest.json').read_text())!=expected:
+                raise UpdateError('下载内容与远端提交不一致，暂停带做。')
+            required=['SKILL.md','references/01-network.md','references/02-browser-iphone.md','references/05-ai-walkthrough.md']
+            if any(not (new/name).is_file() for name in required):
+                raise UpdateError('下载包缺少带做所需正文，暂停带做。')
+            if latest_commit(auth)!=commit:
+                continue
+            if source is not None:
+                shutil.copytree(source,new/'.local',ignore=shutil.ignore_patterns('update-check.json','startup.json'))
+            local=new/'.local';local.mkdir(exist_ok=True)
+            receipt={'repository':REPO,'version':meta['version'],'commit':commit,
+                     'verified_at':datetime.now(timezone.utc).isoformat(),'directory':str(dest)}
+            (local/'startup.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+            if dest.exists() or dest.is_symlink():
+                raise UpdateError('目标目录已被创建，停止覆盖。')
+            new.rename(dest)
+        return dict(receipt,status='ready',read_next=str(dest/'SKILL.md'),
+                    message='已下载并校验核对时 main 的最新完整版本；请从本目录重新读取 Skill 和核心正文，再开始带做。')
+    raise UpdateError('下载期间仓库连续更新，尚未确认最新版本，请重新执行 start；暂停带做。')
+
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('action',choices=['check','apply']);ap.add_argument('--commit');ap.add_argument('--force',action='store_true',help='check 时忽略 24 小时缓存，立即重新联网');args=ap.parse_args()
+    ap=argparse.ArgumentParser();ap.add_argument('action',choices=['check','apply','start']);ap.add_argument('--commit');ap.add_argument('--destination',type=Path);ap.add_argument('--progress-from',type=Path);ap.add_argument('--force',action='store_true',help='check 时忽略 24 小时缓存，立即重新联网');args=ap.parse_args()
     if args.force and args.action!='check':ap.error('--force 仅适用于 check。')
+    if args.action=='start' and not args.destination:ap.error('start 需要 --destination 新目录。')
+    if args.action!='start' and (args.destination or args.progress_from):ap.error('--destination 和 --progress-from 仅适用于 start。')
     try:
         auth=None  # Public repository: no login or credential lookup required.
-        if args.action=='check':result=check(ROOT,auth,force=args.force)
+        if args.action=='start':result=start_latest(args.destination,auth,args.progress_from)
+        elif args.action=='check':result=check(ROOT,auth,force=args.force)
         else:
             if not args.commit or not re.fullmatch('[a-f0-9]{40}',args.commit):raise UpdateError('请使用刚才检查到并经用户同意的完整提交 SHA。')
             meta=file_json('version.json',args.commit,auth)
@@ -222,6 +276,8 @@ def main():
     except Exception:
         # Never log headers, credentials, response bodies, or credential-helper stderr.
         result={'status':'unavailable','message':'本次无法检查或下载更新。请稍后重试，或从公开仓库下载最新 ZIP。继续使用本地教程。'}
+    if args.action=='start' and result['status']!='ready':
+        result['message']='尚未完成最新完整版本下载与校验，暂停带做，不回退旧教程。'+result.get('message','').replace('继续使用本地教程。','')
     print(json.dumps(result,ensure_ascii=False,indent=2))
-    return 0 if result['status'] in {'current','local_ahead','update_available','updated'} else 2
+    return 0 if result['status'] in {'ready','current','local_ahead','update_available','updated'} else 2
 if __name__=='__main__':sys.exit(main())

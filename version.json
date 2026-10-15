@@ -1,11 +1,11 @@
 {
-  "version": "1.0.19",
-  "published_at": "2026-10-14",
+  "version": "1.0.20",
+  "published_at": "2026-10-15",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "新增安卓手机浏览器官网 Google Pay 基础订阅分支，付款选项以实际页面为准",
-    "付款前告知使用案例较少及作者反馈的封号后无法退款风险；与 Apple／Google Play 路线分开",
-    "同步带做入口、网络自检、订阅验收、售后和进度记录"
+    "收到仓库链接先实时下载并校验 main 最新完整包，不复用旧目录或更新缓存",
+    "新增 start 启动命令，校验远端清单及文件，失败暂停带做；保留旧目录并迁移进度",
+    "成功后显示版本与实际目录，重新读取新规则再推荐 VPS"
   ]
 }

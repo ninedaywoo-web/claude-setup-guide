@@ -64,7 +64,11 @@ Apple 账号准备、App Store 登录、礼品卡充值和 App 内订阅。网�
 
 ### 2.6 [Windows 专门流程](10-windows.md)
 
-Windows 本机连接 Linux VPS，默认用 v2rayN 与 AdsPower。先保留旧 VPN 测新节点，再切换 TUN＋全局，检查实际出口与 Codex 新回复。Windows＋iPhone 用图解带做；仅 Android 先确认订阅途径。真实 Windows 整机验收仍待完成。
+Windows 本机连接 Linux VPS，默认用 v2rayN 与 AdsPower。先保留旧 VPN 测新节点，再切换 TUN＋全局，检查实际出口与 Codex 新回复。Windows＋iPhone 用图解带做；Android 手机网络通过后可按下面的官网 Google Pay 基础指引继续。真实 Windows 整机验收仍待完成。
+
+### 2.7 [安卓官网 Google Pay 基础订阅](11-android-web-pay.md)
+
+配置并验收安卓手机节点后，用手机浏览器进入 Claude 官网；实际显示 Google Pay 时才选择支付。付款前主动告知目前案例较少、可能存在风险，以及作者目前掌握的封号后无法退款反馈；用户接受后再继续。这是官网付款，不是 Google Play 内购，不套用 Apple 充值与退款步骤。
 
 ## 3. 给 AI 的带做说明
 

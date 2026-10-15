@@ -10,7 +10,7 @@
 
 下载完整项目并解压，把整个文件夹交给 Codex 或其他能读取本地文件的 AI。打开 [SKILL.md](SKILL.md)，AI 就知道该做什么，不需要自己写长提示词。只上传 SKILL.md 单个文件会缺少配套教程，请保留完整目录。
 
-本次交付默认采用：前面确认 Google 账号 → VPS 与 Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 手机小火箭全局代理 → Apple 账户准备 → 手机 Google 登录并订阅 Pro → 回电脑验收权益与正常对话。手机主要用于登录和订阅，Claude Code 安装与使用教学不在本次交付内。没有 Google 账号时，按[账号与两步验证说明](references/08-google-account.md)准备。
+本次交付默认采用：前面确认 Google 账号 → VPS 与 Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 手机小火箭全局代理 → Apple 账户准备 → 手机 Google 登录并订阅 Pro → 回电脑验收权益与正常对话。上面是 iPhone 路线；安卓网络自检后可用手机浏览器进入官网，按 Google Pay 基础指引继续。手机主要用于登录和订阅，Claude Code 安装与使用教学不在本次交付内。没有 Google 账号时，按[账号与两步验证说明](references/08-google-account.md)准备。
 
 AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指纹浏览器与 iPhone 网络配置](references/02-browser-iphone.md)，再了解你的设备和进度，每次只带一小步。做完发截图或口述结果即可。Apple、退款和申诉在需要时再读。
 
@@ -26,7 +26,7 @@ Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-
 
 购买 VPS 时，AI 会按所选商家主动展示[搬瓦工注册与 AKILE 选购图解](references/09-vps-purchase.md)。也可直接保存[搬瓦工注册 PDF](assets/vps-purchase/bandwagon-registration.pdf) 和 [VPS 选购 PDF](assets/vps-purchase/vps-purchase-guide.pdf)。
 
-Windows 用户还会读取 [Windows 专门流程](references/10-windows.md)：先保留旧 VPN 测试新节点，再切换到 TUN＋全局并复验；只有 Android 时先确认订阅途径。Windows 真实整机交付验收仍待完成，本次发布不代表已实测跑通。
+Windows 用户还会读取 [Windows 专门流程](references/10-windows.md)：先保留旧 VPN 测试新节点，再切换到 TUN＋全局并复验；Android 用户可按[官网 Google Pay 基础指引](references/11-android-web-pay.md)继续，付款前先了解案例较少及作者反馈的封号后无法退款风险；支付选项以实际页面为准。Windows 真实整机交付验收仍待完成，本次发布不代表已实测跑通。
 
 ## 安装成 Skill
 

@@ -2,6 +2,10 @@
 
 App Store 提示无法购买或购买未完成时，先按[Apple 购买受限人工支持](07-apple-purchase-support.md)请求 Apple 复核。下面的封号申诉处理 Claude 账号；Apple 退款处理已经发生的订阅订单，按实际问题选择对应流程。
 
+## 先核对付款渠道
+
+安卓浏览器在 Claude 官网使用 Google Pay 的订单，不是 Apple 内购，也不等同于 Google Play 内购。按作者目前掌握的渠道反馈，这条路线在 Claude 账号被封后目前无法退款；付款前必须按[安卓订阅指引](11-android-web-pay.md)告知用户，并按费用可能无法退回的风险决定。此为作者反馈，不作为已核实的官方统一政策；用户仍可凭实际订单向 Claude 官方支持核实，不承诺退款，也不带用户去 Apple 入口申请该笔订单。
+
 ## 退款申请
 
 **Claude 被封后，Apple 退款完整流程**

@@ -20,11 +20,11 @@ AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指
 
 Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-apple-purchase-support.md)，由 Codex 进入官方客服并沟通购买问题，用户完成登录和 Support PIN 输入；客服答复、等待起点、具体重试时间和到期跟进记入本机进度。
 
-准备 Apple 内购时，网络自检通过后再单独确认账户新旧。根据客户反馈，新注册或刚接手的成品号建议先正常使用约两天，暂不充值和订阅；AI 会记住等待安排，恢复时接着做。
+准备 Apple 内购时，网络自检通过后再单独确认账户新旧。根据客户反馈，新注册或刚接手的成品号会立即收到醒目提醒：先只在自己手机 App Store／“媒体与购买项目”成功登录一次，从实际首次登录使用的时间起正常使用约两天，暂不充值和订阅；不更换 iCloud。AI 会记住等待安排，恢复时接着做。
 
 初次开始，Codex 会先解释 VPS 是什么，再问您有没有自建节点；没买、买了未配置、已经搭好，分别从对应步骤开始。普通梯子订阅不等于自建 VPS，已有服务器不用重复买。
 
-项目内附[客户阅读版 PDF](assets/reading/README.md)，共 10 份、75 页，本次阅读版修订日期为 2026-10-18。Codex 会主动推荐并询问是否另存到本地，方便您看图、理解操作；不下载也照常带做。哪一步不懂，可以请 Codex 找出对应 PDF 和页码；PDF 里的内容看不懂，也可以截图给 GPT 问。
+项目内附[客户阅读版 PDF](assets/reading/README.md)，共 10 份、76 页，整套最近更新于 2026-10-19；本次更新网络篇和 Apple 篇，其他篇目沿用 2026-10-18 阅读版。Codex 会主动推荐并询问是否另存到本地，方便您看图、理解操作；不下载也照常带做。哪一步不懂，可以请 Codex 找出对应 PDF 和页码；PDF 里的内容看不懂，也可以截图给 GPT 问。
 
 阅读版以 Mac／iPhone 图解为主，Windows 和 Android 仍按各自专章带做。PDF 随完整项目提供；另存到本地的副本不会自动改变。项目更新带来新版 PDF 时，Codex 会提醒已保存阅读版的客户另存新版，保留旧副本与笔记。
 
@@ -33,6 +33,8 @@ Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-
 购买 VPS 时，AI 会按所选商家主动展示[搬瓦工注册与 AKILE 选购图解](references/09-vps-purchase.md)。也可直接保存[搬瓦工注册 PDF](assets/vps-purchase/bandwagon-registration.pdf) 和 [VPS 选购 PDF](assets/vps-purchase/vps-purchase-guide.pdf)。
 
 Windows 用户还会读取 [Windows 专门流程](references/10-windows.md)：先保留旧 VPN 测试新节点，再切换到 TUN＋全局并复验；Android 用户可按[官网 Google Pay 基础指引](references/11-android-web-pay.md)继续，付款前先了解案例较少及作者反馈的封号后无法退款风险；支付选项以实际页面为准。Windows 真实整机交付验收仍待完成，本次发布不代表已实测跑通。
+
+后台测通后，如果切换新线路导致 Codex 持续掉线，或您反馈连不上，AI 会在旧 VPN 恢复后主动核对库里的网络栈与 REALITY 兼容案例；不需要您先提醒它去找。新线路实际出口和 Codex 新回复均确认前，不进入后面的账号步骤。
 
 ## 安装成 Skill
 

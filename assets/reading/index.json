@@ -1,0 +1,55 @@
+{
+  "revision": "2026-10-18",
+  "files": [
+    {
+      "file": "01-纯净魔法从零部署.pdf",
+      "pages": 28,
+      "sha256": "752ce08745ed1b0b014bfe645d6adcb8ab907ae96ddde79fd4c74396b98effe1"
+    },
+    {
+      "file": "02-指纹浏览器与 iPhone 网络配置.pdf",
+      "pages": 8,
+      "sha256": "a5d925aa24f2481940429bd7f44a5cc32dcb7e17a079e2eeb8d1ead1e3376305"
+    },
+    {
+      "file": "03-Apple 账号、礼品卡与内购.pdf",
+      "pages": 14,
+      "sha256": "46fa8fb023842a9c36c72c47ae1cf2a62c6066a4652f176125af1fecce007b7c"
+    },
+    {
+      "file": "04-退款、封号申诉与旧账号清理.pdf",
+      "pages": 4,
+      "sha256": "40b634568478cef24867285ed5c492ff49fba2b8fe962dbc034cf5641f2cef50"
+    },
+    {
+      "file": "05-注册与登录前自检.pdf",
+      "pages": 2,
+      "sha256": "e80bf7af2f76f68a2089451aacf56dacb966c88b1c80f749e61fa3269344541d"
+    },
+    {
+      "file": "06-Apple 购买受限与人工支持.pdf",
+      "pages": 3,
+      "sha256": "6c3774eafd392031b3f6c410850803a1bc8838eadc29f2ee680b4b3d7ba40ad2"
+    },
+    {
+      "file": "07-Google 账号准备与两步验证.pdf",
+      "pages": 2,
+      "sha256": "ccd2ae414e7cbaf85f2d9d16d168c6b7e5f6c37a65dc12e25a2753bab45f3a7b"
+    },
+    {
+      "file": "08-VPS 注册与购买图解.pdf",
+      "pages": 8,
+      "sha256": "6898bba7f342e74ac2b5a2ef0c86e780f036de6747a249832ae48ad28599c703"
+    },
+    {
+      "file": "09-搬瓦工注册中文图解_原始配图版.pdf",
+      "pages": 4,
+      "sha256": "0f32e403f0db39b6de9298f51d2c3e6a01bf5a619b7ed2e6346ce8454b38f53f"
+    },
+    {
+      "file": "10-VPS购买推荐官网图解_原始配图版.pdf",
+      "pages": 2,
+      "sha256": "f22edb603284ac582329b8d97b95792ab7a73935f11472c7cba013d9128166a0"
+    }
+  ]
+}

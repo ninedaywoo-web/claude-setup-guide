@@ -1,11 +1,11 @@
 {
-  "version": "1.0.25",
+  "version": "1.0.26",
   "published_at": "2026-10-20",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "全流程复用同版本连续带做的已读资料，只回查当前步骤及必要依赖，保留首次全文阅读与更新重读",
-    "沿用现有进度和已确认选择，记录来源与待复验项，保留网络切换、登录和订阅的现场验收",
-    "区分 AI 代做与用户手动指导，已授权的小目标连续操作并验收，需本人接手或结果不明确时暂停"
+    "询问 VPS 后主动说明设备搭配：Mac＋iPhone 优先，Windows＋iPhone 次之，Windows＋Android 暂非新手首选",
+    "提前解释手机代做与手动配合范围，iPad 可承担 Apple 内购但不套用 iPhone 镜像",
+    "提前核对 Android 支付准备，Google Pay 仅在实际官网付款页提供时使用，保留既有网络验收"
   ]
 }

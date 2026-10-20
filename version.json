@@ -1,11 +1,11 @@
 {
-  "version": "1.0.26",
+  "version": "1.0.27",
   "published_at": "2026-10-20",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "询问 VPS 后主动说明设备搭配：Mac＋iPhone 优先，Windows＋iPhone 次之，Windows＋Android 暂非新手首选",
-    "提前解释手机代做与手动配合范围，iPad 可承担 Apple 内购但不套用 iPhone 镜像",
-    "提前核对 Android 支付准备，Google Pay 仅在实际官网付款页提供时使用，保留既有网络验收"
+    "小火箭全局超时优先检查 TLS 指纹案例，适用时单独尝试实际支持的 Chrome 140，有效保留、无效恢复",
+    "指纹浏览器与新节点独立测试统一优先 HTTP，明确混合端口与 TUN mixed/gvisor 的区别",
+    "保留开场设备搭配及支付准备说明，记录案例前后结果与代理类型，网络验收不省略"
   ]
 }

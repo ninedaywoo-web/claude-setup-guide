@@ -1,10 +1,10 @@
 {
   "files": {
     ".gitignore": "29d98e57738b3097cf43d3f351df9be6766d48a0b522393e1b5437a9587988f0",
-    "AGENTS.md": "aee151e0279159c81125faaffc43a4694c281d01e705ee5483598a367f100e5c",
-    "CHANGELOG.md": "38c9d2443254e583c3bf6e740c35974cc1a86fcaed65a63d27cbe2c0e728172d",
+    "AGENTS.md": "ae03fa7c751516d355e47be98182e9d2c677e425f2397b0395bf2fb3f4125c40",
+    "CHANGELOG.md": "7726b6535d71879195400ec94d09a24fdd32dbc76bfbb838e21e7b024688bed3",
     "README.md": "0447defdb335963cec70e43c40478e9212804e597d3c4d08ba9b11676cc3296e",
-    "SKILL.md": "fe104ec59914a638f36fb67e3710e5e70ec11c472780e19f8a871b210d040e1e",
+    "SKILL.md": "e71cf4929aa8494ade4051f2f9fd3a0e19089d294987d260fbe2ee41a16ff47b",
     "agents/openai.yaml": "77f7b07e49ad3a01d1cd9f61e5ef30867346474bb53a4af6b77a84ad6cf22014",
     "assets/images/apple/01.jpg": "f8c3ef0157153840a111cdc2654e4da8f5ddf5079502e4f28921e879f5ea1f19",
     "assets/images/apple/02.jpg": "4517e514a089d19e643323f24efd06ea843339019c3760c36029037d49eba28e",
@@ -57,7 +57,7 @@
     "assets/images/network/20.jpg": "60ea23bc72b299a8853b383e9e4b15644f2d9d107c33fef93f2a9318d8402f5a",
     "assets/images/recovery/01.jpg": "0ba9dcdc1d0b09959f1a3be9c15a5168c7de3c63d87ce83904005506f79fa119",
     "assets/images/recovery/02.jpg": "a8a3da1e7fc332935288da61143ea87f8462d16e90c9c183dcae76a300757d1d",
-    "assets/progress-template.md": "a5107df143e768f81a334ecdddb65c248f81efc737bd841353b06610f445dd64",
+    "assets/progress-template.md": "4a7adefa16b1ca102473f26a7ba7da819b468f0e603eda6ab924418ceb37d9d7",
     "assets/reading/01-纯净魔法从零部署.pdf": "ad263cafc8d91415ac47ba61c06126ef0cbf692678524d5958a85dbcde1167a9",
     "assets/reading/02-指纹浏览器与 iPhone 网络配置.pdf": "a5d925aa24f2481940429bd7f44a5cc32dcb7e17a079e2eeb8d1ead1e3376305",
     "assets/reading/03-Apple 账号、礼品卡与内购.pdf": "c284c8a57e5327adbb885812b16dd2fc3813f27374ee54f82d7b5810a72421b8",
@@ -83,11 +83,11 @@
     "docs/superpowers/specs/2026-10-13-update-notification-design.md": "35484633b13f14c772efffc39a296d2a227feb0e2e3f000294384e98b4ea50e5",
     "docs/superpowers/specs/2026-10-15-link-start-design.md": "bb75efc8c785941316cc541ed250628ba3cb3a0b72e7c3bd95877c784daacd62",
     "references/00-start.md": "6998784c0a3b35485881502fb2ff233bc763efe0ce5ec2f0cbe24558d0b608b8",
-    "references/01-network.md": "ce8938c4a2e93e1caa6b4dd4cfdd6aafefbca11f5ab13af735835731215f5b4e",
-    "references/02-browser-iphone.md": "fd9fac526378acf1aba3099ad4dba9d4d7aaebf3ef94e9856f3b71b3ed31b493",
+    "references/01-network.md": "f4f2c5c5f5e29e7fe45104189cc574142b795c7da342d84e78c9d8a120f4b026",
+    "references/02-browser-iphone.md": "adaf992781cca850044f384b1f22e781ef953741a5d4af6f98af85fc1c7c11e9",
     "references/03-apple.md": "d81b88667585ccaf216d3ab2cd95cda0662b3a278259ac10b33ac0b09cf8f8bc",
     "references/04-recovery.md": "ee72d5c48b8b27257f04cd934ee6f16ae7611cf479cd1b4dc66b6d422f4b7987",
-    "references/05-ai-walkthrough.md": "171bbf1e312fe48c9d94b2c3d17db5543657e0ea624c313af811fe8cb692507b",
+    "references/05-ai-walkthrough.md": "302bc021baea81618884e3461defbdf759ef522256c630864884133518a52ad2",
     "references/06-before-login.md": "fdffd8dd0b81ff7755c6c87356f2c7528b5c228b7e55f1cc1bf9afcf53c5316b",
     "references/07-apple-purchase-support.md": "0555c775a8333e39a71782028d538c95f00a7748881506cc4ae0e979f9fecd0e",
     "references/08-google-account.md": "96c311a842a49d797480339dcbb09455b3101ed2393279d452b5849ffd5e351c",
@@ -100,6 +100,6 @@
     "scripts/update.py": "3ab376f966933d8242f6d76f3742e1835c0864fcc0267269f9d602630f038be0",
     "tests/test_start.py": "d813d8ac97cf1f97a83f4b175a393c554f8549200f6ba6ac9e5c65852650c487",
     "tests/test_update.py": "1cd9fa34ede185cb77543e5d2be097d6b7e2e9be09ce12ce35e11eb31ab366ff",
-    "version.json": "7e32f51e3efbc168e83061cbc440db35d58f974421f95d30972fe236654fbfcf"
+    "version.json": "8f2f0fbd021b76336ce006f7f4f767692bb0c27a6a57f371a33cb3a265f62bcd"
   }
 }

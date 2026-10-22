@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Check a public GitHub guide; apply only a user-approved, pinned commit."""
-import argparse, base64, hashlib, io, json, math, os, re, shutil, stat, subprocess, sys, tempfile, time, urllib.request, zipfile
+import argparse, base64, hashlib, io, json, math, os, re, shutil, stat, subprocess, sys, tempfile, time, urllib.error, urllib.request, zipfile
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 REPO = 'ninedaywoo-web/claude-setup-guide'
@@ -14,7 +14,7 @@ class Redirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         from urllib.parse import urlparse
         host=urlparse(newurl).hostname
-        if urlparse(newurl).scheme!='https' or host not in {'api.github.com','codeload.github.com','github.com'}:
+        if urlparse(newurl).scheme!='https' or host not in {'api.github.com','codeload.github.com','github.com','raw.githubusercontent.com'}:
             raise UpdateError('更新下载跳转到了不支持的地址。')
         new=super().redirect_request(req,fp,code,msg,headers,newurl)
         if host!='api.github.com': new.remove_header('Authorization')
@@ -30,13 +30,54 @@ def token():
         except (OSError,subprocess.TimeoutExpired):pass
     return None
 
+def network_reason(error):
+    if isinstance(error,urllib.error.HTTPError):
+        return 'HTTP '+str(error.code)+('（访问受限或 API 限流）' if error.code in {403,429} else '')
+    reason=getattr(error,'reason',error)
+    if isinstance(reason,TimeoutError):return '连接或读取超时'
+    return '网络连接失败（请检查当前代理、DNS 和证书）'
+
+def fetch_bytes(url,headers=None,binary=False):
+    # One retry for transient failures; retain the existing proxy and route.
+    for attempt in range(2):
+        try:
+            req=urllib.request.Request(url,headers=headers or {'User-Agent':'claude-setup-guide-updater'})
+            with urllib.request.build_opener(Redirect()).open(req,timeout=60 if binary else 30) as response:
+                data=response.read(LIMIT+1)
+            if len(data)>LIMIT:raise UpdateError('下载体积超过上限。')
+            return data
+        except (urllib.error.URLError,TimeoutError,ConnectionError) as error:
+            transient=not isinstance(error,urllib.error.HTTPError) or error.code in {408,429,500,502,503,504}
+            if attempt or not transient:raise
+
 def request(path, auth, binary=False):
     headers={'User-Agent':'claude-setup-guide-updater','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}
     if auth:headers['Authorization']='Bearer '+auth
-    req=urllib.request.Request('https://api.github.com/repos/'+REPO+'/'+path,headers=headers)
-    with urllib.request.build_opener(Redirect()).open(req,timeout=30) as response:
-        data=response.read(LIMIT+1)
-    if len(data)>LIMIT:raise UpdateError('下载体积超过上限。')
+    try:
+        data=fetch_bytes('https://api.github.com/repos/'+REPO+'/'+path,headers,binary)
+    except (urllib.error.URLError,TimeoutError,ConnectionError) as api_error:
+        # Only official public endpoints, pinned to the same commit. No auth is forwarded.
+        try:
+            if binary and re.fullmatch(r'zipball/[a-f0-9]{40}',path):
+                data=fetch_bytes('https://codeload.github.com/'+REPO+'/zip/'+path.split('/')[1],binary=True)
+            elif re.fullmatch(r'contents/(version|manifest)\.json\?ref=[a-f0-9]{40}',path):
+                name,commit=path[len('contents/'):].split('?ref=')
+                raw=fetch_bytes('https://raw.githubusercontent.com/'+REPO+'/'+commit+'/'+name)
+                return {'content':base64.b64encode(raw).decode('ascii')}
+            elif path=='git/ref/heads/main' and shutil.which('git'):
+                env=dict(os.environ,GIT_TERMINAL_PROMPT='0',GCM_INTERACTIVE='Never')
+                result=subprocess.run(['git','-c','credential.helper=','-c','credential.interactive=false',
+                    'ls-remote','https://github.com/'+REPO+'.git','refs/heads/main'],
+                    capture_output=True,text=True,timeout=30,env=env)
+                match=re.fullmatch(r'([a-f0-9]{40})\s+refs/heads/main\s*',result.stdout)
+                if result.returncode or not match:raise UpdateError('Git 官方备用查询未成功。')
+                return {'object':{'sha':match.group(1)}}
+            else:
+                raise UpdateError('当前请求没有可用的官方备用通道。')
+        except (urllib.error.URLError,TimeoutError,ConnectionError,subprocess.TimeoutExpired,OSError,UpdateError) as fallback_error:
+            stage='完整包下载' if binary else '最新提交查询' if path=='git/ref/heads/main' else '版本／清单读取'
+            reason=str(fallback_error) if isinstance(fallback_error,UpdateError) else network_reason(fallback_error)
+            raise UpdateError(stage+'未完成：GitHub API '+network_reason(api_error)+'；备用通道：'+reason+'。请 AI 保留当前 VPN，检查对应域名访问后重试；无需登录 GitHub，也无需默认让用户点击 Code → Download ZIP。') from None
     return data if binary else json.loads(data)
 
 def file_json(name,commit,auth):
@@ -249,8 +290,8 @@ def start_latest(destination,auth=None,progress_from=None):
             if dest.exists() or dest.is_symlink():
                 raise UpdateError('目标目录已被创建，停止覆盖。')
             new.rename(dest)
-        return dict(receipt,status='ready',read_next=str(dest/'SKILL.md'),
-                    message='已下载并校验核对时 main 的最新完整版本；请从本目录重新读取 Skill 和核心正文，再开始带做。')
+        return dict(receipt,status='ready',read_next=str(dest/'SKILL.md'),reader_directory=str(dest/'assets/reading'),
+                    message='已下载并校验最新项目完整包，包含供 AI 执行的程序／流程、操作配图和给您阅读的 PDF 教程。PDF 已在项目的 assets/reading 文件夹内；稍后询问的是是否把 PDF 另存到方便阅读的位置，不是是否下载程序。请从本目录重新读取 Skill 和核心正文，再开始带做。')
     raise UpdateError('下载期间仓库连续更新，尚未确认最新版本，请重新执行 start；暂停带做。')
 
 def main():
@@ -273,9 +314,11 @@ def main():
                 backup=replace_package(ROOT,new)
             result={'status':'updated','version':meta['version'],'backup':str(backup),'message':'已保留 .local 进度。请重新读取 SKILL.md 和变更章节。'}
     except UpdateError as e:result={'status':'not_updated','message':str(e)}
+    except PermissionError:
+        result={'status':'unavailable','message':'本机文件读写权限不足，请 AI 检查保存位置或工具权限后重试；这不是 GitHub 仓库访问权限问题。'}
     except Exception:
         # Never log headers, credentials, response bodies, or credential-helper stderr.
-        result={'status':'unavailable','message':'本次无法检查或下载更新。请稍后重试，或从公开仓库下载最新 ZIP。继续使用本地教程。'}
+        result={'status':'unavailable','message':'本次未完成检查或下载。请 AI 检查终端、Python、网络与文件写入能力，定位失败步骤后重试，不默认转交用户手动下载。'}
     if args.action=='start' and result['status']!='ready':
         result['message']='尚未完成最新完整版本下载与校验，暂停带做，不回退旧教程。'+result.get('message','').replace('继续使用本地教程。','')
     print(json.dumps(result,ensure_ascii=False,indent=2))

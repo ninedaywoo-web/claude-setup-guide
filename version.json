@@ -1,9 +1,12 @@
 {
-  "version": "1.0.32",
+  "version": "1.0.33",
   "published_at": "2026-10-22",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "将客户阅读版介绍精简为三段，保留项目已下载、PDF 用途、求助顺序及建议保存"
+    "新增固定版本 VPS 部署、节点导出、网络检测与中断恢复脚本",
+    "三站评分按设备分别汇总，轻微偏离参考值可继续流程",
+    "内置 Mac 端与 Windows 端清理 Skill，支持审计、备份和按范围清理",
+    "修复 Windows 中文路径恢复备份时的编码问题"
   ]
 }

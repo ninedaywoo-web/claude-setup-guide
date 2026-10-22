@@ -24,7 +24,7 @@ Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-
 
 准备 Apple 内购时，网络自检通过后再单独确认账户新旧。根据客户反馈，新注册或刚接手的成品号会立即收到醒目提醒：先只在自己手机 App Store／“媒体与购买项目”成功登录一次，从实际首次登录使用的时间起正常使用约两天，暂不充值和订阅；不更换 iCloud。AI 会记住等待安排，恢复时接着做。
 
-初次开始，Codex 的第一个问题是“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”有的话，先按设备提供旧登录残留检查：Mac 推荐配套清理 Skill，iPhone 建议删除并重新下载官方 Claude App。处理或安排好适用事项后，再解释 VPS 是什么、问您有没有自建节点；没买、买了未配置、已经搭好，分别从对应步骤开始。普通梯子订阅不等于自建 VPS，已有服务器不用重复买。
+初次开始，Codex 的第一个问题是“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”有的话，先按设备提供旧登录残留检查：电脑按系统使用内置的 [Mac 端清理 Skill](references/15-mac-cleanup.md) 或 [Windows 端清理 Skill](references/16-windows-cleanup.md)，iPhone 建议删除并重新下载官方 Claude App。处理或安排好适用事项后，再解释 VPS 是什么、问您有没有自建节点；没买、买了未配置、已经搭好，分别从对应步骤开始。普通梯子订阅不等于自建 VPS，已有服务器不用重复买。
 
 项目内附[客户阅读版 PDF](assets/reading/README.md)，共 10 份、76 页，整套最近更新于 2026-10-19；本次更新网络篇和 Apple 篇，其他篇目沿用 2026-10-18 阅读版。这些 PDF 已经随程序／流程一起下载到项目的 `assets/reading/` 文件夹。Codex 会先明确告诉您 GitHub 项目本身已经下载好，再简短介绍 PDF 的用途和使用方法：遇到问题先问 Codex；问题还没解决或解释不明白时，可以让 Codex 找出对应 PDF、章节、页码和图示，您自己对照着看，仍不懂的内容可以截图继续问。我们建议您保存一份阅读版到方便打开的位置。讲清楚这些之后，Codex 才会询问是否需要把 PDF 单独保存到“下载”等文件夹；项目内已有文件，会直接复制一份给您，无需重新下载程序。暂时不保存也照常带做。
 
@@ -83,6 +83,8 @@ python3 scripts/update.py check --force
 - `assets/images/`：本地配图。
 - `assets/reading/`：10 份客户阅读版 PDF、阅读目录及供 AI 核对的索引。
 - `assets/progress-template.md`：进度模板。
+- `scripts/network.py`：VPS 部署与节点导出、网络检测、三站评分汇总和执行状态恢复，详见[确定性执行层](references/14-scripted-execution.md)。
+- `scripts/cleanup.py`：Mac／Windows 清理入口，默认只读审计。
 - `scripts/update.py`：24 小时检查缓存、回答末尾提醒文本及经确认后的更新；`check --force` 可立即重查。
 - `version.json`、`CHANGELOG.md`：版本与更新记录。
 - `.local/`：使用者自己的进度与设置，不上传。

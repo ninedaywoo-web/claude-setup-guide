@@ -1,5 +1,8 @@
 # 指纹浏览器与 iPhone 网络配置
 
+**三站评分汇总：**实际观察 NetCoffee、Ping0、Scamalytics 后，按 [确定性执行层](14-scripted-execution.md#三站结果与建议) 分别记录原值和建议。79 对约 80、35 对约 30 等轻微偏离不阻断；大幅偏离先复查。出口、DNS／IPv6／WebRTC 与手机检查按本章完成。
+
+
 ## 1. 电脑端：AdsPower 配合本机代理
 
 本章 Mac 示例使用 Karing；Windows 使用 [Windows 专章](10-windows.md)中的 v2rayN，以下 Karing 的 HTTP 入口与节点检查对应换成 v2rayN 实际入口。Windows 环境选择 Windows，不照抄 Mac 的界面和参数。

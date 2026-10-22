@@ -4,17 +4,19 @@ App Store 提示无法购买或购买未完成时，先按[Apple 购买受限人
 
 ## 有封禁经历时先处理旧登录残留
 
-本节在开场第一个问题回答“有”时主动读取，早于 VPS 询问；先确认是电脑、手机还是两者曾登录过被 Claude 封禁的账号，以及用过浏览器、Claude App 还是 Claude Code。账号被封不等于已经证实整台设备被列入黑名单，不凭封禁经历宣称“设备指纹必须重置”。
+本节在开场第一个问题回答“有”时主动读取，早于 VPS 询问；先确认是电脑、手机还是两者曾登录过被 Claude 封禁的账号，以及用过浏览器、Claude App 还是 Claude Code。
 
-### Mac：主动提供已有的清理 Skill
+### 电脑：按系统提供内置清理 Skill
 
-直接在客户对话中给出：
+Mac 客户直接展示 [Mac 端清理 Skill](15-mac-cleanup.md)，Windows 客户展示 [Windows 端清理 Skill](16-windows-cleanup.md)，并说明：
 
-> 您这台 Mac 用过被封禁的 Claude 账号，我们先检查旧账号的本地登录残留。这里有配套的 [Claude 本机清理 Skill](https://github.com/suyuan2022/suyuan-skill/blob/main/claude-cleanup/SKILL.md)，可以交给 Codex 做检查和清理。它会先检查、备份，再按您确认的范围处理。
+> 我们先检查旧账号的本地登录残留。项目已内置适合您电脑系统的清理 Skill，会先列出实际范围，备份后再按您确认的范围处理。
 
-先读取外部 Skill 与随附脚本，核对当前支持范围再执行。已核对的用途是 macOS 上 Claude Code／Claude Desktop 的本机审计、备份、缓存与登录状态处理；只使用浏览器的客户按其实际浏览器配置档排查旧登录状态，不因此清空全部浏览器资料。Windows 不直接运行 Mac 的钥匙串或路径操作，使用当前平台适用的退出登录、卸载或缓存检查步骤；未经实测不宣称已支持。
+对客户使用“Mac 端清理 Skill”“Windows 端清理 Skill”。两端都先只读审计，具体操作与验证范围见对应入口。
 
-客户同意执行清理后，按该 Skill 完整备份并展示实际影响，遵守其最终确认步骤。先做审计，不因客户回答“有封过号”就擅自删除目录、钥匙串或历史会话。不自动轮换本地身份、修改时区或改变现有网络；这些不是有封禁经历后的默认动作。只处理当前设备实际存在的项目，不能把 Claude Code 的 `.claude` 目录当成浏览器或 iPhone 的缓存目录。
+先确认实际使用的是 Claude Code、Claude Desktop 还是浏览器。只使用浏览器时，按指定浏览器配置档检查站点登录状态，不清空全部浏览器资料，也不清理未使用过的 CLI。Mac 的钥匙串路径不能套到 Windows；Windows Credential Manager 不自动删除。
+
+沿用客户已确认的清理范围，展示实际清单、备份后，由客户在终端做一次最终确认。身份／账号状态单独选择；时区与网络按对应章节处理。结果记录具体已处理项目和备份位置。
 
 ### iPhone：建议删除，再重新下载 Claude
 
@@ -371,11 +373,7 @@ Anthropic 支持团队，你们好：
 
 我两台封过号的 MacBook，清完都在正常用。
 
-有朋友把清理流程写成了一个 Skill：
-
-[claude-cleanup / SKILL.md](https://github.com/suyuan2022/suyuan-skill/blob/main/claude-cleanup/SKILL.md)
-
-目前支持 macOS，Windows 我还没测试。
+项目已内置 [Mac 端清理 Skill](15-mac-cleanup.md) 和 [Windows 端清理 Skill](16-windows-cleanup.md)。按系统进入对应流程。
 
 **动手之前，先完整备份 ~/.claude。**你的 Skills、Hooks、会话记录都在备份里。
 
@@ -400,7 +398,7 @@ Claude 会在你电脑里留下不少东西，主要是这几处：
 
 ### 用 Skill 完成备份和清理
 
-使用上一节的 claude-cleanup Skill。它是这么干活的：
+Mac 端按上一节的内置清理 Skill 执行；Windows 的范围与恢复方式见 Windows 端入口。Mac 端流程如下：
 
 - 动手前先完整备份 ~/.claude，保留 Skills、Hooks 和会话记录。
 - 缓存和日志它会自动清。换本地 ID、清钥匙串和桌面端的登录状态、改台北时区这些改动比较大的，做不做由你自己选。
@@ -409,7 +407,7 @@ Claude 会在你电脑里留下不少东西，主要是这几处：
 
 注意要让 Codex 或者普通终端来跑它，**别让正在运行的 Claude Code 清理它自己的目录。**
 
-使用方法：把 Skill 链接丢给 Agent，说一句「执行这个 Skill 帮我清理」。
+使用方法：让 Agent 读取本项目中对应平台的清理入口，先进行只读审计。
 
 它会先做一遍只读审计，告诉你找到了哪些缓存、备份要占多大空间、哪些是高风险操作，一样都还没动。
 

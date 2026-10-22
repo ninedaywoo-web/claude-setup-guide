@@ -2,9 +2,9 @@
   "files": {
     ".gitignore": "29d98e57738b3097cf43d3f351df9be6766d48a0b522393e1b5437a9587988f0",
     "AGENTS.md": "8c5f2e215a4ad499dc666e769eb7ca4f2112b463298ccbcf274fae88161f0324",
-    "CHANGELOG.md": "4cf4975b87a9628db995e2b5a9a6aa5944944e262cab3f76604e480b664c006f",
-    "README.md": "58efa5a0a110cacc0e37b0b4cd3860b3a0b1f6a2cfbd17292937b9f6bdbb2bef",
-    "SKILL.md": "b87024b51f286556d6e62b5c24c8ab6f9d110d74d76021b5dbd9bde751c0858c",
+    "CHANGELOG.md": "16b5b61ffe969c81a0bd94dd01b80b7780a748b39d77e600a8c7dfd48678dbc0",
+    "README.md": "cb4fa0da102a439dddf11ba7ce90d6fd59ebfeb019af5a55d602f585f370fdf3",
+    "SKILL.md": "e2f4bc714a35f777841dcdb8dc4578837e60a2533220e937aace30cfb54f68f9",
     "agents/openai.yaml": "77f7b07e49ad3a01d1cd9f61e5ef30867346474bb53a4af6b77a84ad6cf22014",
     "assets/images/apple/01.jpg": "f8c3ef0157153840a111cdc2654e4da8f5ddf5079502e4f28921e879f5ea1f19",
     "assets/images/apple/02.jpg": "4517e514a089d19e643323f24efd06ea843339019c3760c36029037d49eba28e",
@@ -87,7 +87,7 @@
     "references/02-browser-iphone.md": "adaf992781cca850044f384b1f22e781ef953741a5d4af6f98af85fc1c7c11e9",
     "references/03-apple.md": "d81b88667585ccaf216d3ab2cd95cda0662b3a278259ac10b33ac0b09cf8f8bc",
     "references/04-recovery.md": "ee72d5c48b8b27257f04cd934ee6f16ae7611cf479cd1b4dc66b6d422f4b7987",
-    "references/05-ai-walkthrough.md": "ba796a417c0331c1087d80de53b408179f89371f5fbd4ed4ab180b54310348de",
+    "references/05-ai-walkthrough.md": "0bf91d819b136126174f514f6b0b70df2b3ca091f528ef8310c1ccd685a76131",
     "references/06-before-login.md": "fdffd8dd0b81ff7755c6c87356f2c7528b5c228b7e55f1cc1bf9afcf53c5316b",
     "references/07-apple-purchase-support.md": "0555c775a8333e39a71782028d538c95f00a7748881506cc4ae0e979f9fecd0e",
     "references/08-google-account.md": "96c311a842a49d797480339dcbb09455b3101ed2393279d452b5849ffd5e351c",
@@ -95,12 +95,12 @@
     "references/10-windows.md": "a405ada58a78fd8b9ff8f496eaa42e859ae9d220d69f881675dd355ec900d039",
     "references/11-android-web-pay.md": "caac55bb763ec0eb89621827308b3048d69b96f2bb403b74b509a6c833b15c14",
     "references/12-latest-start.md": "aa1fb383b9065f750429a217b52918d80721f8291bd783adc02b7582af3eaa04",
-    "references/13-reader-guide.md": "53750c8ae58ce707eff49675f87f4028b9f8db8f0f0cc157e25aaeacd67ff98d",
+    "references/13-reader-guide.md": "255f862c03eaa02bceefe374f25be2e949c319c9038e44b46bee6f8e0c5da5d1",
     "scripts/manifest.py": "921c592e346658380b8f17c60980fb080f9356cb6ad5be690298520a765eac1d",
     "scripts/update.py": "0decd7eb501176730cb16e62a6122d634154fafcdaf4043fb03c4d9393829131",
     "tests/test_download.py": "3cebad299c30613768d84373da77e2f69964f1a2e8418eec1c252889ceff573a",
     "tests/test_start.py": "d813d8ac97cf1f97a83f4b175a393c554f8549200f6ba6ac9e5c65852650c487",
     "tests/test_update.py": "1cd9fa34ede185cb77543e5d2be097d6b7e2e9be09ce12ce35e11eb31ab366ff",
-    "version.json": "481ba13eb2544186a95ccf2c75f7210d0b680e67c773e15035a3489f90741092"
+    "version.json": "717517d3f20a01cc33f0d15dfdbf895916929f67e959387529ac72a370217cd1"
   }
 }

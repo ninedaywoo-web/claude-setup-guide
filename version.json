@@ -1,10 +1,9 @@
 {
-  "version": "1.0.31",
+  "version": "1.0.32",
   "published_at": "2026-10-22",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "完整输出项目已下载、客户阅读版 PDF 的用途及使用方法，最后再询问是否保存",
-    "明确遇到问题先问 Codex，再由 Codex 定位 PDF 对照阅读，并建议保存阅读副本"
+    "将客户阅读版介绍精简为三段，保留项目已下载、PDF 用途、求助顺序及建议保存"
   ]
 }

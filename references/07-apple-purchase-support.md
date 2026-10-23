@@ -1,6 +1,6 @@
 # Apple 购买受限：Codex 带办人工支持
 
-App Store 内购提示「无法完成购买／Purchase Not Completed／Cannot Complete Purchase」，完成余额、账号与购买权限自查后仍失败，或页面明确要求联系 Apple 支持时，按本章请求人工复核。用户希望 Codex 帮忙处理时，直接沿下面的流程带办。
+用户明确反馈购买受限，或 App Store 显示「无法完成购买／Purchase Not Completed／Cannot Complete Purchase」时，立即进入本章，由 Codex 打开支持页面并协助推进。账户、余额和订单信息在此流程内核对，复用已有结果；不继续追问礼品卡或让用户重复试付。
 
 本章处理 Apple 的购买问题。按实际提示分流：Apple 账户无法登录时先完成账户恢复；已扣款但权益未到账时核对订单与 App 权益；提示订阅关联其他 Claude 账号时核对订阅归属；申请退款走[退款章节](04-recovery.md)。记录原始报错，让客服核实具体限制。
 

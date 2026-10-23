@@ -44,7 +44,7 @@
 
 [打开 Ping0 IP 检测](https://ping0.cc/)。连接要检查的节点，在实际准备使用的浏览器环境里检测，查看出口地区、ASN / 运营商、IP 类型、风控值、是否原生 IP 和共享人数。
 
-把检测时间、设备与浏览器环境、节点名称和页面结果记到本机 `.local/progress.md`；截图先隐藏完整 IP，再保存到 `.local/`，作为本次节点检测的凭证。换节点或环境后重新检测，不能用别人的截图代替自己的结果。具体检查和记录方式见[浏览器检查步骤](02-browser-iphone.md#14-配好后先检查再注册)。
+把检测时间、设备与浏览器环境、节点名称和页面结果记到本机 `.local/progress.md`；截图先隐藏完整 IP，再保存到 `.local/`，作为本次节点检测的凭证。换节点或环境后重新检测，不能用别人的截图代替自己的结果。具体检查和记录方式见[浏览器检查步骤](02-browser-iphone.md#14-配好后先检查再进入手机)。
 
 Ping0 的风控值越低表示该站评估的风险越低，与前面 Claude 检测的“80 分以上”不是同一个量表。它的结果作为辅助证据，仍需完成实际出口、IPv6、DNS、WebRTC 和断线行为检查。
 
@@ -56,7 +56,7 @@ Ping0 的风控值越低表示该站评估的风险越低，与前面 Claude 检
 
 开始时先确认有没有自己可用的 Google 账号；没有则提供[原有购号网站](https://chuhai91.cc)及 [Google 账号补充渠道 GmailBuy](https://gmailbuy.com/)，选择商家标明的美区 Google 账号。交付串和 2FA 使用方法见[Google 账号准备](08-google-account.md)。账号由用户自己保管，不发给 AI。
 
-默认顺序：账号与设备准备 → VPS → Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 按平台带做 iPhone 小火箭全局代理 → 电脑／手机时区选择与关闭定位 → 核对美区 Apple ID、养号完成记录和余额／礼品卡 → 保持手机节点开启，下载 Claude → Google 注册／登录并订阅 Pro → 订单与手机权益确认，结束交付。手机主要用于登录和订阅，Claude Code 教学不在交付范围。
+默认顺序：账号与设备准备 → VPS → Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 按平台带做 iPhone 小火箭全局代理 → 电脑／手机时区选择与关闭定位 → 核对美区 Apple ID、等待安排与客户选择记录和余额／礼品卡 → 保持手机节点开启，下载 Claude → Google 注册／登录并订阅 Pro → 订单与手机权益确认，结束交付。手机主要用于登录和订阅，Claude Code 教学不在交付范围。
 
 ## 2. 配置教程
 
@@ -76,7 +76,7 @@ Apple 账号准备、App Store 登录、礼品卡充值和 App 内订阅。网�
 
 ### 2.4 [退款、封号申诉与旧账号清理](04-recovery.md)
 
-按付款渠道申请退款、准备申诉资料，以及备份和清理登录残留。“退出旧账号”的独立操作段落待补充。
+按付款渠道申请退款、准备申诉资料，以及备份和清理登录残留。旧账号由客户自行退出，本项目不提供具体退出指导。
 
 ### 2.5 [注册／登录前自检](06-before-login.md)
 
@@ -92,4 +92,4 @@ Windows 本机连接 Linux VPS，默认用 v2rayN 与 AdsPower。先保留旧 VP
 
 ## 3. 给 AI 的带做说明
 
-[AI 从零带做指南](05-ai-walkthrough.md)。开始前完整读取网络与浏览器两篇，其他资料按阶段读取。VPS 选购以文档推荐的 DMIT 套餐为对照。DMIT 缺货时，最推荐[搬瓦工](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9)；其次并列推荐 [AKILE Cloud](https://akile.ai/) 与 [Hostinger KVM 1](https://www.hostinger.com/vps-hosting)。先匹配 DMIT 的优化线路，再对照硬件、流量和带宽，最后列出价格，不以十美元预算筛选。搬瓦工默认选 USCA_9 的 1 GB 档（49.99 美元/季），AKILE 默认选 LAXPremium-Mini（79.99 元/月），Hostinger 默认选 KVM 1（1 vCPU、4 GB、50 GB NVMe、4 TB）；不为对齐 DMIT 的内存自动升级。Hostinger 美国机房为 Phoenix 或 Boston，当前未核实同级大陆优化线路；官网月价与续费金额按付款周期分别核对。具体配置、流量差别和库存见[网络教程的套餐对照](01-network.md)。选择商家后再比较是否预留云端运行配置。
+[AI 从零带做指南](05-ai-walkthrough.md)。开始前完整读取网络与浏览器两篇，其他资料按阶段读取。VPS 选购以文档推荐的 DMIT 套餐为对照。DMIT 缺货时，最推荐[搬瓦工](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9)；其次并列推荐 [AKILE Cloud](https://akile.ai/) 与 [Hostinger KVM 1](https://www.hostinger.com/vps-hosting)。先匹配 DMIT 的优化线路，再对照硬件、流量和带宽，最后列出价格，不以十美元预算筛选。搬瓦工默认选 USCA_9 的 1 GB 档（49.99 美元/季），AKILE 默认选 LAXPremium-Mini（79.99 元/月），Hostinger 默认选 KVM 1（1 vCPU、4 GB、50 GB NVMe、4 TB）；不为对齐 DMIT 的内存自动升级。Hostinger 美国机房为 Phoenix 或 Boston，当前未核实同级大陆优化线路；官网月价与续费金额按付款周期分别核对。具体配置、流量差别和库存见[网络教程的套餐对照](01-network.md)。套餐仅按网络节点用途选择。

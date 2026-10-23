@@ -221,6 +221,7 @@ def probe(c, route, request=curl_request):
 
 
 def scores(data, expected_context):
+    from score_policy import assessment
     require(isinstance(data, dict) and set(data) == {"context", "environment", "observed_at", "exit_matches", "scores"}, "invalid_score_fields")
     require(data["context"] == expected_context, "score_context_mismatch")
     require(data["environment"] in ("adspower", "iphone_wifi", "iphone_cellular", "android_wifi", "android_cellular"), "invalid_score_environment")
@@ -236,12 +237,8 @@ def scores(data, expected_context):
         value = obj["value"]
         require(value is None or (type(value) in (int, float) and 0 <= value <= 100), "invalid_score_value")
         require(isinstance(obj["evidence"], str) and (value is None or bool(obj["evidence"].strip())), "score_evidence_required")
-        # Explicitly a local workflow tolerance, not a validated account-risk model.
-        band = "unverified"
-        if value is not None:
-            ideal = value >= 80 if name == "netcoffee" else value < (30 if name == "ping0" else 10)
-            close = value >= 75 if name == "netcoffee" else value <= (35 if name == "ping0" else 15)
-            band = "reference_met" if ideal else "near_reference" if close else "recheck_recommended"
+        band = assessment(name, value)
+        require(band != 'invalid', 'invalid_score_value')
         results[name] = {"value": value, "assessment": band, "site": SITES[name]}
     return {"status": "recorded", "environment": data["environment"], "observed_at": data["observed_at"],
             "exit_matches": data["exit_matches"], "scores": results, "advisory_only": True,

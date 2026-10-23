@@ -50,7 +50,7 @@ class NetworkWorkflowTests(unittest.TestCase):
         scripts = self.root/'scripts'
         scripts.mkdir()
         source = Path(__file__).resolve().parents[1]/'scripts'
-        for name in ('network.py', 'network_server.py', 'workflow_guard.py'):
+        for name in ('network.py', 'network_server.py', 'workflow_guard.py', 'score_policy.py'):
             shutil.copy2(source/name, scripts/name)
         self.private = self.root/'.local/network'
         self.private.mkdir(parents=True)

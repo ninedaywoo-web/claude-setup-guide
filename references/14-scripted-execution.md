@@ -84,12 +84,13 @@ python3 scripts/workflow.py run --action server_deploy
 ```bash
 python3 scripts/workflow.py run --action probe_proxy
 # 按原教程安排恢复方法，完成旧 VPN → 新客户端交接后：
-python3 scripts/network.py invalidate
 python3 scripts/workflow.py run --action probe_system
 python3 scripts/network.py status
 ```
 
 `proxy` 强制请求走指定的本机 HTTP／混合端口，忽略 `NO_PROXY` 和 curl 用户配置；失败不回退直连。首版仅支持无需认证的回环入口；已有入口要求认证时沿原教程测试，不为迁就脚本关闭认证。`system` 禁用 curl 显式／环境代理，让请求走当前系统路由。系统代理、TUN 和旧 VPN 接管状态通过客户端实际设置核对。
+
+普通切换直接执行新的 system 探针，不失效服务器步骤。客户端重配使用 `workflow.py change --scope handoff --reason "客户端接管改变"`，随后重新执行 proxy 与 system；服务端确实修改才使用 network 范围重新读回。
 
 两种方式都实测两个 IPv4 出口服务与一个 HTTPS 204 地址：至少一个出口服务返回有效 IPv4，所有取得的出口都与预期一致，并且 HTTPS 204 成功才判本次请求通过。一个服务不可用会在记录中保留；两站出口不一致不通过。预期出口来自实际 VPS／节点核验，不能把检测返回的任意 IP 自动填作预期。
 

@@ -1,5 +1,6 @@
 """Single stage catalog and completion rules for customer delivery."""
 from datetime import datetime, timedelta, timezone
+from score_policy import assessment
 
 DEVICE_GUIDANCE = """**这套程序最推荐 Mac＋iPhone，其次是 Windows＋iPhone。**
 
@@ -16,7 +17,7 @@ STAGES = [
     ('cleanup', '处理适用设备的旧登录残留', '04-recovery.md',
      {'outcome': ('cleaned', 'deferred', 'not_applicable'), 'handled_scope': 'text'}),
     ('devices', '记录设备搭配与准备说明', '13-reader-guide.md',
-     {'computer': ('mac', 'windows'), 'phone': ('iphone', 'ipad', 'android'), 'setup_explained': True}),
+     {'computer': ('mac', 'windows'), 'phone': ('iphone', 'ipad', 'android'), 'setup_explained': True, 'pdf_explained': True}),
     ('google', '准备可用 Google 账号', '08-google-account.md', {'account_available': True}),
     ('vps', '读取或准备 VPS 与 SSH 访问', '01-network.md',
      {'access_ready': True, 'node_label': 'text', 'node_timezone': 'text'}),
@@ -32,7 +33,7 @@ STAGES = [
       'proxy_configured': True, 'fingerprint_configured': True, 'location_blocked': True,
       'checked_profile_ref': 'text', 'exit_matches': True, 'https_ok': True,
       'dns_checked': True, 'ipv6_checked': True, 'webrtc_checked': True,
-      'disconnect_checked': True, 'scores': 'scores'}),
+      'disconnect_checked': True, 'scores': 'scores', 'usage_explained': True}),
     ('phone_proxy', '配置手机同一节点和全局代理', '02-browser-iphone.md',
      {'node_label': 'text', 'client': 'text', 'global_route': True, 'vpn_connected': True}),
     ('timezone', '选择时区并展示、完成电脑与手机设置路径', '02-browser-iphone.md',
@@ -47,10 +48,10 @@ STAGES = [
     ('payment_preparation', '核对美区 Apple ID、养号起点与支付准备', '03-apple.md', {}),
     ('app', '保持节点开启，下载官方 Claude 并检查请求路径', '03-apple.md', {}),
     ('login', '使用 Google 注册／登录 Claude', '08-google-account.md',
-     {'google_login': True, 'signed_in': True, 'account_ref': 'text'}),
+     {'google_login': True, 'signed_in': True, 'account_ref': 'text', 'browser_notice_shown': True}),
     ('subscription', '确认手机订单和 Pro 权益，完成交付', '03-apple.md',
      {'account_ref': 'text', 'channel': ('apple', 'google_pay'),
-      'order_confirmed': True, 'pro_visible': True}),
+      'order_confirmed': True, 'pro_visible': True, 'handoff_explained': True}),
 ]
 
 # Technical changes retain commercial/account history. A changed phone rechecks
@@ -61,6 +62,7 @@ INVALIDATES = {
     'devices': ('devices', 'computer_network', 'browser', 'phone_proxy', 'timezone', 'phone_network',
                 'payment_preparation', 'app', 'login', 'subscription'),
     'node': ('vps', 'server', 'computer_network', 'browser', 'phone_proxy', 'timezone', 'phone_network', 'app'),
+    'handoff': ('computer_network', 'browser', 'phone_proxy', 'timezone', 'phone_network', 'app'),
     'network': ('server', 'computer_network', 'browser', 'phone_proxy', 'timezone', 'phone_network', 'app'),
     'computer': ('computer_network', 'browser', 'timezone'),
     'browser': ('browser', 'timezone'),
@@ -71,7 +73,7 @@ INVALIDATES = {
 }
 
 # Changing these objects starts fresh observations within the current stage.
-OBJECT_FIELDS = {'browser': 'profile_ref', 'payment_preparation': 'apple_account_ref'}
+OBJECT_FIELDS = {'browser': 'profile_ref', 'payment_preparation': 'apple_account_ref', 'phone_proxy': 'apple_account_ref'}
 
 ACTIONS = {
     'cleanup_audit': ('cleanup', ['cleanup.py', '--audit']),
@@ -88,6 +90,33 @@ ACTIONS = {
 }
 
 
+APPLE_OPTIONAL = {'apple_account_ref': 'text', 'account_type': ('longstanding', 'new'),
+                  'store_signed_in': True, 'first_used_at': 'timestamp',
+                  'wait_choice': ('wait', 'continue'), 'apple_reminder_shown': True,
+                  'purchase_restricted': False, 'support_case': 'text', 'support_retry_at': 'date'}
+OPTIONAL_FIELDS = {
+    'devices': {'pdf_save_choice': ('yes', 'no', 'unanswered'), 'pdf_saved_path': 'text'},
+    'phone_proxy': {**APPLE_OPTIONAL, 'client_available': True},
+    'payment_preparation': {**APPLE_OPTIONAL, 'route_accepted': True},
+    'browser': {'score_review': ('rechecked', 'continue'), 'score_review_note': 'text'},
+    'phone_network': {'score_review': ('rechecked', 'continue'), 'score_review_note': 'text'},
+    'subscription': {'purchase_restricted': False, 'support_case': 'text', 'support_retry_at': 'date'},
+}
+
+
+def apple_wait(data, now):
+    if data.get('account_type') != 'new' or data.get('store_signed_in') is not True:
+        return None
+    try:
+        first = timestamp(data['first_used_at'])
+        if first > now:
+            return None
+        until = first + timedelta(hours=48)
+        return until.isoformat() if now < until and data.get('wait_choice') != 'continue' else None
+    except (ValueError, TypeError, KeyError):
+        return None
+
+
 def facts(state, stage):
     return state.get('records', {}).get(stage, {}).get('data', {})
 
@@ -100,6 +129,10 @@ def catalog(state):
         if key == 'cleanup' and facts(state, 'intake').get('banned_login') != 'yes':
             continue
         fields = dict(fields)
+        if key == 'devices' and android:
+            fields.update(android_route_explained=True, payment_route_status=('available', 'needs_setup', 'unknown'))
+        if android and key in ('phone_proxy', 'timezone'):
+            reference = '11-android-web-pay.md'
         if key == 'timezone':
             if device.get('computer') == 'mac':
                 fields.update(computer_location_off=True, computer_timezone_location_off=True)
@@ -108,7 +141,7 @@ def catalog(state):
         if key == 'payment_preparation':
             if android:
                 title, reference = '确认 Android 官网支付准备', '11-android-web-pay.md'
-                fields = {'payment_method_available': True, 'route_explained': True}
+                fields = {'payment_method_available': True, 'route_explained': True, 'route_accepted': True}
             else:
                 fields = {'apple_account_ref': 'text', 'region': ('US',), 'store_signed_in': True,
                           'account_type': ('longstanding', 'new'), 'purchase_restricted': False,
@@ -123,6 +156,8 @@ def catalog(state):
         if android and key == 'subscription':
             reference = '11-android-web-pay.md'
             fields['google_pay_displayed'] = True
+        if key == 'phone_proxy' and not android:
+            fields['client_available'] = True
         result.append({'id': key, 'title': title, 'reference': 'references/' + reference, 'fields': fields})
     return result
 
@@ -137,10 +172,24 @@ def timestamp(value):
 def validation(stage, data, state, now):
     # Derive dynamic fields from the proposed account type, not only saved facts.
     fields = dict(stage['fields'])
-    if stage['id'] == 'payment_preparation':
+    if stage['id'] == 'devices':
+        if data.get('phone') == 'android':
+            fields.update(android_route_explained=True, payment_route_status=('available', 'needs_setup', 'unknown'))
+        else:
+            fields.pop('android_route_explained', None)
+            fields.pop('payment_route_status', None)
+    apple_stage = stage['id'] in ('payment_preparation', 'phone_proxy') and facts(state, 'devices').get('phone') != 'android'
+    if apple_stage:
         fields.pop('first_used_at', None)
         if data.get('account_type') == 'new':
-            fields['first_used_at'] = 'timestamp'
+            fields.update(first_used_at='timestamp', apple_account_ref='text', store_signed_in=True, apple_reminder_shown=True)
+    optional = OPTIONAL_FIELDS.get(stage['id'], {})
+    # Apple fields never leak into the Android route.
+    if facts(state, 'devices').get('phone') == 'android':
+        optional = {k: v for k, v in optional.items() if k not in APPLE_OPTIONAL and k != 'client_available'}
+    for key, rule in optional.items():
+        if key in data:
+            fields.setdefault(key, rule)
     issues = []
     for name, rule in fields.items():
         value = data.get(name)
@@ -151,9 +200,11 @@ def validation(stage, data, state, now):
             valid = value in rule
         elif rule == 'text':
             valid = isinstance(value, str) and bool(value.strip())
-        elif rule == 'timestamp':
+        elif rule in ('timestamp', 'date'):
             try:
-                valid = isinstance(value, str) and timestamp(value) <= now
+                valid = isinstance(value, str) and (rule == 'date' or timestamp(value) <= now)
+                if valid:
+                    timestamp(value)
             except (ValueError, TypeError):
                 pass
         elif rule == 'scores':
@@ -164,7 +215,7 @@ def validation(stage, data, state, now):
                         valid = False
                         break
                     score = observation.get('value')
-                    valid &= (score is None or (type(score) in (int, float) and 0 <= score <= 100))
+                    valid &= assessment('netcoffee', score) != 'invalid'
                     valid &= isinstance(observation.get('result'), str) and bool(observation['result'].strip())
         if not valid:
             issues.append(name)
@@ -186,10 +237,19 @@ def validation(stage, data, state, now):
             issues.append('channel')
     unknown = set(data) - set(fields)
     issues.extend('unknown:' + name for name in sorted(unknown))
-    if issues:
-        return {'valid': False, 'missing': sorted(set(issues))}
-    if key == 'payment_preparation' and data.get('account_type') == 'new':
-        until = timestamp(data['first_used_at']) + timedelta(hours=48)
-        if now < until:
-            return {'valid': True, 'waiting_until': until.isoformat()}
-    return {'valid': True}
+    result = {'valid': not issues, 'missing': sorted(set(issues))}
+    if apple_stage:
+        until = apple_wait(data, now)
+        if until:
+            result['waiting_until'] = until
+    if key in ('browser', 'phone_network') and isinstance(data.get('scores'), dict):
+        bands = {name: assessment(name, obj.get('value')) for name, obj in data['scores'].items()
+                 if isinstance(obj, dict) and name in ('netcoffee', 'ping0', 'scamalytics')}
+        result['score_advice'] = bands
+        if 'recheck_recommended' in bands.values():
+            if data.get('score_review') not in ('rechecked', 'continue'):
+                result['missing'].append('score_review')
+            if not isinstance(data.get('score_review_note'), str) or not data['score_review_note'].strip():
+                result['missing'].append('score_review_note')
+            result['valid'] = not result['missing']
+    return result

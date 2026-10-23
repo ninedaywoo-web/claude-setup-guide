@@ -54,7 +54,7 @@ python3 scripts/workflow.py next
 | VPS、服务端和电脑网络 | `01-network.md`、`14-scripted-execution.md`；Windows 加读 `10-windows.md`。保留旧 VPN，先测新线路，完成交接后继续 AdsPower。 |
 | AdsPower 与手机 | `02-browser-iphone.md`、`06-before-login.md`：先完成并验收 AdsPower，再进入手机；手机连接后展示原攻略的时区和定位设置路径。 |
 | 时区选择 | 询问一次“跟随节点（程序和作者推荐）／台北”。电脑、手机与 AdsPower 同步所选时区，关闭自动时区和定位；已有选择直接复用。 |
-| Apple 准备与订阅 | `03-apple.md`：核对美区 Apple ID 和养号记录，默认约两天由首次使用时间计算。就绪后保持节点开启、下载官方 Claude、Google 登录并直接订阅 Pro。 |
+| Apple 准备与订阅 | `03-apple.md`：核对美区 Apple ID 和养号记录，默认约两天从本人手机首次 App Store 登录成功计算；客户明确选择现在继续时记录后推进。就绪后保持节点开启、下载官方 Claude、Google 登录并直接订阅 Pro。 |
 | Android | `11-android-web-pay.md`：按官网支付条件继续，使用 Android 字段，不套用 Apple 等待和商店字段。 |
 | 售后 | `04-recovery.md`、`07-apple-purchase-support.md`：仅实际需要时进入。本人验证与付款由客户完成。 |
 

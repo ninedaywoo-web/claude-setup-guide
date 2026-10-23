@@ -13,6 +13,7 @@ import uuid
 
 from network import lock, private_file
 from network_server import Failure
+from workflow_messages import customer_output
 from workflow_definition import ACTIONS, DEVICE_GUIDANCE, INVALIDATES, OBJECT_FIELDS, catalog, facts, validation
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,7 +45,10 @@ class Workflow:
         config = self.root / '.local/network/input.json'
         state = self.root / '.local/network/state.json'
         # Include configuration content and the helper generation, never credentials.
-        return {'config': digest(read(config)) if config.exists() else None,
+        configuration = read(config) if config.exists() else {}
+        server_config = {key: value for key, value in configuration.items() if key != 'probe'}
+        return {'config': digest(configuration) if config.exists() else None,
+                'server': digest(server_config) if server_config else None,
                 'generation': read(state).get('generation') if state.exists() else None}
 
     def init(self):
@@ -89,8 +93,20 @@ class Workflow:
     def sync(self):
         self.require_state()
         changed = self.signature()
+        old = self.state['network_signature']
+        if 'server' not in old and changed['config'] == old['config']:
+            # An unchanged legacy config lets us migrate its server receipts in place.
+            old['server'] = changed['server']
+            for receipt in self.state['receipts']:
+                signature = receipt.get('network_signature', {})
+                if signature.get('config') == old['config']:
+                    signature['server'] = changed['server']
+            self.save()
         if changed != self.state['network_signature']:
-            self.invalidate('network', '网络配置或检测代次发生变化，复查受影响步骤')
+            old = self.state['network_signature']
+            server_changed = (changed['server'] != old['server']) if 'server' in old else (changed['config'] != old['config'])
+            scope = 'network' if server_changed else 'handoff'
+            self.invalidate(scope, '网络配置或检测代次变化，复查受影响步骤')
         if self.state.get('execution'):
             # CLI holds the workflow lock during execution. Reacquiring it means
             # the old controller stopped; never repeat a payment or UI mutation.
@@ -112,7 +128,8 @@ class Workflow:
             receipt = next((item for item in reversed(self.state['receipts'])
                             if item['action'] in actions
                             and item.get('stage_generation', 0) == self.state.get('stage_generations', {}).get(stage['id'], 0)
-                            and item.get('network_signature') == self.state['network_signature']), None)
+                            and (item.get('network_signature', {}).get('server', item.get('network_signature', {}).get('config')) == self.state['network_signature'].get('server', self.state['network_signature']['config'])
+                                 if stage['id'] == 'server' else item.get('network_signature') == self.state['network_signature'])), None)
             valid = bool(receipt and receipt['success'])
             if valid:
                 output = receipt['result']
@@ -121,7 +138,7 @@ class Workflow:
             if not valid:
                 missing.append(name)
         if missing:
-            return {'valid': False, 'missing': sorted(set(missing))}
+            return {**result, 'valid': False, 'missing': sorted(set(missing))}
         return result
 
     def projection(self):
@@ -138,8 +155,8 @@ class Workflow:
             if current is None and status != 'complete':
                 current = (stage, checked)
         if current is None:
-            return {'status': 'complete', 'stage': None, 'next_action': '手机订单与当前账号 Pro 权益已确认，交付完成。',
-                    'progress': progress}
+            return customer_output({'status': 'complete', 'stage': None, 'next_action': '手机订单与当前账号 Pro 权益已确认，交付完成。',
+                    'progress': progress}, self.state, self.clock())
         stage, checked = current
         ticket = digest([self.state['session'], self.state['revision'], stage['id']])
         previous = None
@@ -167,6 +184,8 @@ class Workflow:
                                       and (key != 'download_karing' or facts(self.state, 'devices').get('computer') == 'mac')
                                       and (key != 'cleanup_restore' or sys.platform == 'win32')],
                   'progress': progress}
+        if 'score_advice' in checked:
+            result['score_advice'] = checked['score_advice']
         if stage['id'] == 'devices' and facts(self.state, 'devices').get('setup_explained') is not True:
             result['customer_message'] = DEVICE_GUIDANCE
             result['next_action'] = ('确认电脑和手机类型后，在对话中展示 customer_message 的设备搭配说明；'
@@ -178,7 +197,7 @@ class Workflow:
             result.update(resume_at=checked['waiting_until'], next_action='保留已记录的首次使用时间，到期运行 next 后继续。', allowed_actions=[])
         if stage['id'] == 'subscription' and previous and previous.get('order_confirmed'):
             result['next_action'] = '已有付款记录；核对当前账号订单与权益，先恢复权益，避免重复付款。'
-        return result
+        return customer_output(result, self.state, self.clock())
 
     def next(self):
         return self.projection()
@@ -214,8 +233,19 @@ class Workflow:
         object_field = OBJECT_FIELDS.get(view['stage'])
         if object_field in data and object_field in existing and data[object_field] != existing[object_field]:
             existing = {}
+        if data.get('wait_choice') == 'continue' and source['kind'] != 'user':
+            raise WorkflowError('立即继续需记录客户明确选择，source.kind=user')
+        if data.get('score_review') == 'continue' and source['kind'] != 'user':
+            raise WorkflowError('继续使用偏离结果需记录客户选择，source.kind=user')
+        if view['stage'] in ('browser', 'phone_network') and 'scores' in data and data['scores'] != existing.get('scores'):
+            existing = {k: v for k, v in existing.items() if k not in ('score_review', 'score_review_note')}
+        if view['stage'] == 'devices' and any(k in data and k in existing and data[k] != existing[k] for k in ('computer', 'phone')):
+            existing = {k: v for k, v in existing.items() if k not in ('setup_explained', 'android_route_explained', 'payment_route_status')}
         merged = {**existing, **data}
-        if view['stage'] == 'payment_preparation' and facts(self.state, 'devices').get('phone') != 'android':
+        if view['stage'] == 'devices' and merged.get('phone') != 'android':
+            merged.pop('android_route_explained', None)
+            merged.pop('payment_route_status', None)
+        if view['stage'] in ('payment_preparation', 'phone_proxy') and facts(self.state, 'devices').get('phone') != 'android':
             account_ref = merged.get('apple_account_ref')
             history = self.state.get('apple_accounts', {}).get(account_ref, {}) if isinstance(account_ref, str) else {}
             merged = {**history, **merged}
@@ -227,9 +257,14 @@ class Workflow:
         record = self.state['records'].setdefault(view['stage'], {'data': {}, 'observations': []})
         record['data'] = merged
         record['observations'].append({'source': source, 'data': data, 'at': self.clock().isoformat()})
-        if view['stage'] == 'payment_preparation' and checked['valid'] and 'apple_account_ref' in merged:
-            self.state.setdefault('apple_accounts', {})[merged['apple_account_ref']] = {
-                key: merged[key] for key in ('account_type', 'first_used_at') if key in merged}
+        if view['stage'] in ('payment_preparation', 'phone_proxy') and isinstance(merged.get('apple_account_ref'), str) and merged['apple_account_ref'].strip():
+            if merged.get('store_signed_in') is True and 'first_used_at' not in checked.get('missing', []):
+                self.state.setdefault('apple_accounts', {})[merged['apple_account_ref']] = {
+                    key: merged[key] for key in ('account_type', 'first_used_at', 'apple_reminder_shown', 'wait_choice',
+                                                 'purchase_restricted', 'support_case', 'support_retry_at') if key in merged}
+            elif isinstance(merged.get('purchase_restricted'), bool):
+                account = self.state.setdefault('apple_accounts', {}).setdefault(merged['apple_account_ref'], {})
+                account.update({key: merged[key] for key in ('purchase_restricted', 'support_case', 'support_retry_at') if key in merged})
         self.state['submissions'][payload['ticket']] = digest(payload)
         self.append('observed', stage=view['stage'], valid=checked['valid'])
         self.save()

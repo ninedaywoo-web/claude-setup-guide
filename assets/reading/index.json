@@ -1,41 +1,41 @@
 {
-  "revision": "2026-10-19",
+  "revision": "2026-10-23",
   "files": [
     {
       "file": "01-纯净魔法从零部署.pdf",
-      "pages": 28,
-      "sha256": "ad263cafc8d91415ac47ba61c06126ef0cbf692678524d5958a85dbcde1167a9",
-      "revised_at": "2026-10-19"
+      "pages": 24,
+      "sha256": "cdb9c0039026d7af592bfb0449e6a0e90de9d5e470fa9bd4db73fe9fafea1149",
+      "revised_at": "2026-10-23"
     },
     {
       "file": "02-指纹浏览器与 iPhone 网络配置.pdf",
       "pages": 8,
-      "sha256": "a5d925aa24f2481940429bd7f44a5cc32dcb7e17a079e2eeb8d1ead1e3376305",
-      "revised_at": "2026-10-18"
+      "sha256": "c4628a7a62f3ec518344a3fec71094823e75e08d04154e504adea03b1b3d463d",
+      "revised_at": "2026-10-23"
     },
     {
       "file": "03-Apple 账号、礼品卡与内购.pdf",
-      "pages": 15,
-      "sha256": "c284c8a57e5327adbb885812b16dd2fc3813f27374ee54f82d7b5810a72421b8",
-      "revised_at": "2026-10-19"
+      "pages": 17,
+      "sha256": "428a422a145383d4b04e86e5a2604020825394ebdc9e5d72f033640d3efe5c9c",
+      "revised_at": "2026-10-23"
     },
     {
       "file": "04-退款、封号申诉与旧账号清理.pdf",
       "pages": 4,
-      "sha256": "40b634568478cef24867285ed5c492ff49fba2b8fe962dbc034cf5641f2cef50",
-      "revised_at": "2026-10-18"
+      "sha256": "5cdb983f38232801ef34496c980334c41205a356c03b1f09dcd694c92534d3fd",
+      "revised_at": "2026-10-23"
     },
     {
       "file": "05-注册与登录前自检.pdf",
       "pages": 2,
-      "sha256": "e80bf7af2f76f68a2089451aacf56dacb966c88b1c80f749e61fa3269344541d",
-      "revised_at": "2026-10-18"
+      "sha256": "f3b95cf0a169f7137c8b8a85495946c7a859869878ede6aa1c45fa0fa91b0dd0",
+      "revised_at": "2026-10-23"
     },
     {
       "file": "06-Apple 购买受限与人工支持.pdf",
       "pages": 3,
-      "sha256": "6c3774eafd392031b3f6c410850803a1bc8838eadc29f2ee680b4b3d7ba40ad2",
-      "revised_at": "2026-10-18"
+      "sha256": "ef3b57e7e60abae434a84cd804f9f5c15d24f421dcf6b15495591f9edffb31fa",
+      "revised_at": "2026-10-23"
     },
     {
       "file": "07-Google 账号准备与两步验证.pdf",

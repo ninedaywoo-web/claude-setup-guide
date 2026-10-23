@@ -39,7 +39,7 @@ class WorkflowTests(unittest.TestCase):
             elif isinstance(rule, tuple):
                 data[name] = rule[0]
             elif rule == 'scores':
-                data[name] = {site: {'value': 20, 'result': 'Observed test page'} for site in ('netcoffee', 'ping0', 'scamalytics')}
+                data[name] = {site: {'value': {'netcoffee': 80, 'ping0': 20, 'scamalytics': 5}[site], 'result': 'Observed test page'} for site in ('netcoffee', 'ping0', 'scamalytics')}
             elif rule == 'timestamp':
                 data[name] = self.first_used_at.isoformat()
             else:
@@ -48,6 +48,8 @@ class WorkflowTests(unittest.TestCase):
             data['banned_login'] = 'no'
         if key == 'devices':
             data.update(computer=self.computer, phone=self.phone)
+            if self.phone == 'android':
+                data.update(android_route_explained=True, payment_route_status='available')
         if key == 'vps':
             data.update(node_label='node-a', node_timezone='America/Los_Angeles')
         if key == 'server':
@@ -63,6 +65,7 @@ class WorkflowTests(unittest.TestCase):
             data['account_type'] = self.account_type
             if self.account_type == 'new':
                 data['first_used_at'] = self.first_used_at.isoformat()
+                data['apple_reminder_shown'] = True
         if key in ('login', 'subscription'):
             data['account_ref'] = 'claude-main'
         if key == 'subscription':
@@ -113,20 +116,22 @@ class WorkflowTests(unittest.TestCase):
         resumed = Workflow(self.root, lambda: self.now)
         view = resumed.next()
         self.assertEqual(view['stage'], 'devices')
-        self.assertEqual(view['missing'], ['setup_explained'])
+        self.assertEqual(view['missing'], ['pdf_explained', 'setup_explained'])
         for combination in ('Mac＋iPhone', 'Windows＋iPhone', 'Windows＋Android'):
             self.assertIn(combination, view['customer_message'])
         self.assertIn('手动操作', view['customer_message'])
         self.assertIn('整套交付验证', view['customer_message'])
         next_view = self.flow.submit(self.payload({'setup_explained': True}))
-        self.assertEqual(next_view['stage'], 'google')
-        self.assertNotIn('customer_message', next_view)
+        self.assertEqual(next_view['stage'], 'devices')
+        self.assertIn('PDF', next_view['customer_message'])
+        self.flow.submit(self.payload({'pdf_explained': True}))
+        self.assertEqual(self.flow.next()['stage'], 'google')
 
     def test_device_guidance_is_not_repeated_after_display(self):
         self.reach('devices')
         view = self.flow.submit(self.payload({'setup_explained': True}))
         self.assertEqual(view['stage'], 'devices')
-        self.assertNotIn('customer_message', view)
+        self.assertIn('PDF', view['customer_message'])
         self.flow.submit(self.payload({'computer': 'mac', 'phone': 'iphone'}))
         view = self.flow.invalidate('devices', '客户换成 Windows 和 Android')
         self.assertEqual(view['stage'], 'devices')
@@ -239,7 +244,7 @@ class WorkflowTests(unittest.TestCase):
         network = self.root / '.local/network'; network.mkdir()
         (network / 'state.json').write_text(json.dumps({'generation': 1}))
         self.flow.sync()
-        self.assertEqual(self.flow.next()['stage'], 'server')
+        self.assertEqual(self.flow.next()['stage'], 'computer_network')
         self.assertNotIn('browser', self.flow.state['records'])
         self.assertTrue(self.flow.state['records']['subscription']['data']['order_confirmed'])
         self.reach(None)
@@ -501,8 +506,8 @@ class WorkflowTests(unittest.TestCase):
         data = self.data('payment_preparation'); data['payment_ready'] = False
         self.flow.submit(self.payload(data))
         self.flow.submit(self.payload({'account_type': 'new', 'payment_ready': True}))
-        self.assertEqual(self.flow.next()['missing'], ['first_used_at'])
-        self.flow.submit(self.payload({'first_used_at': self.now.isoformat()}))
+        self.assertEqual(self.flow.next()['missing'], ['apple_reminder_shown', 'first_used_at'])
+        self.flow.submit(self.payload({'first_used_at': self.now.isoformat(), 'apple_reminder_shown': True}))
         self.assertEqual(self.flow.next()['status'], 'waiting')
 
 

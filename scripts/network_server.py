@@ -23,10 +23,18 @@ import tempfile
 import time
 import urllib.request
 import uuid
+import zipfile
 from pathlib import Path
 from urllib.parse import urlencode, quote
 
 VERSION = "v3.10.2"
+XRAY_VERSION = "26.7.28"
+DEFAULT_SNI = "www.cloudflare.com"
+MIN_CLIENT_VERSION = "1.0.0"
+XRAY_ARCHIVES = {
+    "x86_64": ("Xray-linux-64.zip", "8195d909f1109b8f3d99eefe401a3c451d7bf4af71f24d3815420f77e5dd2a40"),
+    "aarch64": ("Xray-linux-arm64-v8a.zip", "f5698bb218ada3b4022db26fafc39601c5f53b46b19eb76c9616325985807501"),
+}
 ARCHIVES = {
     "x86_64": ("amd64", "bfda7921984e7a72555c38d4e861c7a8b67b3686b658608937de99682f1452d0"),
     "aarch64": ("arm64", "a867c65ce52ad49f6504dd4c9c395337dc92ba57ae478da4f1b7ddb624014ed5"),
@@ -72,6 +80,7 @@ def command(args, timeout=45):
 
 def validate(c):
     require(isinstance(c, dict), "invalid_server_config")
+    c.setdefault("sni", DEFAULT_SNI)
     require(set(c) == {"address", "port", "panel_port", "sni"}, "invalid_server_fields")
     try:
         ipaddress.ip_address(c["address"])
@@ -119,7 +128,8 @@ def preflight(c):
     require(managed or port_free(c["panel_port"]), "panel_port_in_use")
     require(target_tls(c["sni"]), "target_tls13_failed")
     return {"status": "passed", "architecture": ARCHIVES[platform.machine()][0], "panel_version": VERSION,
-            "managed_install": managed, "target_tls13": True, "external_firewall": "unverified"}
+            "deployment_xray_version": XRAY_VERSION, "managed_install": managed,
+            "target_tls13": True, "external_firewall": "unverified"}
 
 
 class Panel:
@@ -143,8 +153,8 @@ def object_field(value):
     return json.loads(value) if isinstance(value, str) else value
 
 
-def node_payload(c, identity):
-    return {
+def node_payload(c, identity, min_client_version=MIN_CLIENT_VERSION):
+    payload = {
         "remark": identity["remark"], "enable": True, "port": c["port"], "listen": "0.0.0.0",
         "protocol": "vless", "total": 0, "expiryTime": 0,
         "settings": {"clients": [{"id": identity["uuid"], "email": identity["email"], "enable": True,
@@ -155,6 +165,9 @@ def node_payload(c, identity):
                 "settings": {"publicKey": identity["public_key"], "fingerprint": "chrome", "serverName": c["sni"], "spiderX": "/"}}},
         "sniffing": {"enabled": True, "destOverride": ["http", "tls", "quic"], "routeOnly": False},
     }
+    if min_client_version:
+        payload["streamSettings"]["realitySettings"]["minClientVer"] = min_client_version
+    return payload
 
 
 def matches(actual, expected):
@@ -173,6 +186,8 @@ def matches(actual, expected):
         return False
     reality = stream.get("realitySettings", {})
     want = expected["streamSettings"]["realitySettings"]
+    if "minClientVer" in want and reality.get("minClientVer") != want["minClientVer"]:
+        return False
     return all(reality.get(k) == want[k] for k in ("privateKey", "serverNames", "shortIds")) and reality.get("target", reality.get("dest")) == want["target"]
 
 
@@ -184,7 +199,7 @@ def ensure_node(panel, receipt, persist):
             "remark": "claude-setup-" + secrets.token_hex(8), "sub_id": secrets.token_hex(16),
             "private_key": keys["privateKey"], "public_key": keys["publicKey"], "short_id": secrets.token_hex(8)}
         persist(receipt)  # Durable identity BEFORE the API mutation.
-    payload = node_payload(receipt["config"], receipt["identity"])
+    payload = node_payload(receipt["config"], receipt["identity"], receipt.get("min_client_version"))
     existing = panel.call("inbounds/list")
     nodes = [n for n in existing if n.get("remark") == payload["remark"]]
     require(len(nodes) <= 1, "duplicate_managed_nodes")
@@ -210,6 +225,29 @@ def export_uri(receipt):
     return "vless://%s@%s:%d?%s#%s" % (i["uuid"], addr, c["port"], urlencode(params), quote(i["remark"]))
 
 
+def xray_binary(installation=None):
+    return (installation or INSTALL) / "bin" / ("xray-linux-" + ARCHIVES[platform.machine()][0])
+
+
+def xray_version(binary):
+    return command([str(binary), "version"]).splitlines()[0].split()[1]
+
+
+def install_xray(installation):
+    name, checksum = XRAY_ARCHIVES[platform.machine()]
+    with tempfile.TemporaryDirectory(dir=str(HOME)) as tmp:
+        archive = Path(tmp) / name
+        url = "https://github.com/XTLS/Xray-core/releases/download/v%s/%s" % (XRAY_VERSION, name)
+        with urllib.request.urlopen(url, timeout=60) as src, archive.open("wb") as dst:
+            shutil.copyfileobj(src, dst)
+        require(hashlib.sha256(archive.read_bytes()).hexdigest() == checksum, "xray_checksum_mismatch")
+        binary = xray_binary(installation)
+        with zipfile.ZipFile(archive) as bundle:
+            binary.write_bytes(bundle.read("xray"))
+        binary.chmod(0o755)
+        require(xray_version(binary) == XRAY_VERSION, "xray_version_mismatch")
+
+
 def install_archive():
     arch, checksum = ARCHIVES[platform.machine()]
     with tempfile.TemporaryDirectory(dir=str(HOME)) as tmp:
@@ -225,8 +263,14 @@ def install_archive():
         # Staging on the destination filesystem allows an atomic rename.
         stage = INSTALL.with_name(".claude-setup-x-ui-stage")
         require(not stage.exists(), "staging_directory_requires_inspection")
-        shutil.copytree(Path(tmp) / "x-ui", stage)
-        stage.rename(INSTALL)
+        try:
+            shutil.copytree(Path(tmp) / "x-ui", stage)
+            # Assemble the delivery bundle before installing or starting the panel.
+            install_xray(stage)
+            stage.rename(INSTALL)
+        finally:
+            if stage.exists():
+                shutil.rmtree(stage)
 
 
 def configure_panel(receipt):
@@ -292,12 +336,15 @@ def deploy(c):
         else:
             # Repeat the read-only checks under the deployment lock.
             preflight(c)
-            receipt = {"version": VERSION, "config": c, "stage": "prepared", "username": "guide-" + secrets.token_hex(4),
+            receipt = {"version": VERSION, "xray_version": XRAY_VERSION, "min_client_version": MIN_CLIENT_VERSION,
+                       "config": c, "stage": "prepared", "username": "guide-" + secrets.token_hex(4),
                        "password": secrets.token_urlsafe(32), "base_path": secrets.token_hex(16)}
             persist(receipt)
         if not INSTALL.exists():
             install_archive()
         require(command([str(INSTALL / "x-ui"), "-v"]).strip().lstrip("v") == VERSION.lstrip("v"), "panel_version_changed")
+        if receipt.get("xray_version"):
+            require(xray_version(xray_binary()) == receipt["xray_version"], "xray_version_changed")
         if receipt["stage"] == "prepared":
             configure_panel(receipt)
             receipt["stage"] = "panel_configured"
@@ -325,9 +372,11 @@ def verify(c):
     panel = Panel(receipt)
     panel_listen_verified(c["panel_port"])
     nodes = [n for n in panel.call("inbounds/list") if n.get("remark") == receipt["identity"]["remark"]]
-    require(len(nodes) == 1 and matches(nodes[0], node_payload(c, receipt["identity"])), "node_readback_failed")
+    require(len(nodes) == 1 and matches(nodes[0], node_payload(c, receipt["identity"], receipt.get("min_client_version"))), "node_readback_failed")
     status = panel.call("server/status")
     require(status.get("xray", {}).get("state") == "running", "xray_not_running")
+    if receipt.get("xray_version"):
+        require(status["xray"].get("version") == receipt["xray_version"], "xray_version_changed")
     with socket.create_connection(("127.0.0.1", c["port"]), timeout=5):
         pass
     return {"status": "passed", "panel_version": VERSION, "xray_version": status["xray"].get("version"),

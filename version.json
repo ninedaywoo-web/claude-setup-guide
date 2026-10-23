@@ -1,11 +1,11 @@
 {
-  "version": "1.0.34",
+  "version": "1.0.35",
   "published_at": "2026-10-22",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "Karing 连接或 REALITY 握手失败时直接执行已有修复流程，由 AI 连续操作并复测",
-    "统一故障入口与网络交接规则，用户仅配合具体的本人操作",
-    "补齐 REALITY 修复后的配置记录同步，保证原节点可复用和正确导出"
+    "新交付直接使用 Karing 1.2.25.2802 与服务端 Xray 26.7.28 固定组合",
+    "新增 Mac Karing 固定版本下载与校验脚本",
+    "首次创建节点即配置 Cloudflare 目标／SNI 与 REALITY minClientVer 1.0.0"
   ]
 }

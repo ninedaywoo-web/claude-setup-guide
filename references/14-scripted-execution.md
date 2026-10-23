@@ -2,6 +2,26 @@
 
 用于部署服务器、导出参数、固定网络请求、状态记录和三站评分汇总。按原交付顺序调用 `scripts/network.py`；VPN 切换由现有客户端流程完成。
 
+## 固定交付版本
+
+| 组件 | 交付值 |
+| --- | --- |
+| Mac Karing | 1.2.25.2802（Universal，macOS 12+） |
+| 3x-ui 面板 | 3.10.2 |
+| 服务端 Xray | 26.7.28 |
+| REALITY minClientVer | 1.0.0 |
+| 目标 / 两端 SNI | www.cloudflare.com:443 / www.cloudflare.com |
+
+Mac 在项目目录运行：
+
+```bash
+python3 scripts/download_karing.py
+```
+
+脚本从官方固定版本地址下载并校验 SHA-256，返回 `.local/downloads/` 内的安装包路径；重复运行复用校验通过的文件。AI 用返回的 DMG 安装 Karing，读取应用版本 `1.2.25`、构建号 `2802` 后继续导入。Universal 包适用于 Intel 和 Apple 芯片。交付软件版本由项目统一维护；后续版本经过验证后再更新固定值。
+
+新服务器安装时，脚本先组装 3x-ui 与指定 Xray，再启动面板和创建节点。`server.sni` 省略时自动填 `www.cloudflare.com`，明确填写的自定义值按实际配置使用。回执保存交付内核版本与 REALITY 配置，后续部署和导出会读回核验。已经运行的旧部署继续沿用其回执；旧版故障设备进入网络章节的修复流程。
+
 ## 调用约定
 
 由 AI 准备输入、调用脚本并读取 JSON 结果。普通步骤成功后自行继续，不每步询问用户；遇到缺失信息、本人验证、购买付款或现有教程要求的网络恢复确认时才交接。失败先看 `error` 与当前状态，不盲目重试变更操作。
@@ -25,7 +45,7 @@
     "address": "203.0.113.10",
     "port": 18555,
     "panel_port": 18899,
-    "sni": "www.microsoft.com"
+    "sni": "www.cloudflare.com"
   },
   "probe": {
     "proxy": "http://127.0.0.1:actual-port",
@@ -47,7 +67,7 @@ python3 scripts/network.py export
 ```
 
 - `preflight` 只读检查 Linux、amd64／arm64、systemd、权限、磁盘、端口及目标网站 TLS 1.3。云安全组和外部可达性仍待实测。
-- `deploy` **仅支持全新服务器，或本脚本自己创建的部署**。锁定 3x-ui v3.10.2 官方发行包并校验 SHA-256；附带 Xray v26.10.10。客户端连接按原教程实测，Karing 故障直接进入网络章节第十节连续修复。
+- `deploy` **仅支持全新服务器，或本脚本自己创建的部署**。分别锁定并校验 3x-ui v3.10.2 与 Xray v26.7.28 官方发行包，组装完成后首次启动。客户端连接按原教程实测，Karing 故障直接进入网络章节第十节连续修复。
 - 已有其他面板返回 `existing_panel_requires_manual_path`，沿原教程检查和复用；首版部署脚本只管理自己创建的安装。
 - 节点 UUID、密钥和 Short ID 在创建之前持久保存到服务器 `/var/lib/claude-setup-network/receipt.json`。失败后重新执行先读回面板，复用同一节点；遇到人工改动返回 `node_config_drift`，不自动覆盖。
 - 安装位置 `/usr/local/x-ui`，服务 `x-ui.service`，数据库 `/etc/x-ui`。不做系统全量升级，不改防火墙。开放节点 TCP 端口需要按实际云安全组与服务器防火墙核对。
@@ -114,4 +134,4 @@ python3 scripts/network.py scores --input .local/network/scores-input.json
 
 `.local/network/report.json` 以 `scope: script_execution` 汇总每个脚本步骤的实际结果。`.local/progress.md` 只追加一次报告入口，保留原内容；VPN 交接、浏览器、手机和账号阶段的结果继续记在进度文件。
 
-常见错误：`ssh_or_remote_protocol_failed` 先查 SSH、主机指纹、Python 与 sudo；`managed_config_changed` 先查当前输入是否属于同一客户；`node_config_drift` 对照现有节点；`panel_not_ready`／`xray_not_running` 查看服务器日志；探针 `failed` 检查本机入口、实际出口与 HTTPS。原始日志可能含秘密，只在本机检查，给用户显示脱敏结论。
+常见错误：`ssh_or_remote_protocol_failed` 先查 SSH、主机指纹、Python 与 sudo；`managed_config_changed` 先查当前输入是否属于同一客户；`node_config_drift` 对照现有节点；`panel_not_ready`／`xray_not_running` 查看服务器日志；`xray_version_changed` 将实际内核恢复为该部署回执中的固定版本；探针 `failed` 检查本机入口、实际出口与 HTTPS。原始日志可能含秘密，只在本机检查，给用户显示脱敏结论。

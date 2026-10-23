@@ -31,6 +31,8 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Mac Ka
 
 ## 脚本执行入口
 
+新交付固定使用 Karing `1.2.25.2802`、服务端 Xray `26.7.28`、REALITY `minClientVer=1.0.0`、目标 `www.cloudflare.com:443` 与两端 SNI `www.cloudflare.com`。AI 直接运行 `python3 scripts/download_karing.py` 获取 Mac 安装包，安装后读取版本 `1.2.25`、构建号 `2802`。服务端首次启动前即装入指定 Xray；默认目标与 SNI 已内置。版本选择由项目维护，客户按这套组合交付。
+
 服务器预检／新部署／节点导出、固定网络检测、状态恢复与三站评分汇总，优先按 [确定性执行层](references/14-scripted-execution.md) 调用 `scripts/network.py`。已有面板按原教程复用。脚本步骤完成后继续客户端验收；手机、AdsPower 和 VPN 交接按实际界面与既有流程完成。三站分别展示实际分数与建议，轻微偏离继续，缺失结果标为未验证。
 
 开场涉及旧账号清理时，Mac 读 [Mac 端清理 Skill](references/15-mac-cleanup.md)，Windows 读 [Windows 端清理 Skill](references/16-windows-cleanup.md)。脚本已内置；客户界面只使用这两个名称，不要求安装原项目的桌面客户端。先审计、沿用用户已选范围，备份后做一次最终确认。

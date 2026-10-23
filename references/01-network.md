@@ -398,14 +398,16 @@ root@vps:~#
 
 ## 四、服务器部署与面板配置
 
+**固定交付组合：**新交付固定使用 Karing `1.2.25.2802`、服务端 Xray `26.7.28`、REALITY `minClientVer=1.0.0`、目标 `www.cloudflare.com:443` 与两端 SNI `www.cloudflare.com`。
+
 **AI 脚本执行入口：**优先读 [确定性执行层](14-scripted-execution.md)。全新受支持服务器可由脚本预检、固定版本部署并导出节点；已有面板或不支持的环境继续本章。脚本面板走 SSH 隧道；脚本部署成功后直接进入客户端配置，已有面板按本章管理。
 
-### （一）更新系统环境
+### （一）准备系统工具
 
-成功登录后，先执行以下命令，让系统保持最新，并安装必备的下载工具：
+手动管理服务器时，更新软件索引并安装必备的下载工具：
 
 ```bash
-apt update && apt upgrade -y
+apt update
 ```
 
 ```bash
@@ -414,21 +416,25 @@ apt install curl wget -y
 
 ### （二）安装 3x-ui 可视化面板
 
-**Mac / Karing 修复入口：**部署前读取 Karing 与服务端 Xray 版本。出现握手报错或连接失败，直接执行本篇第十节的固定修复流程；AI 负责读取环境、应用已有方案和复测。
+**Mac / Karing 交付入口：**新服务器直接安装本节的固定版本组合。AI 读取安装后的版本并测通；已有设备连接失败时，直接执行第十节的修复流程。
 
 我们要安装一个叫 3x-ui 的控制面板，它能让你在网页上用鼠标点点点就能建好节点，不用敲复杂的代码。
 
-1. 执行安装脚本
+1. 执行固定版本部署
 
-在终端中复制并运行以下一键脚本：
+AI 按[确定性执行层](14-scripted-execution.md)准备本机输入文件，在项目目录运行：
 
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
+python3 scripts/network.py preflight
+python3 scripts/network.py deploy
+python3 scripts/network.py export
 ```
 
-2. 初始交互设置
+脚本自动完成面板、固定内核与节点配置，返回本机节点文件和面板资料；随后进入客户端安装与导入。
 
-脚本运行中途会停下来问你几个问题：
+2. 已有面板的设置参考
+
+已有面板按实际界面管理，以下为手动设置时的字段说明：
 
 是否自定义账号密码和端口？ 输入 y 并回车。
 
@@ -534,7 +540,7 @@ Access URL（最终登录地址）
 
 流控 (Flow)：如果在选项里能看到，选择 xtls-rprx-vision（如果没有或者找不到，可以留空不管）。
 
-目标网站 (Dest) / SNI：填入一个支持 TLS 1.3 的国外大厂域名，比如填入 www.oracle.com:443 或 www.microsoft.com:443，SNI 框填 www.oracle.com。
+目标网站 (Dest / target)：`www.cloudflare.com:443`；服务端允许的 SNI 与客户端 SNI 都填 `www.cloudflare.com`；REALITY `minClientVer` 填 `1.0.0`。新部署脚本已自动写入这组值。
 
 ![](../assets/images/network/12.jpg)
 
@@ -572,7 +578,7 @@ Windows 完整顺序按 [Windows 专章](10-windows.md)执行，本节保留界�
 
 因为clash verge这玩意儿不支持导入vless链接，要先创建yaml文件，才能导入，很麻烦，karing一键导入比较简单
 
-下面仅仅展示win版本的v2rayN如何下载，karing是同理的办法，如果不会，可以问下任何Ai，然后按照下面的思路下载下来即可。但是karing的导入方法会单独介绍。
+下面展示 Windows v2rayN 的下载；Mac Karing 使用第（八）节的固定版本下载脚本。
 
 ### （一）下载版本选择
 
@@ -668,7 +674,13 @@ v2rayN 软件最下方的那一排状态栏，是决定你电脑怎么上网的�
 
 导入后出现 `reality verification failed` 或连接失败，直接执行本篇第十节：适用时先试 `mixed → gvisor`，随后自动校正参数并应用已有 REALITY 修复组合，每步复测，成功后继续。
 
-先在github把karing下载下来，可能开始需要你一些授权，给一下就好了
+AI 在项目目录执行固定版本下载：
+
+```bash
+python3 scripts/download_karing.py
+```
+
+使用返回的 DMG 安装 Karing `1.2.25.2802`，核对应用版本 `1.2.25`、构建号 `2802`。安装和首次启动涉及系统授权时由用户完成，然后继续导入节点。
 
 点击“添加配置”
 
@@ -834,6 +846,8 @@ Proxy Only 模式下，YouTube 等大部分 App 根本不认识代理
 
 ## 十、Karing REALITY 握手失败
 
+新交付已在安装阶段配置好本节的固定版本组合。本节处理已有设备或交付过程中出现的连接故障；AI 读取当前版本与参数，已匹配的项目直接进入下一项检测。
+
 **触发即执行：**用户反馈 Karing 连不上、出现 `reality verification failed`、切换后 Codex 断连，或新节点反复连接失败，就进入本节。AI 自行读取环境、保存原值、修复并复测；用户已经要求配置或修复时，沿用这份授权连续完成。
 
 给用户的开场话术：“我先按已有方案修复 Karing，完成后检查实际连接。”随后直接操作。日志用于判断每步效果和选择下一步；“是否属于已知兼容问题”由 AI 在执行中判断。需要用户配合时，只提出缺失的访问方式、本人验证或当前工具无法完成的具体动作。
@@ -872,7 +886,7 @@ AI 使用当前面板的 Xray 内核版本管理，或官方对应架构的发�
 
 Xray 内核由服务端入站共用，切换后同时检查服务状态及其余入站。修复有效就保留；无效则恢复这组原配置，读取本轮客户端与服务端日志，继续定位下一项。
 
-历史依据：2026 年 9 月 30 日，Karing `1.2.25.2802` 连接 Xray `26.9.9` 握手失败，升级 Karing 测试版 `1.2.26.2905` 后仍失败；服务端切换到 `26.7.28` 并同步上述目标配置后，原稳定版 Karing 恢复连接。当次还涉及 Microsoft 目标证书数据的处理，因此版本、目标和 SNI 一起纳入本修复步骤。客户端保留当前 Karing 版本，历史版本号用于查阅案例。
+历史依据：2026 年 9 月 30 日，Karing `1.2.25.2802` 连接 Xray `26.9.9` 握手失败，升级 Karing 测试版 `1.2.26.2905` 后仍失败；服务端切换到 `26.7.28` 并同步上述目标配置后，原稳定版 Karing 恢复连接。当次还涉及 Microsoft 目标证书数据的处理，因此版本、目标和 SNI 一起纳入本修复步骤。本项目据此将 Karing `1.2.25.2802` 和上述服务端组合设为新交付默认版本。
 
 **脚本创建的节点同步记录：**完成修复后，AI 按实际服务端配置同步本机 `.local/network/input.json` 的 `server.sni` 和服务器 `/var/lib/claude-setup-network/receipt.json` 的 `config.sni`，保留已有节点身份字段与面板版本。使用脚本的原子保存方式写入，随后执行 `python3 scripts/network.py invalidate`、`python3 scripts/network.py export`，再检测实际连接。这样后续导出和续跑会沿用修复后的目标。恢复原配置时同步恢复这两处记录。已有其他面板按其原导出流程处理。
 

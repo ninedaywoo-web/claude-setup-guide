@@ -36,6 +36,8 @@ Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-
 
 Windows 用户还会读取 [Windows 专门流程](references/10-windows.md)：先保留旧 VPN 测试新节点，再切换到 TUN＋全局并复验；Android 用户可按[官网 Google Pay 基础指引](references/11-android-web-pay.md)继续，付款前先了解案例较少及作者反馈的封号后无法退款风险；支付选项以实际页面为准。Windows 真实整机交付验收仍待完成，本次发布不代表已实测跑通。
 
+新交付使用固定组合：Karing **1.2.25.2802**、服务端 Xray **26.7.28**，REALITY 目标与 SNI 统一为 Cloudflare，脚本直接下载、校验并配置。
+
 Karing 连接失败、REALITY 握手报错或切换后 Codex 掉线时，AI 会直接按已有方案修复：适用时先试 gvisor，随后校正参数并应用已有 REALITY 版本与目标组合，每步实测，成功后继续交付。技术判断由 AI 完成；用户只需配合工具无法代做的具体动作。
 
 ## 安装成 Skill
@@ -84,6 +86,7 @@ python3 scripts/update.py check --force
 - `assets/reading/`：10 份客户阅读版 PDF、阅读目录及供 AI 核对的索引。
 - `assets/progress-template.md`：进度模板。
 - `scripts/network.py`：VPS 部署与节点导出、网络检测、三站评分汇总和执行状态恢复，详见[确定性执行层](references/14-scripted-execution.md)。
+- `scripts/download_karing.py`：下载并校验固定版本的 Mac Karing 安装包。
 - `scripts/cleanup.py`：Mac／Windows 清理入口，默认只读审计。
 - `scripts/update.py`：24 小时检查缓存、回答末尾提醒文本及经确认后的更新；`check --force` 可立即重查。
 - `version.json`、`CHANGELOG.md`：版本与更新记录。

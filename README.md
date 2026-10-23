@@ -1,5 +1,7 @@
 # Claude Max 防封奶妈级教程
 
+本地开发中的统一交付控制层：启动读取后运行 `python3 scripts/workflow.py init`，由同一入口管理从开场到订阅完成的阶段。当前实现与使用方法见[统一控制层](references/17-workflow-controller.md)。
+
 这是客户交付的离线图文教程和 AI 带做 Skill。正文、操作配图及 10 份客户阅读版 PDF 均在项目内，不需要打开在线文档。
 
 ## 给 AI 的入口

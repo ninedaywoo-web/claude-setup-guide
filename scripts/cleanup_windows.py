@@ -11,6 +11,7 @@ import shutil
 import stat
 import subprocess
 import sys
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -221,21 +222,37 @@ def restore(batch, check=processes_stopped):
         current = snapshot(Path(e["path"]))
         require(current in (e["before"], item["after"]), "new_data_refuse_restore")
     check()
+    p['status'] = 'restoring'
+    p['restore_completed'] = []
+    save(batch / 'manifest.json', p)
     for item in reversed(todo):
         n = item["index"]; e = p["entries"][n]; dst = Path(e["path"])
         check()
         current = snapshot(dst)
         if current == e["before"]:
+            p['restore_completed'].append(n)
+            save(batch / 'manifest.json', p)
             continue
         require(current == item["after"], "new_data_refuse_restore")
         dst.parent.mkdir(parents=True, exist_ok=True)
         if e["operation"] == "edit":
             temp = batch / "restore.tmp"
             shutil.copy2(batch / ("backup-%d" % n), temp)
+            check()
+            require(snapshot(dst) == item['after'], 'new_data_refuse_restore')
             os.replace(temp, dst)
         else:
-            copy(batch / ("backup-%d" % n), dst)
+            # Build on the destination filesystem; interruption leaves dst absent.
+            with tempfile.TemporaryDirectory(prefix='.claude-restore-', dir=dst.parent) as staging:
+                temp = Path(staging) / 'content'
+                copy(batch / ("backup-%d" % n), temp)
+                require(snapshot(temp) == e['before'], 'restore_verification_failed')
+                check()
+                require(snapshot(dst) == item['after'], 'new_data_refuse_restore')
+                temp.rename(dst)
         require(snapshot(dst) == e["before"], "restore_verification_failed")
+        p['restore_completed'].append(n)
+        save(batch / 'manifest.json', p)
     p["status"] = "restored"
     save(batch / "manifest.json", p)
     return {"status": "restored", "backup": str(batch)}
@@ -250,6 +267,11 @@ def main():
     parser.add_argument("--scope", nargs="+", choices=SCOPES, default=["cache"])
     args = parser.parse_args()
     try:
+        from workflow_guard import check
+        try:
+            check(Path(__file__).resolve().parents[1], 'cleanup:' + ('restore' if args.restore else ('apply' if args.apply else 'audit')))
+        except ValueError as exc:
+            raise Failure(str(exc))
         require(sys.platform == "win32", "windows_required")
         home = Path.home()
         roaming = Path(os.environ["APPDATA"])

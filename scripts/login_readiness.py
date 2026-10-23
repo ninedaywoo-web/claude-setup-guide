@@ -73,6 +73,15 @@ def evaluate(record):
 
 
 def main():
+    if (ROOT / '.local/workflow/state.json').exists():
+        from network import lock
+        from workflow import Workflow
+        with lock(ROOT / '.local/workflow'):
+            workflow = Workflow(ROOT)
+            workflow.sync()
+            result = workflow.next()
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--input', type=Path, default=ROOT / '.local/login-readiness.json')
     parser.add_argument('--template', action='store_true')

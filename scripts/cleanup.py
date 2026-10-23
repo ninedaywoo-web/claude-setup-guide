@@ -14,8 +14,18 @@ def main():
     else:
         print("清理 Skill 当前仅支持 macOS 和 Windows。", file=sys.stderr)
         return 2
+    apply = '--apply' in sys.argv
     if len(sys.argv) == 1:
-        sys.argv.append("--audit")
+        sys.argv.append('--audit')
+    from workflow_guard import check
+    try:
+        operation = 'restore' if '--restore' in sys.argv else ('apply' if apply else 'audit')
+        check(root.parent, 'cleanup:' + operation)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    if sys.platform == 'darwin' and apply:
+        sys.argv.remove('--apply')
     runpy.run_path(str(script), run_name="__main__")
     return 0
 

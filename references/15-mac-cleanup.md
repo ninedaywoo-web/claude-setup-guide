@@ -5,13 +5,13 @@
 先运行只读审计：
 
 ```bash
-python3 scripts/cleanup.py --audit
+python3 scripts/workflow.py run --action cleanup_audit
 ```
 
 展示实际存在的缓存／日志、CLI 本地身份、钥匙串和 Desktop 登录态，沿用客户已确认的选择。实际清理在真实终端运行：
 
 ```bash
-python3 scripts/vendor/mac_cleanup/claude_cleanup.py
+python3 scripts/workflow.py run --action cleanup_apply
 ```
 
 客户在最终清单后输入一次 `CONFIRM`，由本人完成，AI 不管道代答。只在范围新增或变化时补问。CLI 身份、钥匙串、Desktop 数据／应用分别选择；精简模式与时区默认保持原值。网络配置阶段的时区按浏览器与 iPhone 章节选择节点城市或台北，并统一电脑、手机与浏览器设置。

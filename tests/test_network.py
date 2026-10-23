@@ -43,6 +43,31 @@ class MemoryPanel:
 
 
 class ServerTests(unittest.TestCase):
+    def test_resume_starts_stopped_managed_service_and_preserves_running_one(self):
+        for active in (False, True):
+            with self.subTest(active=active), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)/'state'; home.mkdir()
+                install = Path(tmp)/'install'; install.mkdir()
+                receipt = {'config': SERVER, 'version': s.VERSION, 'xray_version': s.XRAY_VERSION,
+                           'stage': 'panel_ready'}
+                (home/'receipt.json').write_text(json.dumps(receipt))
+                calls = []
+                def command(args, **kw):
+                    calls.append(args)
+                    return s.VERSION if args[-1] == '-v' else ''
+                def wait(receipt):
+                    self.assertEqual(['systemctl', 'start', 'x-ui'] in calls, not active)
+                    return object()
+                with patch.object(s, 'HOME', home), patch.object(s, 'INSTALL', install), \
+                     patch.object(s.platform, 'machine', return_value='x86_64'), \
+                     patch.object(s, 'preflight'), patch.object(s, 'command', side_effect=command), \
+                     patch.object(s, 'xray_version', return_value=s.XRAY_VERSION), \
+                     patch.object(s.subprocess, 'run', return_value=SimpleNamespace(
+                         returncode=0 if active else 3, stdout='active' if active else 'inactive')), \
+                     patch.object(s, 'wait_panel', side_effect=wait), \
+                     patch.object(s, 'panel_listen_verified'), patch.object(s, 'ensure_node'):
+                    self.assertEqual(s.deploy(dict(SERVER))['status'], 'configured')
+
     def test_ambiguous_create_reuses_persisted_identity(self):
         panel = MemoryPanel(); panel.ambiguous = True
         receipt = {'config': SERVER}

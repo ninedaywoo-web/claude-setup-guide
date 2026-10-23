@@ -1,6 +1,6 @@
 # 确定性执行层
 
-用于部署服务器、导出参数、固定网络请求、状态记录和三站评分汇总。按原交付顺序调用 `scripts/network.py`；VPN 切换由现有客户端流程完成。
+用于部署服务器、导出参数、固定网络请求、状态记录和三站评分汇总。由[统一控制层](17-workflow-controller.md)按当前阶段调用现有脚本；VPN 切换的页面操作仍由对应客户端步骤完成。
 
 ## 固定交付版本
 
@@ -15,7 +15,7 @@
 Mac 在项目目录运行：
 
 ```bash
-python3 scripts/download_karing.py
+python3 scripts/workflow.py run --action download_karing
 ```
 
 脚本从官方固定版本地址下载并校验 SHA-256，返回 `.local/downloads/` 内的安装包路径；重复运行复用校验通过的文件。AI 用返回的 DMG 安装 Karing，读取应用版本 `1.2.25`、构建号 `2802` 后继续导入。Universal 包适用于 Intel 和 Apple 芯片。交付软件版本由项目统一维护；后续版本经过验证后再更新固定值。
@@ -61,10 +61,11 @@ python3 scripts/download_karing.py
 ## 服务器与节点
 
 ```bash
-python3 scripts/network.py preflight
-python3 scripts/network.py deploy
-python3 scripts/network.py export
+python3 scripts/workflow.py run --action server_preflight
+python3 scripts/workflow.py run --action server_deploy
 ```
+
+已有本脚本管理的节点在 `server` 阶段使用 `server_export` 替代新部署；新部署成功后已有导出结果，按程序返回继续。
 
 - `preflight` 只读检查 Linux、amd64／arm64、systemd、权限、磁盘、端口及目标网站 TLS 1.3。云安全组和外部可达性仍待实测。
 - `deploy` **仅支持全新服务器，或本脚本自己创建的部署**。分别锁定并校验 3x-ui v3.10.2 与 Xray v26.7.28 官方发行包，组装完成后首次启动。客户端连接按原教程实测，Karing 故障直接进入网络章节第十节连续修复。
@@ -81,10 +82,10 @@ python3 scripts/network.py export
 ## 独立测通与切换后复测
 
 ```bash
-python3 scripts/network.py probe --route proxy
+python3 scripts/workflow.py run --action probe_proxy
 # 按原教程安排恢复方法，完成旧 VPN → 新客户端交接后：
 python3 scripts/network.py invalidate
-python3 scripts/network.py probe --route system
+python3 scripts/workflow.py run --action probe_system
 python3 scripts/network.py status
 ```
 
@@ -117,8 +118,10 @@ python3 scripts/network.py status
 `environment` 可为 `adspower`、`iphone_wifi`、`iphone_cellular`、`android_wifi`、`android_cellular`，分别记录。没有测到填 `null`；有分数时，`evidence` 填实际观察来源或本机凭证路径，无需为汇总另存一份文件。原教程要求保留的 Ping0 凭证照常保存。超过 24 小时的结果仍展示原值和时间，附复测建议；客户、节点或设备上下文不符时先核对来源。环境变化后复验受影响项。
 
 ```bash
-python3 scripts/network.py scores --input .local/network/scores-input.json
+python3 scripts/workflow.py run --action browser_scores --input .local/network/scores-input.json
 ```
+
+手机阶段用 `phone_scores`，输入的设备环境应对应当前手机。
 
 | 网站 | 原建议参考 | 本地流程的轻微偏离容差 | 超出容差 |
 | --- | --- | --- | --- |
@@ -130,12 +133,14 @@ python3 scripts/network.py scores --input .local/network/scores-input.json
 
 ## 记录与恢复
 
+重新运行服务端部署时，脚本检查本项目管理的 `x-ui` 实际运行状态，已停止的服务自动启动，再读取面板和节点状态；正在运行的服务保持运行。
+
 `.local/network/state.json` 记录 `running / interrupted / stale / failed / passed / configured / exported / recorded`。`running` 遇到下次恢复会变成 `interrupted`。配置变化或 `invalidate` 保留旧结果但标为 `stale`。状态坏掉会停止，不静默重建。
 
 `.local/network/report.json` 以 `scope: script_execution` 汇总每个脚本步骤的实际结果。`.local/progress.md` 只追加一次报告入口，保留原内容；VPN 交接、浏览器、手机和账号阶段的结果继续记在进度文件。
 
 常见错误：`ssh_or_remote_protocol_failed` 先查 SSH、主机指纹、Python 与 sudo；`managed_config_changed` 先查当前输入是否属于同一客户；`node_config_drift` 对照现有节点；`panel_not_ready`／`xray_not_running` 查看服务器日志；`xray_version_changed` 将实际内核恢复为该部署回执中的固定版本；探针 `failed` 检查本机入口、实际出口与 HTTPS。原始日志可能含秘密，只在本机检查，给用户显示脱敏结论。
 
-## 手机登录前的顺序检查
+## 全流程顺序与恢复
 
-手机网络连接后，按浏览器与 iPhone 章节 2.3 展示并完成电脑／手机时区和定位设置，再完成网络验收。AI 将逐项观察结果写入 `.local/login-readiness.json`，运行 `python3 scripts/login_readiness.py`。脚本返回首个待办和全部剩余项；完成后返回 `ready`，直接接手机登录与订阅。字段、平台选择和恢复规则见[登录前衔接脚本](06-before-login.md#登录前衔接脚本)。网络脚本的成功报告只代表对应网络操作完成。
+阶段顺序、实际观察、等待和下一步统一由 `scripts/workflow.py` 管理，使用方法见[统一交付控制层](17-workflow-controller.md)。网络脚本的局部报告会接入对应阶段，网络输入或检测代次变化自动使相关检查失效；手机、浏览器、账号和付款不再通过独立的文字“已完成”推进。

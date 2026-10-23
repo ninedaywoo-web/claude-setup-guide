@@ -2,6 +2,7 @@ import contextlib
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -72,6 +73,53 @@ class WindowsCleanupTests(unittest.TestCase):
         (self.home/'.claude.json').write_text('{"new":"keep me"}')
         with self.assertRaisesRegex(w.Failure, 'new_data'): w.restore(self.batch, check=lambda:None)
         self.assertEqual((self.home/'.claude.json').read_text(), '{"new":"keep me"}')
+
+    def test_interrupted_directory_restore_can_retry(self):
+        (self.home/'.claude/cache/b').write_text('second file')
+        self.apply(self.plan('cache'))
+        def interrupted(source, target):
+            target.mkdir(); shutil.copy2(source/'a', target/'a')
+            raise OSError('interrupted during directory copy')
+        with patch.object(w, 'copy', side_effect=interrupted):
+            with self.assertRaises(OSError): w.restore(self.batch, check=lambda:None)
+        self.assertFalse((self.home/'.claude/cache').exists())
+        w.restore(self.batch, check=lambda:None)
+        self.assertEqual((self.home/'.claude/cache/a').read_text(), 'cache')
+        self.assertEqual((self.home/'.claude/cache/b').read_text(), 'second file')
+        self.assertEqual(json.loads((self.batch/'manifest.json').read_text())['status'], 'restored')
+
+    def test_restore_corrupt_staging_never_publishes_partial_directory(self):
+        self.apply(self.plan('cache'))
+        def corrupt(source, target):
+            target.mkdir(); (target/'a').write_text('bad copy')
+        with patch.object(w, 'copy', side_effect=corrupt):
+            with self.assertRaisesRegex(w.Failure, 'restore_verification_failed'):
+                w.restore(self.batch, check=lambda:None)
+        self.assertFalse((self.home/'.claude/cache').exists())
+        w.restore(self.batch, check=lambda:None)
+        self.assertEqual((self.home/'.claude/cache/a').read_text(), 'cache')
+
+    def test_restore_keeps_new_data_created_during_staging(self):
+        self.apply(self.plan('cache'))
+        original = w.copy
+        def concurrent_write(source, target):
+            original(source, target)
+            dest = self.home/'.claude/cache'; dest.mkdir(); (dest/'new').write_text('keep')
+        with patch.object(w, 'copy', side_effect=concurrent_write):
+            with self.assertRaisesRegex(w.Failure, 'new_data_refuse_restore'):
+                w.restore(self.batch, check=lambda:None)
+        self.assertEqual((self.home/'.claude/cache/new').read_text(), 'keep')
+
+    def test_restore_retries_after_publish_before_journal_save(self):
+        self.apply(self.plan('cache'))
+        original = w.save
+        def interrupted(path, data):
+            if data.get('restore_completed'): raise OSError('interrupted after rename')
+            original(path, data)
+        with patch.object(w, 'save', side_effect=interrupted):
+            with self.assertRaises(OSError): w.restore(self.batch, check=lambda:None)
+        w.restore(self.batch, check=lambda:None)
+        self.assertEqual((self.home/'.claude/cache/a').read_text(), 'cache')
 
     def test_links_and_nested_links_are_refused(self):
         (self.home/'.claude/cache/link').symlink_to(self.home/'.claude/skills', target_is_directory=True)

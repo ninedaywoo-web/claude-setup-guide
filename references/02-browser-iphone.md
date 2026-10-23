@@ -1,5 +1,7 @@
 # 指纹浏览器与 iPhone 网络配置
 
+先读取[统一控制层](17-workflow-controller.md)的当前阶段：`browser` 执行电脑部分，完成后由程序返回 `phone_proxy`，再做手机。章节标题与节点连通本身不决定阶段切换。
+
 **三站评分汇总：**实际观察 NetCoffee、Ping0、Scamalytics 后，按 [确定性执行层](14-scripted-execution.md#三站结果与建议) 分别记录原值和建议。79 对约 80、35 对约 30 等轻微偏离不阻断；大幅偏离先复查。出口、DNS／IPv6／WebRTC 与手机检查按本章完成。
 
 

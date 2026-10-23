@@ -425,10 +425,11 @@ apt install curl wget -y
 AI 按[确定性执行层](14-scripted-execution.md)准备本机输入文件，在项目目录运行：
 
 ```bash
-python3 scripts/network.py preflight
-python3 scripts/network.py deploy
-python3 scripts/network.py export
+python3 scripts/workflow.py run --action server_preflight
+python3 scripts/workflow.py run --action server_deploy
 ```
+
+已有本脚本管理的节点，在 `server` 阶段改用 `server_export` 读回导出。新部署已自动完成导出，按程序返回进入电脑客户端。
 
 脚本自动完成面板、固定内核与节点配置，返回本机节点文件和面板资料；随后进入客户端安装与导入。
 
@@ -677,7 +678,7 @@ v2rayN 软件最下方的那一排状态栏，是决定你电脑怎么上网的�
 AI 在项目目录执行固定版本下载：
 
 ```bash
-python3 scripts/download_karing.py
+python3 scripts/workflow.py run --action download_karing
 ```
 
 使用返回的 DMG 安装 Karing `1.2.25.2802`，核对应用版本 `1.2.25`、构建号 `2802`。安装和首次启动涉及系统授权时由用户完成，然后继续导入节点。
@@ -707,6 +708,8 @@ python3 scripts/download_karing.py
 正确的做法是，给 Claude 的流量单独指定线路，这条线路失败时直接拒绝连接，不许自动换节点、更不许直连。检查一下你的分流规则，claude.ai 和 [api.anthropic.com](https://api.anthropic.com/) 这些域名有没有可能落到 DIRECT 上，兜底规则是不是直连。
 
 ## 八、安卓手机配置 v2rayNG导入vless链接
+
+本节在统一控制层返回 Android 的 `phone_proxy` 阶段时执行。电脑客户端完成后，先按程序返回的 `browser` 阶段配置并验收 AdsPower，再进入本节。详见[统一控制层](17-workflow-controller.md)。
 
 在电脑端成功搭建好 VLESS+REALITY 节点后，将节点同步到手机上是最简单的。只需扫个码，手机就能使用配置好的。
 
@@ -888,7 +891,7 @@ Xray 内核由服务端入站共用，切换后同时检查服务状态及其余
 
 历史依据：2026 年 9 月 30 日，Karing `1.2.25.2802` 连接 Xray `26.9.9` 握手失败，升级 Karing 测试版 `1.2.26.2905` 后仍失败；服务端切换到 `26.7.28` 并同步上述目标配置后，原稳定版 Karing 恢复连接。当次还涉及 Microsoft 目标证书数据的处理，因此版本、目标和 SNI 一起纳入本修复步骤。本项目据此将 Karing `1.2.25.2802` 和上述服务端组合设为新交付默认版本。
 
-**脚本创建的节点同步记录：**完成修复后，AI 按实际服务端配置同步本机 `.local/network/input.json` 的 `server.sni` 和服务器 `/var/lib/claude-setup-network/receipt.json` 的 `config.sni`，保留已有节点身份字段与面板版本。使用脚本的原子保存方式写入，随后执行 `python3 scripts/network.py invalidate`、`python3 scripts/network.py export`，再检测实际连接。这样后续导出和续跑会沿用修复后的目标。恢复原配置时同步恢复这两处记录。已有其他面板按其原导出流程处理。
+**脚本创建的节点同步记录：**完成修复后，AI 按实际服务端配置同步本机 `.local/network/input.json` 的 `server.sni` 和服务器 `/var/lib/claude-setup-network/receipt.json` 的 `config.sni`，保留已有节点身份字段与面板版本。使用脚本的原子保存方式写入，随后执行 `python3 scripts/network.py invalidate`、`python3 scripts/workflow.py run --action server_export`，再检测实际连接。这样后续导出和续跑会沿用修复后的目标。恢复原配置时同步恢复这两处记录。已有其他面板按其原导出流程处理。
 
 ### 4. 修复后直接验收并继续
 

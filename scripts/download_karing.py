@@ -46,6 +46,11 @@ def main():
     parser.add_argument("--output-dir", type=Path, default=ROOT / ".local/downloads")
     args = parser.parse_args()
     try:
+        from workflow_guard import check
+        try:
+            check(ROOT, 'download_karing')
+        except ValueError as exc:
+            raise Failure(str(exc))
         result = download(args.output_dir)
     except Exception as e:
         result = {"status": "failed", "error": str(e) if isinstance(e, Failure) else type(e).__name__}

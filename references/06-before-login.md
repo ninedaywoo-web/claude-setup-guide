@@ -68,13 +68,9 @@
 
 ## 登录前衔接脚本
 
-iPhone／iPad 主线在首次打开 Claude 登录页前，以及从旧进度恢复到登录／订阅阶段时，运行一次本节脚本。AI 负责整理已观察到的结果；用户继续按具体设置页面操作，无需填写 JSON。
+整个交付统一使用[控制层](17-workflow-controller.md)：运行 `python3 scripts/workflow.py next`，按当前阶段补齐实际观察并提交。电脑、AdsPower、手机代理、时区定位和手机网络分别完成后，程序接到支付准备、App 与登录。
 
-1. 读取本次 `.local/progress.md` 和当前设置结果。运行 `python3 scripts/login_readiness.py --template --computer mac --phone iphone` 查看字段（Windows 用 `windows`，iPad 用 `ipad`）。将逐项记录保存到 `.local/login-readiness.json`；已有文件只更新相关字段。
-2. 先记录 `timezone_choice`（`node` 或 `taipei`）和 `target_timezone`（所选城市的 IANA 标识，例如 `America/Los_Angeles` 或 `Asia/Taipei`）。每项保留 `status` 和 `result`。已从工具、设置页或用户明确反馈完成的项写 `passed`，`result` 简记实际结果；其余保留 `pending`。三个 `*_timezone_matches_choice` 项同时填写从设备读取的 `timezone`，统一为所选 IANA 标识（Windows 名称换算为相应 IANA 标识）；`result` 保留城市与复查结果。定位项记录总开关状态，系统服务项记录“已关闭”或“随总开关停用”。网络项采用本章登录前的浏览器与代理验收结果；App 请求路径在随后下载 App 后检查。准备好账户或检测分数高，只完成对应项目。
-3. 执行 `python3 scripts/login_readiness.py`，按 `next_action` 连续补齐 `pending`。返回 `ready` 后直接进入下方账号／手机订阅主线；先核对美区 Apple ID、养号完成记录与余额，再保持手机节点开启，下载 Claude，用 Google 登录并直接订阅；订单和手机权益确认后结束交付。
-
-脚本负责根据记录确定下一步，设置状态由 AI 通过设备页面和用户操作结果取得。它只读取记录，不修改系统。旧版记录中的 `*_timezone_matches_exit` 项按已记录的城市和本次选择迁移为 `*_timezone_matches_choice`，保留其他已完成结果；选择缺失只问一次。设备、时区选择、节点、网络或设置变化时，将受影响项改回 `pending` 后复查；未变化的已完成项保留。用户恢复定位总开关后，同步更新定位和系统服务项。Android 继续按其专章执行适用检查。
+旧 `login_readiness.py` 在统一状态存在时返回同一控制层结果。原 `login-readiness.json` 仅作为历史观察来源，AI 将可复用的具体结果提交到对应当前阶段，保留账号选择和已有设置，缺项继续补做。
 
 ## 网络、时区和定位完成后，进入 Apple 账户准备与手机登录
 

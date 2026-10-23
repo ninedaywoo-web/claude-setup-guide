@@ -355,6 +355,11 @@ def deploy(c):
             command(["systemctl", "enable", "--now", "x-ui"])
             receipt["stage"] = "panel_ready"
             persist(receipt)
+        else:
+            # Resume our managed installation using its current service state.
+            active = subprocess.run(['systemctl', 'is-active', 'x-ui'], capture_output=True, text=True, timeout=15)
+            if active.returncode != 0 or active.stdout.strip() != 'active':
+                command(['systemctl', 'start', 'x-ui'])
         panel = wait_panel(receipt)
         panel_listen_verified(c["panel_port"])
         ensure_node(panel, receipt, persist)

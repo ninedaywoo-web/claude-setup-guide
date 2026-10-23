@@ -235,6 +235,15 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="安全审计和清理 Claude 本机状态")
     parser.add_argument("--audit", action="store_true", help="只读审计")
     args = parser.parse_args(argv)
+    project_root = pathlib.Path(__file__).resolve().parents[3]
+    if (project_root / '.local/workflow/state.json').exists():
+        sys.path.insert(0, str(project_root / 'scripts'))
+        from workflow_guard import check
+        try:
+            check(project_root, 'cleanup:audit' if args.audit else 'cleanup:apply')
+        except ValueError as error:
+            print(str(error), file=sys.stderr)
+            return 2
     home, app = pathlib.Path.home(), APP
     claude, identity, settings = home / ".claude", home / ".claude.json", home / ".claude/settings.json"
     if running_under_claude() and not args.audit:

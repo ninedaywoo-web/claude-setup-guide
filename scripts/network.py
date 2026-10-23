@@ -309,6 +309,15 @@ def main():
     p.add_argument("--input", help="Private JSON containing actual browser observations")
     args = p.parse_args()
     try:
+        if args.action not in ('status', 'invalidate'):
+            from workflow_guard import check
+            operation = 'network:' + args.action
+            if args.action == 'probe':
+                operation += ':' + args.route
+            try:
+                check(ROOT, operation)
+            except ValueError as exc:
+                raise Failure(str(exc))
         source = Path(args.config).resolve()
         require(ROOT / ".local" in source.parents, "config_must_be_private")
         c = config(source)

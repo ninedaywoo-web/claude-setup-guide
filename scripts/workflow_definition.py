@@ -1,6 +1,15 @@
 """Single stage catalog and completion rules for customer delivery."""
 from datetime import datetime, timedelta, timezone
 
+DEVICE_GUIDANCE = """**这套程序最推荐 Mac＋iPhone，其次是 Windows＋iPhone。**
+
+- **Mac＋iPhone：最适配。**电脑配置由 Codex 协助完成；手机支持镜像时，也可以由 Codex 协助配置，您需要手动操作的部分最少。
+- **Windows＋iPhone：也可以使用。**电脑配置由 Codex 协助完成，手机部分需要您手动操作，Codex 会按步骤指导您，遇到问题可以发截图一起排查。
+- **Windows＋Android：目前暂不推荐。**安卓的订阅付款流程还没有完成整套交付验证，现阶段优先选择 iPhone／iPad 的订阅路线。
+
+账号验证和付款由您本人完成。iPad 也能用于 Apple 内购，手机／平板的具体操作按实际设备继续。"""
+
+
 # Field rules: true/false, text, timestamp, scores, or an explicit choice tuple.
 STAGES = [
     ('intake', '确认设备封禁经历', '13-reader-guide.md', {'banned_login': ('yes', 'no', 'unknown')}),

@@ -107,6 +107,31 @@ class WorkflowTests(unittest.TestCase):
         self.advance()
         self.assertEqual(self.flow.next()['stage'], 'devices')
 
+    def test_device_guidance_survives_partial_input_and_resume(self):
+        self.reach('devices')
+        self.flow.submit(self.payload({'computer': 'windows', 'phone': 'iphone'}))
+        resumed = Workflow(self.root, lambda: self.now)
+        view = resumed.next()
+        self.assertEqual(view['stage'], 'devices')
+        self.assertEqual(view['missing'], ['setup_explained'])
+        for combination in ('Mac＋iPhone', 'Windows＋iPhone', 'Windows＋Android'):
+            self.assertIn(combination, view['customer_message'])
+        self.assertIn('手动操作', view['customer_message'])
+        self.assertIn('整套交付验证', view['customer_message'])
+        next_view = self.flow.submit(self.payload({'setup_explained': True}))
+        self.assertEqual(next_view['stage'], 'google')
+        self.assertNotIn('customer_message', next_view)
+
+    def test_device_guidance_is_not_repeated_after_display(self):
+        self.reach('devices')
+        view = self.flow.submit(self.payload({'setup_explained': True}))
+        self.assertEqual(view['stage'], 'devices')
+        self.assertNotIn('customer_message', view)
+        self.flow.submit(self.payload({'computer': 'mac', 'phone': 'iphone'}))
+        view = self.flow.invalidate('devices', '客户换成 Windows 和 Android')
+        self.assertEqual(view['stage'], 'devices')
+        self.assertIn('customer_message', view)
+
     def test_future_submission_rejected_at_every_stage(self):
         while self.flow.next()['stage']:
             payload = self.payload()

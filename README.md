@@ -16,7 +16,7 @@
 
 如果您已经手动下载并解压，也可以把完整文件夹交给 Codex 或其他能读取本地文件的 AI，从 [SKILL.md](SKILL.md) 开始。只上传 SKILL.md 单个文件会缺少配套教程，请保留完整目录。仅能聊天、没有本机文件或下载能力的工具，需要您协助保存，AI 应先说明具体缺少的能力。
 
-本次交付默认采用：先问设备是否登录过被封禁的 Claude 账号，安排适用清理 → 确认 Google 账号 → VPS 与 Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 手机小火箭全局代理 → 电脑／手机时区与定位设置 → 核对美区 Apple ID 和养号完成记录 → 保持节点开启，下载 Claude → 手机 Google 登录并订阅 Pro → 订单与手机权益确认，结束交付。上面是 iPhone 路线；安卓网络自检后可用手机浏览器进入官网，按 Google Pay 基础指引继续。手机主要用于登录和订阅，Claude Code 安装与使用教学不在本次交付内。没有 Google 账号时，按[账号与两步验证说明](references/08-google-account.md)准备。
+本次交付默认采用：先问设备是否登录过被封禁的 Claude 账号，安排适用清理 → 设备搭配说明与阅读版介绍 → 确认 Google 账号 → VPS 与 Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 手机小火箭全局代理 → 电脑／手机时区与定位设置 → 核对美区 Apple ID 和养号完成记录 → 保持节点开启，下载 Claude → 手机 Google 登录并订阅 Pro → 订单与手机权益确认，结束交付。上面是 iPhone 路线；安卓网络自检后可用手机浏览器进入官网，按 Google Pay 基础指引继续。手机主要用于登录和订阅，Claude Code 安装与使用教学不在本次交付内。没有 Google 账号时，按[账号与两步验证说明](references/08-google-account.md)准备。
 
 AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指纹浏览器与 iPhone 网络配置](references/02-browser-iphone.md)，再了解你的设备和进度，每次只带一小步。做完发截图或口述结果即可。Apple、退款和申诉在需要时再读。
 
@@ -26,7 +26,7 @@ Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-
 
 准备 Apple 内购时，网络自检通过后再单独确认账户新旧。根据客户反馈，新注册或刚接手的成品号会立即收到醒目提醒：先只在自己手机 App Store／“媒体与购买项目”成功登录一次，从实际首次登录使用的时间起正常使用约两天，暂不充值和订阅；不更换 iCloud。AI 会记住等待安排，恢复时接着做。
 
-初次开始，Codex 的第一个问题是“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”有的话，先按设备提供旧登录残留检查：电脑按系统使用内置的 [Mac 端清理 Skill](references/15-mac-cleanup.md) 或 [Windows 端清理 Skill](references/16-windows-cleanup.md)，iPhone 建议删除并重新下载官方 Claude App。处理或安排好适用事项后，再解释 VPS 是什么、问您有没有自建节点；没买、买了未配置、已经搭好，分别从对应步骤开始。普通梯子订阅不等于自建 VPS，已有服务器不用重复买。
+初次开始，Codex 的第一个问题是“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”有的话，先按设备提供旧登录残留检查：电脑按系统使用内置的 [Mac 端清理 Skill](references/15-mac-cleanup.md) 或 [Windows 端清理 Skill](references/16-windows-cleanup.md)，iPhone 建议删除并重新下载官方 Claude App。处理或安排好适用事项后，确认电脑和手机类型、当场说明设备搭配并介绍阅读版；准备好 Google 账号后，再解释 VPS 是什么、问您有没有自建节点；没买、买了未配置、已经搭好，分别从对应步骤开始。普通梯子订阅不等于自建 VPS，已有服务器不用重复买。
 
 项目内附[客户阅读版 PDF](assets/reading/README.md)，共 10 份、76 页，整套最近更新于 2026-10-19；本次更新网络篇和 Apple 篇，其他篇目沿用 2026-10-18 阅读版。这些 PDF 已经随程序／流程一起下载到项目的 `assets/reading/` 文件夹。Codex 会先明确告诉您 GitHub 项目本身已经下载好，再简短介绍 PDF 的用途和使用方法：遇到问题先问 Codex；问题还没解决或解释不明白时，可以让 Codex 找出对应 PDF、章节、页码和图示，您自己对照着看，仍不懂的内容可以截图继续问。我们建议您保存一份阅读版到方便打开的位置。讲清楚这些之后，Codex 才会询问是否需要把 PDF 单独保存到“下载”等文件夹；项目内已有文件，会直接复制一份给您，无需重新下载程序。暂时不保存也照常带做。
 

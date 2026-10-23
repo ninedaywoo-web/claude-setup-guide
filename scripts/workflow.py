@@ -13,7 +13,7 @@ import uuid
 
 from network import lock, private_file
 from network_server import Failure
-from workflow_definition import ACTIONS, INVALIDATES, OBJECT_FIELDS, catalog, facts, validation
+from workflow_definition import ACTIONS, DEVICE_GUIDANCE, INVALIDATES, OBJECT_FIELDS, catalog, facts, validation
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -167,6 +167,10 @@ class Workflow:
                                       and (key != 'download_karing' or facts(self.state, 'devices').get('computer') == 'mac')
                                       and (key != 'cleanup_restore' or sys.platform == 'win32')],
                   'progress': progress}
+        if stage['id'] == 'devices' and facts(self.state, 'devices').get('setup_explained') is not True:
+            result['customer_message'] = DEVICE_GUIDANCE
+            result['next_action'] = ('确认电脑和手机类型后，在对话中展示 customer_message 的设备搭配说明；'
+                                     '展示后提交 setup_explained=true，再继续阅读版介绍和账号准备。')
         if stage['id'] == 'payment_preparation' and facts(self.state, 'devices').get('phone') != 'android':
             result['conditional_fields'] = {'account_type=new': {'first_used_at': 'timestamp'}}
             result['account_history'] = self.state.get('apple_accounts', {})

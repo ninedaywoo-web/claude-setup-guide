@@ -47,7 +47,7 @@ python3 scripts/network.py export
 ```
 
 - `preflight` 只读检查 Linux、amd64／arm64、systemd、权限、磁盘、端口及目标网站 TLS 1.3。云安全组和外部可达性仍待实测。
-- `deploy` **仅支持全新服务器，或本脚本自己创建的部署**。锁定 3x-ui v3.10.2 官方发行包并校验 SHA-256；附带 Xray v26.10.10。客户端连接按原教程实测，Karing 故障沿用既有修复顺序。
+- `deploy` **仅支持全新服务器，或本脚本自己创建的部署**。锁定 3x-ui v3.10.2 官方发行包并校验 SHA-256；附带 Xray v26.10.10。客户端连接按原教程实测，Karing 故障直接进入网络章节第十节连续修复。
 - 已有其他面板返回 `existing_panel_requires_manual_path`，沿原教程检查和复用；首版部署脚本只管理自己创建的安装。
 - 节点 UUID、密钥和 Short ID 在创建之前持久保存到服务器 `/var/lib/claude-setup-network/receipt.json`。失败后重新执行先读回面板，复用同一节点；遇到人工改动返回 `node_config_drift`，不自动覆盖。
 - 安装位置 `/usr/local/x-ui`，服务 `x-ui.service`，数据库 `/etc/x-ui`。不做系统全量升级，不改防火墙。开放节点 TCP 端口需要按实际云安全组与服务器防火墙核对。
@@ -56,7 +56,7 @@ python3 scripts/network.py export
 
 导出文件：`.local/network/node.txt` 是 VLESS 链接；`.local/network/panel-private.json` 是面板登录资料。均为私密文件，供本机导入。只在本次 `deploy`／`export` 成功后使用它们；失败／失效后磁盘可能保留旧文件，不能按“文件存在”判定有效。标准输出只给状态与文件路径，不显示密码、链接、密钥或完整 IP。服务端执行回执含秘密，只保留在服务器受限目录。脚本新部署直接导入 VLESS 链接，因此关闭未使用的默认订阅服务。
 
-端口支持 1–65535，检查实际占用情况。节点连接失败时按原网络章节诊断。
+端口支持 1–65535，检查实际占用情况。Karing 连接失败时直接执行[网络章节第十节](01-network.md#十karing-reality-握手失败)；完成版本与 SNI 修复后，按该节同步输入和服务端回执，再失效旧检测、重新导出并复测。
 
 ## 独立测通与切换后复测
 

@@ -36,7 +36,7 @@ Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-
 
 Windows 用户还会读取 [Windows 专门流程](references/10-windows.md)：先保留旧 VPN 测试新节点，再切换到 TUN＋全局并复验；Android 用户可按[官网 Google Pay 基础指引](references/11-android-web-pay.md)继续，付款前先了解案例较少及作者反馈的封号后无法退款风险；支付选项以实际页面为准。Windows 真实整机交付验收仍待完成，本次发布不代表已实测跑通。
 
-后台测通后，如果切换新线路导致 Codex 持续掉线，或您反馈连不上，AI 会在旧 VPN 恢复后主动核对库里的网络栈与 REALITY 兼容案例；不需要您先提醒它去找。新线路实际出口和 Codex 新回复均确认前，不进入后面的账号步骤。
+Karing 连接失败、REALITY 握手报错或切换后 Codex 掉线时，AI 会直接按已有方案修复：适用时先试 gvisor，随后校正参数并应用已有 REALITY 版本与目标组合，每步实测，成功后继续交付。技术判断由 AI 完成；用户只需配合工具无法代做的具体动作。
 
 ## 安装成 Skill
 

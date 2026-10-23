@@ -81,6 +81,24 @@ class ServerTests(unittest.TestCase):
         s.ensure_node(panel, receipt, lambda x: None)
         self.assertEqual(panel.posts, 1)
 
+    def test_repaired_target_sync_reuses_node_and_exports_new_sni(self):
+        panel = MemoryPanel(); receipt = {'config': dict(SERVER)}
+        s.ensure_node(panel, receipt, lambda x: None)
+        identity = copy.deepcopy(receipt['identity'])
+        reality = panel.nodes[0]['streamSettings']['realitySettings']
+        reality.update(target='www.cloudflare.com:443', serverNames=['www.cloudflare.com'],
+                       minClientVer='1.0.0')
+        with self.assertRaisesRegex(s.Failure, 'node_config_drift'):
+            s.ensure_node(panel, receipt, lambda x: None)
+        receipt['config']['sni'] = 'www.cloudflare.com'
+        s.ensure_node(panel, receipt, lambda x: None)
+        self.assertEqual(panel.posts, 1)
+        self.assertEqual(receipt['identity'], identity)
+        exported = urlsplit(s.export_uri(receipt))
+        self.assertEqual(exported.username, identity['uuid'])
+        self.assertEqual(parse_qs(exported.query)['sni'], ['www.cloudflare.com'])
+        self.assertEqual(parse_qs(exported.query)['pbk'], [identity['public_key']])
+
     def test_invalid_server_parameters(self):
         self.assertEqual(s.validate(dict(SERVER, port=443))['port'], 443)
         for key, val in [('port', 0), ('port', -1), ('port', True), ('port', 99999), ('panel_port', 18555), ('sni', 'x; reboot'), ('address', '-oProxyCommand=x')]:

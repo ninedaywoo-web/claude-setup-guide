@@ -18,7 +18,7 @@
 
 AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指纹浏览器与 iPhone 网络配置](references/02-browser-iphone.md)，再了解你的设备和进度，每次只带一小步。做完发截图或口述结果即可。Apple、退款和申诉在需要时再读。
 
-准备在 iPhone 使用 Claude 或通过 App Store 订阅时，AI 会主动进入手机网络配置关卡，Mac 优先用 Codex Computer Use 操作 iPhone 镜像，镜像有问题先排查；Windows 默认图解与截图带做，不要求 Apple 原生镜像。小火箭默认使用「全局路由 → 代理」并开启 VPN，手机网络和时区单独验收后再继续；电脑检查结果不能代替手机。
+准备在 iPhone 使用 Claude 或通过 App Store 订阅时，AI 会主动进入手机网络配置关卡，Mac 优先用 Codex Computer Use 操作 iPhone 镜像，镜像有问题先排查；Windows 默认图解与截图带做，不要求 Apple 原生镜像。小火箭默认使用「全局路由 → 代理」并开启 VPN，随后主动展示 Mac／手机时区和关闭定位的设置路径，网络、时区、定位分别验收，通过登录前衔接脚本后进入手机登录和订阅；电脑检查结果不能代替手机。
 
 Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-apple-purchase-support.md)，由 Codex 进入官方客服并沟通购买问题，用户完成登录和 Support PIN 输入；客服答复、等待起点、具体重试时间和到期跟进记入本机进度。
 

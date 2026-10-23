@@ -90,7 +90,7 @@ Windows＋iPhone 的小火箭全局超时、节点无法使用时，优先按[�
 
 ## 9. 接回账号与订阅主线
 
-有 iPhone 且手机网络通过：Apple 账户／礼品卡检查 → 新号约两天等待安排 → 手机 Google 登录 Claude → 可选电脑免费体验 → 手机 Pro 订阅 → 电脑同一账号权益与正常对话。细节按[带做指南](05-ai-walkthrough.md)执行。手机主要用于登录和订阅，电脑网页使用已配置的 AdsPower；不主动展开 Claude Code 教学。
+有 iPhone 时，先完成 Windows 时区、iPhone 时区与关闭定位、AdsPower 设置及手机网络验收，再运行[登录前衔接脚本](06-before-login.md#登录前衔接脚本)。完成后：Apple 账户／礼品卡检查 → 新号约两天等待安排 → 手机 Google 登录 Claude → 可选电脑免费体验 → 手机 Pro 订阅 → 电脑同一账号权益与正常对话。细节按[带做指南](05-ai-walkthrough.md)执行。手机主要用于登录和订阅，电脑网页使用已配置的 AdsPower；不主动展开 Claude Code 教学。
 
 安卓路线按上述专章完成官网订阅后，同样回电脑核对同账号权益与对话。
 

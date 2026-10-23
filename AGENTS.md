@@ -8,6 +8,8 @@
 
 Mac 默认使用 Karing。新交付固定使用 Karing `1.2.25.2802`、服务端 Xray `26.7.28`、REALITY `minClientVer=1.0.0`、目标 `www.cloudflare.com:443` 与两端 SNI `www.cloudflare.com`。Mac 安装包由 `scripts/download_karing.py` 下载并校验，服务器由 `scripts/network.py` 直接部署固定组合。项目更新与软件版本分开管理：交付软件跟随本项目固定版本表。用户反馈连接失败、REALITY 握手报错或切换后断连，就直接按 references/01-network.md 第十节执行修复：适用时先试 gvisor，随后校正参数并应用已有服务端版本／目标配置方案，每步实测，成功后继续交付。AI 自行读取环境、备份、修改和复测；用户只需配合工具无法代做的具体动作。
 
+手机节点连接后，先按 references/02-browser-iphone.md 第 2.3 节主动展示并完成电脑／手机时区和定位设置，再做网络验收，运行 scripts/login_readiness.py 后接手机登录与订阅。网络、时区、定位逐项记录，已完成结果复用；时区按 VPS 出口确定。具体脚本输入见 references/06-before-login.md。
+
 维护项目时，Markdown 是正文源文件，图片使用仓库内相对路径。禁止加入在线文档依赖、原帖链接、用户私人 IP 或凭据。更新用户提供的文字时保留其表达，不大幅改写。
 
 发布修改时同步 version.json 与 CHANGELOG.md，运行 python3 scripts/manifest.py，再运行 python3 -m unittest discover -s tests。更新只改课程和脚本；.local/ 是使用者的数据，不提交、不覆盖。

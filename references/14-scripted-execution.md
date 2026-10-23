@@ -135,3 +135,7 @@ python3 scripts/network.py scores --input .local/network/scores-input.json
 `.local/network/report.json` 以 `scope: script_execution` 汇总每个脚本步骤的实际结果。`.local/progress.md` 只追加一次报告入口，保留原内容；VPN 交接、浏览器、手机和账号阶段的结果继续记在进度文件。
 
 常见错误：`ssh_or_remote_protocol_failed` 先查 SSH、主机指纹、Python 与 sudo；`managed_config_changed` 先查当前输入是否属于同一客户；`node_config_drift` 对照现有节点；`panel_not_ready`／`xray_not_running` 查看服务器日志；`xray_version_changed` 将实际内核恢复为该部署回执中的固定版本；探针 `failed` 检查本机入口、实际出口与 HTTPS。原始日志可能含秘密，只在本机检查，给用户显示脱敏结论。
+
+## 手机登录前的顺序检查
+
+手机网络连接后，按浏览器与 iPhone 章节 2.3 展示并完成电脑／手机时区和定位设置，再完成网络验收。AI 将逐项观察结果写入 `.local/login-readiness.json`，运行 `python3 scripts/login_readiness.py`。脚本返回首个待办和全部剩余项；完成后返回 `ready`，直接接手机登录与订阅。字段、平台选择和恢复规则见[登录前衔接脚本](06-before-login.md#登录前衔接脚本)。网络脚本的成功报告只代表对应网络操作完成。

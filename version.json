@@ -1,11 +1,11 @@
 {
-  "version": "1.0.35",
+  "version": "1.0.36",
   "published_at": "2026-10-22",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "新交付直接使用 Karing 1.2.25.2802 与服务端 Xray 26.7.28 固定组合",
-    "新增 Mac Karing 固定版本下载与校验脚本",
-    "首次创建节点即配置 Cloudflare 目标／SNI 与 REALITY minClientVer 1.0.0"
+    "手机代理连接后单列电脑／手机时区和定位操作，补齐具体设置路径",
+    "新增登录前衔接脚本，网络通过与设备设置分别记录，恢复进度只补缺项",
+    "移除重复选择检查方式的环节，按节点出口确定时区，完成后接手机登录与订阅"
   ]
 }

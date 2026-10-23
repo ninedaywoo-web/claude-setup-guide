@@ -8,7 +8,7 @@
 
 Mac 默认使用 Karing。新交付固定使用 Karing `1.2.25.2802`、服务端 Xray `26.7.28`、REALITY `minClientVer=1.0.0`、目标 `www.cloudflare.com:443` 与两端 SNI `www.cloudflare.com`。Mac 安装包由 `scripts/download_karing.py` 下载并校验，服务器由 `scripts/network.py` 直接部署固定组合。项目更新与软件版本分开管理：交付软件跟随本项目固定版本表。用户反馈连接失败、REALITY 握手报错或切换后断连，就直接按 references/01-network.md 第十节执行修复：适用时先试 gvisor，随后校正参数并应用已有服务端版本／目标配置方案，每步实测，成功后继续交付。AI 自行读取环境、备份、修改和复测；用户只需配合工具无法代做的具体动作。
 
-手机节点连接后，先按 references/02-browser-iphone.md 第 2.3 节主动展示并完成电脑／手机时区和定位设置，再做网络验收，运行 scripts/login_readiness.py 后接手机登录与订阅。网络、时区、定位逐项记录，已完成结果复用；时区按 VPS 出口确定。具体脚本输入见 references/06-before-login.md。
+手机节点连接后，先按 references/02-browser-iphone.md 第 2.3 节主动展示并完成电脑／手机时区和定位设置，再做网络验收，运行 scripts/login_readiness.py 后接手机登录与订阅。网络、时区、定位逐项记录，已完成结果复用；时区推荐跟随 VPS 出口，也可选台北；电脑、手机和 AdsPower 统一按所选方案设置。具体脚本输入见 references/06-before-login.md。环境设置完成后核对美区 Apple ID 与养号完成记录，保持手机节点开启并下载官方 Claude App，Google 登录后直接订阅 Pro；订单和手机当前账号权益确认后结束交付。
 
 维护项目时，Markdown 是正文源文件，图片使用仓库内相对路径。禁止加入在线文档依赖、原帖链接、用户私人 IP 或凭据。更新用户提供的文字时保留其表达，不大幅改写。
 

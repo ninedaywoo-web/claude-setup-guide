@@ -15,7 +15,7 @@ def requirements(computer, phone):
         ('browser_network', '完成 AdsPower 网络验收'),
         ('phone_proxy', '手机导入同一节点，开启全局代理与 VPN'),
         ('computer_timezone_auto_off', '电脑关闭自动设置时区'),
-        ('computer_timezone_matches_exit', '电脑手动时区对应 VPS 出口，并返回设置页复查'),
+        ('computer_timezone_matches_choice', '电脑手动时区符合所选时区（节点城市或台北），并返回设置页复查'),
     ]
     if computer == 'mac':
         checks += [
@@ -24,10 +24,10 @@ def requirements(computer, phone):
         ]
     checks += [
         ('phone_timezone_auto_off', '手机关闭日期与时间中的“自动设置”'),
-        ('phone_timezone_matches_exit', '手机手动时区对应 VPS 出口，并返回设置页复查'),
+        ('phone_timezone_matches_choice', '手机手动时区符合所选时区（节点城市或台北），并返回设置页复查'),
         ('phone_timezone_location_off', '手机系统服务“设定时区”关闭或随定位总开关停用'),
         ('phone_location_off', '手机关闭定位服务总开关'),
-        ('browser_timezone_matches_exit', 'AdsPower 实际时区对应 VPS 出口'),
+        ('browser_timezone_matches_choice', 'AdsPower 实际时区符合所选时区（节点城市或台北）'),
         ('browser_geolocation_denied', 'AdsPower 地理位置设为“禁止”'),
         ('phone_network', '完成手机登录前网络验收'),
     ]
@@ -35,9 +35,13 @@ def requirements(computer, phone):
 
 
 def template(computer, phone):
+    checks = {}
+    for key, _ in requirements(computer, phone):
+        checks[key] = {'status': 'pending', 'result': ''}
+        if key.endswith('_timezone_matches_choice'):
+            checks[key]['timezone'] = ''
     return {'computer': computer, 'phone': phone,
-            'checks': {key: {'status': 'pending', 'result': ''}
-                       for key, _ in requirements(computer, phone)}}
+            'timezone_choice': '', 'target_timezone': '', 'checks': checks}
 
 
 def evaluate(record):
@@ -46,15 +50,26 @@ def evaluate(record):
     if not isinstance(checks, dict):
         raise ValueError('checks 应为逐项检查记录。')
     pending = []
+    choice = record.get('timezone_choice')
+    target = record.get('target_timezone')
+    if choice not in ('node', 'taipei'):
+        pending.append({'id': 'timezone_choice',
+                        'action': '询问一次时区选择：跟随节点（程序和作者推荐）／台北；电脑和手机都设置。'})
+    elif not isinstance(target, str) or not target.strip() or (choice == 'taipei' and target != 'Asia/Taipei'):
+        pending.append({'id': 'target_timezone',
+                        'action': '记录所选城市的 IANA 时区；台北使用 Asia/Taipei，节点方案读取实际节点城市。'})
     for key, action in required:
         item = checks.get(key, {})
-        if not isinstance(item, dict) or item.get('status') != 'passed':
+        complete = isinstance(item, dict) and item.get('status') == 'passed'
+        if complete and key.endswith('_timezone_matches_choice'):
+            complete = bool(target) and item.get('timezone') == target
+        if not complete:
             pending.append({'id': key, 'action': action})
     return {'status': 'needs_setup' if pending else 'ready',
             'scope': 'pre_login_environment',
             'pending': pending,
             'next_action': pending[0]['action'] if pending else
-            '复用 Apple 账户与支付准备，进入手机 Google 登录和 Pro 订阅；已登录则继续订阅。'}
+            '核对美区 Apple ID 和养号完成记录；就绪后保持手机节点开启，下载 Claude，Google 登录并订阅 Pro。订单和手机权益确认后结束交付。'}
 
 
 def main():

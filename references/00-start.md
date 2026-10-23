@@ -52,7 +52,7 @@ Ping0 的风控值越低表示该站评估的风险越低，与前面 Claude 检
 
 开始时先确认有没有自己可用的 Google 账号；没有则提供[原有购号网站](https://chuhai91.cc)及 [Google 账号补充渠道 GmailBuy](https://gmailbuy.com/)，选择商家标明的美区 Google 账号。交付串和 2FA 使用方法见[Google 账号准备](08-google-account.md)。账号由用户自己保管，不发给 AI。
 
-默认顺序：账号与设备准备 → VPS → Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 按平台带做 iPhone 小火箭全局代理 → Apple 账户／礼品卡检查及新号约两天等待 → 手机 Google 登录 → 可选电脑免费使用约两天 → 手机订阅 Pro → 电脑同一账号权益与对话验收。手机主要用于登录和订阅，Claude Code 教学不在交付范围。
+默认顺序：账号与设备准备 → VPS → Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 按平台带做 iPhone 小火箭全局代理 → 电脑／手机时区选择与关闭定位 → 核对美区 Apple ID、养号完成记录和余额／礼品卡 → 保持手机节点开启，下载 Claude → Google 注册／登录并订阅 Pro → 订单与手机权益确认，结束交付。手机主要用于登录和订阅，Claude Code 教学不在交付范围。
 
 ## 2. 配置教程
 

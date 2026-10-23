@@ -14,12 +14,16 @@ spec.loader.exec_module(flow)
 class LoginReadinessTests(unittest.TestCase):
     def completed(self, computer='mac', phone='iphone'):
         record = flow.template(computer, phone)
-        for item in record['checks'].values():
+        record.update(timezone_choice='node', target_timezone='America/Los_Angeles')
+        for key, item in record['checks'].items():
             item.update(status='passed', result='Observed in isolated fixture')
+            if key.endswith('_timezone_matches_choice'):
+                item['timezone'] = record['target_timezone']
         return record
 
     def test_network_only_returns_device_settings(self):
         record = flow.template('mac', 'iphone')
+        record.update(timezone_choice='node', target_timezone='America/Los_Angeles')
         for key in ('computer_network', 'browser_network', 'phone_proxy', 'phone_network'):
             record['checks'][key]['status'] = 'passed'
         result = flow.evaluate(record)
@@ -63,7 +67,43 @@ class LoginReadinessTests(unittest.TestCase):
     def test_old_summary_does_not_complete_individual_settings(self):
         result = flow.evaluate({'computer': 'mac', 'phone': 'iphone', 'network': 'passed'})
         self.assertEqual(result['status'], 'needs_setup')
-        self.assertEqual(len(result['pending']), 14)
+        self.assertEqual(len(result['pending']), 15)
+
+    def test_taipei_choice_is_ready_on_all_devices(self):
+        record = self.completed()
+        record.update(timezone_choice='taipei', target_timezone='Asia/Taipei')
+        for key, item in record['checks'].items():
+            if key.endswith('_timezone_matches_choice'):
+                item['timezone'] = 'Asia/Taipei'
+        self.assertEqual(flow.evaluate(record)['status'], 'ready')
+
+    def test_taipei_choice_requires_each_device_to_follow_it(self):
+        for device in ('computer', 'phone', 'browser'):
+            with self.subTest(device=device):
+                record = self.completed()
+                record.update(timezone_choice='taipei', target_timezone='Asia/Taipei')
+                for key, item in record['checks'].items():
+                    if key.endswith('_timezone_matches_choice'):
+                        item['timezone'] = 'Asia/Taipei'
+                key = device + '_timezone_matches_choice'
+                record['checks'][key]['timezone'] = 'America/Los_Angeles'
+                result = flow.evaluate(record)
+                self.assertEqual([item['id'] for item in result['pending']], [key])
+
+    def test_choice_is_requested_once_and_then_reused(self):
+        record = self.completed()
+        del record['timezone_choice']
+        self.assertEqual(flow.evaluate(record)['pending'][0]['id'], 'timezone_choice')
+        record['timezone_choice'] = 'node'
+        self.assertEqual(flow.evaluate(record)['status'], 'ready')
+
+    def test_taipei_cannot_use_shanghai_as_target(self):
+        record = self.completed()
+        record.update(timezone_choice='taipei', target_timezone='Asia/Shanghai')
+        for key, item in record['checks'].items():
+            if key.endswith('_timezone_matches_choice'):
+                item['timezone'] = 'Asia/Shanghai'
+        self.assertEqual(flow.evaluate(record)['pending'][0]['id'], 'target_timezone')
 
     def test_invalid_input_is_actionable(self):
         with tempfile.TemporaryDirectory() as folder:

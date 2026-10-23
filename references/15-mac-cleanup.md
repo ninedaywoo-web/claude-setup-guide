@@ -14,7 +14,7 @@ python3 scripts/cleanup.py --audit
 python3 scripts/vendor/mac_cleanup/claude_cleanup.py
 ```
 
-客户在最终清单后输入一次 `CONFIRM`，由本人完成，AI 不管道代答。只在范围新增或变化时补问。CLI 身份、钥匙串、Desktop 数据／应用分别选择；精简模式与时区默认保持原值。网络配置阶段的时区按实际节点地区设置。
+客户在最终清单后输入一次 `CONFIRM`，由本人完成，AI 不管道代答。只在范围新增或变化时补问。CLI 身份、钥匙串、Desktop 数据／应用分别选择；精简模式与时区默认保持原值。网络配置阶段的时区按浏览器与 iPhone 章节选择节点城市或台北，并统一电脑、手机与浏览器设置。
 
 脚本先完整备份 `~/.claude` 与存在的 `~/.claude.json`，移除项存入时间戳废纸篓。Skills、Hooks、项目与会话按保护范围保留。用 Codex 或普通终端执行；正在运行的 Claude Code 只做只读审计。
 

@@ -14,11 +14,11 @@
 
 如果您已经手动下载并解压，也可以把完整文件夹交给 Codex 或其他能读取本地文件的 AI，从 [SKILL.md](SKILL.md) 开始。只上传 SKILL.md 单个文件会缺少配套教程，请保留完整目录。仅能聊天、没有本机文件或下载能力的工具，需要您协助保存，AI 应先说明具体缺少的能力。
 
-本次交付默认采用：先问设备是否登录过被封禁的 Claude 账号，安排适用清理 → 确认 Google 账号 → VPS 与 Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 手机小火箭全局代理 → Apple 账户准备 → 手机 Google 登录并订阅 Pro → 回电脑验收权益与正常对话。上面是 iPhone 路线；安卓网络自检后可用手机浏览器进入官网，按 Google Pay 基础指引继续。手机主要用于登录和订阅，Claude Code 安装与使用教学不在本次交付内。没有 Google 账号时，按[账号与两步验证说明](references/08-google-account.md)准备。
+本次交付默认采用：先问设备是否登录过被封禁的 Claude 账号，安排适用清理 → 确认 Google 账号 → VPS 与 Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 手机小火箭全局代理 → 电脑／手机时区与定位设置 → 核对美区 Apple ID 和养号完成记录 → 保持节点开启，下载 Claude → 手机 Google 登录并订阅 Pro → 订单与手机权益确认，结束交付。上面是 iPhone 路线；安卓网络自检后可用手机浏览器进入官网，按 Google Pay 基础指引继续。手机主要用于登录和订阅，Claude Code 安装与使用教学不在本次交付内。没有 Google 账号时，按[账号与两步验证说明](references/08-google-account.md)准备。
 
 AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指纹浏览器与 iPhone 网络配置](references/02-browser-iphone.md)，再了解你的设备和进度，每次只带一小步。做完发截图或口述结果即可。Apple、退款和申诉在需要时再读。
 
-准备在 iPhone 使用 Claude 或通过 App Store 订阅时，AI 会主动进入手机网络配置关卡，Mac 优先用 Codex Computer Use 操作 iPhone 镜像，镜像有问题先排查；Windows 默认图解与截图带做，不要求 Apple 原生镜像。小火箭默认使用「全局路由 → 代理」并开启 VPN，随后主动展示 Mac／手机时区和关闭定位的设置路径，网络、时区、定位分别验收，通过登录前衔接脚本后进入手机登录和订阅；电脑检查结果不能代替手机。
+准备在 iPhone 使用 Claude 或通过 App Store 订阅时，AI 会主动进入手机网络配置关卡，Mac 优先用 Codex Computer Use 操作 iPhone 镜像，镜像有问题先排查；Windows 默认图解与截图带做，不要求 Apple 原生镜像。小火箭默认使用「全局路由 → 代理」并开启 VPN，随后询问一次时区选择：程序和作者推荐跟随节点，也可选台北（东八区）；Mac、手机和 AdsPower 统一所选时区，主动展示 Mac／手机时区和关闭定位的原攻略设置路径，网络、时区、定位分别验收，通过登录前衔接脚本后进入手机登录和订阅；电脑检查结果不能代替手机。
 
 Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-apple-purchase-support.md)，由 Codex 进入官方客服并沟通购买问题，用户完成登录和 Support PIN 输入；客服答复、等待起点、具体重试时间和到期跟进记入本机进度。
 

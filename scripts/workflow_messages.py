@@ -4,6 +4,9 @@ PDF_GUIDANCE = """**项目已经下载好了**，接下来 Codex 会按项目流
 项目还附有一套**给您看的 PDF 图文教程**，包含操作步骤和基本原理。遇到问题先问 Codex；仍不明白，可以让它找到 PDF 对应的章节和页码，再对照图片查看。
 
 **建议把 PDF 单独保存一份。需要我帮您放到“下载”文件夹吗？**文件已在项目里，无需重新下载。"""
+GOOGLE_QUESTION = '您有没有自己能正常使用的 Google 账号？有的话直接沿用，后面用它登录 Claude。'
+GOOGLE_PURCHASE = '没有可用账号，可以在 [出海91](https://chuhai91.cc) 或 [GmailBuy](https://gmailbuy.com/) 购买商家标明的美区 Google 账号。购买后，我会按教程帮您辨认账号资料，并在需要时指导两步验证。'
+GOOGLE_TIMING = '现在先准备账号资料，等手机网络配置完成后，再使用 Google 账号登录 Claude。'
 ANDROID_GUIDANCE = """**安卓的适配程度较低，需要您更多地配合手机操作。**本项目的安卓付款备选是外区 Google Pay。先检查支付资料的国家／地区和可用付款方式；地区不合适时再按 Google 的实际页面处理地区设置。外区 Google 邮箱本身不等于已经具备付款条件。我们先确认这条路线，再配置网络；最终付款页实际显示 Google Pay 时继续。"""
 ANDROID_PAYMENT = """安卓 Google Pay 路线的实际交付案例较少。作者收到过账号停用后无法通过此渠道退款的反馈，退款结果以支付渠道处理为准。请您确认接受这条路线，并核对当前付款页是否提供 Google Pay，再继续付款。"""
 BROWSER_GUIDANCE = """**电脑上请使用已配置好的 AdsPower 打开 Claude。**相关邮件中的链接也放到这个浏览器环境处理。以后如需 Claude Code 网页授权，把弹出的授权链接复制到这个环境中打开。"""
@@ -35,6 +38,13 @@ def customer_output(result, state, now):
         result['customer_message'] = '先确认一件事：您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？'
     if key == 'cleanup':
         messages.append('如果您的设备是 iPhone，且还装着此前使用的 Claude App，建议删除后重新下载，您可以自行安排。电脑按实际系统处理适用的登录残留。')
+    if key == 'google':
+        if data.get('account_available') is not False:
+            messages.append(GOOGLE_QUESTION)
+        messages.extend([GOOGLE_PURCHASE, GOOGLE_TIMING])
+        result['next_action'] = ('在对话展示账号准备说明：已有可用 Google 账号就复用；没有则直接提供购买渠道，'
+                                 '按 references/08-google-account.md 指导账号资料和两步验证。本流程不引导注册 Google 账号。'
+                                 '确认账号已备妥后提交 account_available=true；实际登录留到手机网络验收后。')
     if key == 'vps':
         messages.append(VPS_GUIDANCE)
     if key == 'devices':

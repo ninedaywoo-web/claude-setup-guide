@@ -22,7 +22,7 @@ python3 scripts/workflow.py next
 | intake | 设备封禁经历；已有答案复用。 |
 | cleanup | 有封禁经历才进入，记录适用范围及清理结果／客户暂缓选择。 |
 | devices | Mac／Windows 与 iPhone／iPad／Android，完成设备搭配说明。 |
-| google | 已准备可用 Google 账号。 |
+| google | 展示账号准备说明：已有可用 Google 账号就复用，没有则直接提供购买渠道；账号备妥后继续，实际登录留到手机网络验收后。 |
 | vps | 读取或准备 VPS、SSH 访问、节点标签及节点所在城市时区；已有 VPS 直接复用。 |
 | server | 部署或检查已有节点，读回服务状态与客户端参数。 |
 | computer_network | 系统代理关闭、TUN＋全局、HTTP 入口、新出口及 HTTPS、旧 VPN 交接、Codex 新回复和断线检查。 |
@@ -32,7 +32,7 @@ python3 scripts/workflow.py next
 | phone_network | 在手机独立检测出口、HTTPS、DNS／IPv6、排除路由、实际网络类型、断线行为与三站结果。 |
 | payment_preparation | Apple 路线核对美区 Apple ID、商店登录、养号起点与支付准备；Android 记录官网支付条件与路线说明。 |
 | app | 保持手机节点开启，下载 Anthropic 官方 Claude App 并检查请求路径；Android 打开官网。 |
-| login | Google 注册／登录成功，记录本机账号代号。 |
+| login | 使用 Google 账号登录 Claude 成功，记录本机账号代号。 |
 | subscription | 手机订单和同一账号 Pro 权益确认，结束交付。 |
 
 Mac／iPhone 和 Windows／iPad 的具体字段由程序按设备选择生成；Android 采用官网支付字段。关闭定位和系统服务时区的操作沿用浏览器与 iPhone 章节，Windows 采用对应系统设置。`node_label`、`profile_ref`、`account_ref`、`apple_account_ref` 使用本机代号，不存 IP、节点链接、邮箱或凭据。

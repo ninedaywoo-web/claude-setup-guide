@@ -1,11 +1,10 @@
 {
-  "version": "1.0.40",
-  "published_at": "2026-10-23",
+  "version": "1.0.41",
+  "published_at": "2026-10-24",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "统一客户提示的触发时机：设备与 PDF、安卓付款条件、Apple 等待与支持、订阅收尾",
-    "修复客户端切换误退服务器、首次商店登录计时与付款准备顺序，保留恢复记录",
-    "按确认后的程序流程同步六篇阅读版 PDF，保留原图并清理旧流程"
+    "Google 账号准备明确为已有复用、没有直接推荐购买，客户对话展示购买渠道和登录时机",
+    "统一流程摘要为使用 Google 账号登录 Claude，消除注册 Google 账号的歧义"
   ]
 }

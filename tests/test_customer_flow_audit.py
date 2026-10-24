@@ -14,6 +14,33 @@ from workflow_definition import catalog
 
 class CustomerFlowAudit(fixtures.WorkflowTests):
     # Reuse the isolated state machine fixture, not live devices/accounts.
+    def test_google_preparation_shows_reuse_purchase_and_login_timing(self):
+        self.reach('google')
+        view = self.flow.next()
+        self.assertIn('直接沿用', view['customer_message'])
+        for url in ('https://chuhai91.cc', 'https://gmailbuy.com/'):
+            self.assertIn(url, view['customer_message'])
+        self.assertIn('手机网络配置完成后', view['customer_message'])
+        self.assertIn('直接展示', view['display_instruction'])
+        self.assertIn('不引导注册 Google 账号', view['next_action'])
+
+    def test_google_missing_account_keeps_purchase_route_on_resume(self):
+        self.reach('google')
+        self.flow.submit(self.payload({'account_available': False}))
+        view = Workflow(self.root).next()
+        self.assertEqual(view['stage'], 'google')
+        self.assertIn('购买', view['customer_message'])
+        self.assertNotIn('您有没有', view['customer_message'])
+        self.flow.submit(self.payload({'account_available': True}))
+        self.assertEqual(self.flow.next()['stage'], 'vps')
+
+    def test_existing_google_account_advances_without_purchase_requirement(self):
+        self.reach('google')
+        self.flow.submit(self.payload({'account_available': True}))
+        self.assertEqual(self.flow.next()['stage'], 'vps')
+        self.reach('login')
+        self.assertEqual(self.flow.next()['next_action'], '使用 Google 账号登录 Claude')
+
     def test_pdf_unanswered_does_not_block_after_display(self):
         self.reach('devices')
         self.flow.submit(self.payload({'computer':'mac','phone':'iphone','setup_explained':True}))

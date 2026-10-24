@@ -39,7 +39,7 @@ STAGES = [
     ('timezone', '选择时区并展示、完成电脑与手机设置路径', '02-browser-iphone.md',
      {'choice': ('node', 'taipei'), 'target': 'text', 'computer_zone': 'text',
       'phone_zone': 'text', 'browser_zone': 'text', 'paths_shown': True,
-      'computer_auto_off': True, 'computer_location_off': True,
+      'computer_auto_off': True,
       'phone_auto_off': True, 'phone_location_off': True,
       'browser_location_blocked': True}),
     ('phone_network', '在手机独立验收网络', '06-before-login.md',
@@ -137,6 +137,8 @@ def catalog(state):
         if key == 'timezone':
             if device.get('computer') == 'mac':
                 fields['computer_timezone_location_off'] = True
+            else:
+                fields['computer_location_off'] = True
             if not android:
                 fields['phone_timezone_location_off'] = True
         if key == 'payment_preparation':
@@ -173,6 +175,9 @@ def timestamp(value):
 def validation(stage, data, state, now):
     # Derive dynamic fields from the proposed account type, not only saved facts.
     fields = dict(stage['fields'])
+    if stage['id'] == 'timezone' and facts(state, 'devices').get('computer') == 'mac':
+        # Prior Mac observations can contain the retired global-location field.
+        data = {key: value for key, value in data.items() if key != 'computer_location_off'}
     if stage['id'] == 'devices':
         if data.get('phone') == 'android':
             fields.update(android_route_explained=True, payment_route_status=('available', 'needs_setup', 'unknown'))

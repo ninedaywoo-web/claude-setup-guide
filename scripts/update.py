@@ -243,6 +243,30 @@ def check(root,auth,force=False,now=None):
                 checked_at=datetime.fromtimestamp(checked_at,timezone.utc).isoformat(),
                 next_check_at=datetime.fromtimestamp(checked_at+CHECK_INTERVAL,timezone.utc).isoformat())
 
+def workflow_output(root, result):
+    """Attach a cached update check once at the CLI response boundary."""
+    try:
+        checked = check(root, None)
+    except (OSError, ValueError, KeyError):
+        checked = failed_check(None)
+    output = dict(result)
+    view = dict(output['workflow']) if 'workflow' in output else output
+    view['update'] = checked
+    notice = checked.get('update_notice')
+    if notice:
+        existing = view.get('customer_message')
+        view['customer_message'] = '\n\n'.join(([existing] if existing else []) + [notice])
+        view['display_instruction'] = (
+            '先展示当前步骤的客户说明，再在本次带做的首个实质回答末尾单独展示 update.update_notice。'
+            '同一段连续带做已提醒过同一版本时不重复；恢复带做或发现新版本时再提醒。'
+            '更新建议不影响当前步骤；用户同意后执行 update.apply_command，完成后重新读取 Skill 和变更章节。')
+    elif checked['status'] in ('unavailable', 'not_updated'):
+        view['update_display_instruction'] = '简短告知 update.message，继续当前步骤；同一段连续带做不重复同一次检查失败。'
+    if 'workflow' in output:
+        output['workflow'] = view
+    return output
+
+
 def latest_commit(auth):
     commit=request('git/ref/heads/main',auth)['object']['sha']
     if not isinstance(commit,str) or not re.fullmatch('[a-f0-9]{40}',commit):

@@ -15,6 +15,12 @@ python3 scripts/workflow.py next
 
 `next` 返回当前阶段、操作章节、所需观察字段、缺项、已记录结果、允许的脚本动作和本阶段 `ticket`。AI 按当前动作操作，每取得一组结果提交一次；程序合并部分结果并计算下一步。客户只接手本人验证、付款与工具无法代做的具体动作。`devices` 返回 `customer_message` 时，确认电脑和手机类型后将这段设备说明展示在客户对话里，再记录 `setup_explained=true`；接着按阅读版三段话术介绍 PDF，随后进入 Google 账号和 VPS。
 
+## 更新检查与提醒
+
+主流程每次向 AI 返回结果时自动执行更新检查，24 小时内复用缓存，到期后重新联网。`init`、`next`、`status`、`submit`、`change` 的结果含 `update`；`run` 在返回的 `workflow` 内包含相同信息。内部保存与计算不联网。
+
+发现新版时，更新建议直接追加到 `customer_message`。先处理客户当前步骤，再在本次带做的首个实质回答末尾展示建议；同一段连续带做不重复提醒同一版本，恢复时再次提醒。用户同意后执行返回的 `update.apply_command`，更新保留 `.local` 进度，再重读 Skill 和变更章节。检查失败照常继续当前步骤并简短说明；立即重查使用 `python3 scripts/update.py check --force`。
+
 ## 唯一阶段顺序
 
 | 阶段 ID | 当前任务与完成内容 |
@@ -28,14 +34,14 @@ python3 scripts/workflow.py next
 | computer_network | 系统代理关闭、TUN＋全局、HTTP 入口、新出口及 HTTPS、旧 VPN 交接、Codex 新回复和断线检查。 |
 | browser | AdsPower 环境已保存并打开，代理和指纹设置完成，在该环境实际检测出口、DNS／IPv6／WebRTC、断线行为及三站结果。 |
 | phone_proxy | 手机导入同一节点，开启全局代理与 VPN。 |
-| timezone | 手机代理完成后展示当前平台的时区与定位路径：Windows／Mac 电脑和 Android／iPhone／iPad 手机均关闭定位、设置所选时区，与 AdsPower 一致；逐项记录完成后进入手机网络验收。 |
+| timezone | 手机代理完成后展示当前平台的时区与定位路径：Mac 关闭系统服务“设定时区”，保留定位总开关原状，禁止 Claude 网页位置权限；Windows 和手机按对应步骤关闭定位。各端时区与 AdsPower 一致；逐项记录完成后进入手机网络验收。 |
 | phone_network | 在手机独立检测出口、HTTPS、DNS／IPv6、排除路由、实际网络类型、断线行为与三站结果。 |
 | payment_preparation | Apple 路线核对美区 Apple ID、商店登录、养号起点与支付准备；Android 记录官网支付条件与路线说明。 |
 | app | 保持手机节点开启，下载 Anthropic 官方 Claude App 并检查请求路径；Android 打开官网。 |
 | login | 使用 Google 账号登录 Claude 成功，记录本机账号代号。 |
 | subscription | 手机订单和同一账号 Pro 权益确认，结束交付。 |
 
-Mac／iPhone 和 Windows／iPad 的具体字段由程序按设备选择生成；Android 采用官网支付字段。关闭定位和系统服务时区的操作沿用浏览器与 iPhone 章节，Windows 采用对应系统设置。`node_label`、`profile_ref`、`account_ref`、`apple_account_ref` 使用本机代号，不存 IP、节点链接、邮箱或凭据。
+Mac／iPhone 和 Windows／iPad 的具体字段由程序按设备选择生成；Android 采用官网支付字段。Mac 仅关闭时区定位、核对网页位置权限；手机定位和系统服务时区的操作沿用浏览器与 iPhone 章节，Windows 采用对应系统设置。`node_label`、`profile_ref`、`account_ref`、`apple_account_ref` 使用本机代号，不存 IP、节点链接、邮箱或凭据。
 
 ## 提交观察
 

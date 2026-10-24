@@ -53,6 +53,14 @@ class LoginReadinessTests(unittest.TestCase):
         self.assertEqual(result['pending'], [])
         self.assertIn('Pro', result['next_action'])
 
+    def test_mac_global_location_observation_does_not_gate_readiness(self):
+        record = self.completed('mac', 'iphone')
+        self.assertNotIn('computer_location_off', record['checks'])
+        record['checks']['computer_location_off'] = {'status': 'restored', 'result': 'Mac global location stays on'}
+        self.assertEqual(flow.evaluate(record)['status'], 'ready')
+        record['checks']['computer_timezone_location_off']['status'] = 'pending'
+        self.assertEqual([item['id'] for item in flow.evaluate(record)['pending']], ['computer_timezone_location_off'])
+
     def test_windows_ipad_has_phone_settings_without_mac_fields(self):
         record = self.completed('windows', 'ipad')
         self.assertIn('computer_location_off', record['checks'])
@@ -68,7 +76,8 @@ class LoginReadinessTests(unittest.TestCase):
     def test_old_summary_does_not_complete_individual_settings(self):
         result = flow.evaluate({'computer': 'mac', 'phone': 'iphone', 'network': 'passed'})
         self.assertEqual(result['status'], 'needs_setup')
-        self.assertEqual(len(result['pending']), 15)
+        self.assertEqual(len(result['pending']), 14)
+        self.assertNotIn('computer_location_off', [item['id'] for item in result['pending']])
 
     def test_taipei_choice_is_ready_on_all_devices(self):
         record = self.completed()

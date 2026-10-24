@@ -14,6 +14,7 @@ import uuid
 from network import lock, private_file
 from network_server import Failure
 from workflow_messages import customer_output
+from update import workflow_output
 from workflow_definition import ACTIONS, DEVICE_GUIDANCE, INVALIDATES, OBJECT_FIELDS, catalog, facts, validation
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -378,6 +379,7 @@ def main():
             else:
                 result = workflow.next()
                 workflow.save()
+        result = workflow_output(ROOT, result)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return int(args.action == 'run' and not result['execution']['success'])
     except (ValueError, OSError, KeyError, Failure) as exc:

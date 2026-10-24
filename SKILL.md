@@ -15,8 +15,8 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Mac Ka
 
 ## 启动与恢复（本地调用与日常继续）
 
-1. 以本文件所在目录为项目根目录。读 `version.json`。Windows 先确认可用的 Python 3.9+ 解释器；若入口是 `py -3` 或 `python`，将下文命令的 `python3` 替换成已验证的入口，其余参数不变，不反复执行打不开的命令。每次客户调用本项目（新对话开始、恢复带做，或连续带做距离上次检查已满 24 小时后的首轮），执行 `python3 scripts/update.py check`（工作目录为项目根目录）。脚本在 `.local/update-check.json` 保存结果；24 小时内重复调用复用缓存，满 24 小时后下次调用才重新联网，不安装后台程序。同一轮不重复检查。客户要求立即检查时运行 `python3 scripts/update.py check --force`。没有 Python 时由 AI 读取远端 `version.json`，记录检查时间并比较数字版本；无法联网时继续本地教程，简短说明本次未能检查，不能说已是最新版。公开仓库无需申请访问或登录。
-2. 返回 `update_available` 时，先完成客户当前这一步的回答，在本次调用的首个实质回答末尾单独一行展示脚本返回的 `update_notice`，例如“已有最新更新（v1.0.10），建议更新。”必要时补充更新摘要，不能只在工具输出中显示。同一次连续带做不在每条回复重复提醒；下次调用即使复用缓存，仍在首个回答末尾提醒。`current`、`local_ahead` 或检查失败时不编造新版提醒；失败的缓存结果也不能说当前已是最新版。更新提醒不阻断带做。客户未同意或拒绝就继续本地版本；明确同意后才执行返回的 `python3 scripts/update.py apply --commit <已检查的提交>`。成功后停止旧版提醒，重新读取本文件和变更章节；本地版本变化会使旧检查缓存失效。不要未经检查直接执行远程脚本；链接交付按专门启动流程保存并检查脚本后运行。
+1. 以本文件所在目录为项目根目录，读 `version.json`。Windows 先确认可用的 Python 3.9+ 解释器；若入口是 `py -3` 或 `python`，将命令中的 `python3` 替换成已验证的入口。主流程 `workflow.py` 启动、继续和提交结果时，自动检查更新并返回 `update`；统一流程启用后的 `login_readiness.py` 同样返回检查结果。AI 直接使用返回结果，同一轮无需另外执行检查。检查结果保存在 `.local/update-check.json`，24 小时内复用，满 24 小时后的下一次调用重新联网；内部保存进度和计算阶段不触发联网。用户要求立即检查时运行 `python3 scripts/update.py check --force`，随后主流程沿用新结果。尚未进入主流程、只阅读本地教程时，执行 `python3 scripts/update.py check`。没有 Python 时由 AI 读取远端 `version.json`，记录检查时间并比较数字版本；无法联网时继续本地教程，简短说明本次未能检查。公开仓库无需登录。
+2. `update.status` 返回 `update_available` 时，主流程已将更新建议追加到 `customer_message`；独立检查使用顶层结果。此时，先完成客户当前这一步的回答，在本次调用的首个实质回答末尾单独一行展示脚本返回的 `update_notice`，例如“已有最新更新（v1.0.10），建议更新。”必要时补充更新摘要，不能只在工具输出中显示。同一次连续带做不在每条回复重复提醒；下次调用即使复用缓存，仍在首个回答末尾提醒。`current`、`local_ahead` 或检查失败时不编造新版提醒；失败的缓存结果也不能说当前已是最新版。更新提醒不阻断带做。客户未同意或拒绝就继续本地版本；明确同意后才执行返回的 `python3 scripts/update.py apply --commit <已检查的提交>`。成功后停止旧版提醒，重新读取本文件和变更章节；本地版本变化会使旧检查缓存失效。不要未经检查直接执行远程脚本；链接交付按专门启动流程保存并检查脚本后运行。
 3. **在第一次带做前完整阅读** `references/01-network.md`（纯净魔法从零部署）与 `references/02-browser-iphone.md`（指纹浏览器与 iPhone 网络配置）。两篇必须都通读，长文分段读至末尾，不能以检索片段、目录、摘要或 PDF 文字抽取代替全文。图片在相关步骤打开查看，并按下方“图文带做”规则展示给用户。
 4. 阅读 `references/00-start.md` 和 `references/05-ai-walkthrough.md`。恢复时读取 `.local/progress.md`（如存在），结合本轮上下文确认进度。更新涉及前两篇时重新完整读取。
 5. 完成启动和资料读取后，运行 `python3 scripts/workflow.py init`，按返回的当前阶段继续。首次带做先读 `references/13-reader-guide.md`；第一个实质问题由 `intake` 阶段给出：“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”已有答案直接复用。其后的设备说明、Google、VPS、浏览器、手机和订阅均由统一阶段定义推进。`devices` 阶段确认设备后，当场展示返回的 `customer_message`，展示完成再提交 `setup_explained=true`；接着介绍阅读版，继续账号准备。原教程保留具体操作和配图。
@@ -53,7 +53,7 @@ python3 scripts/workflow.py next
 | 适用清理 | `04-recovery.md`、`15-mac-cleanup.md`、`16-windows-cleanup.md`：只称 Mac 端／Windows 端清理 Skill，按实际范围审计、备份与执行。 |
 | VPS、服务端和电脑网络 | `01-network.md`、`14-scripted-execution.md`；Windows 加读 `10-windows.md`。保留旧 VPN，先测新线路，完成交接后继续 AdsPower。 |
 | AdsPower 与手机 | `02-browser-iphone.md`、`06-before-login.md`：先完成并验收 AdsPower，再进入手机；手机连接后展示原攻略的时区和定位设置路径。 |
-| 时区选择 | 询问一次“跟随节点（程序和作者推荐）／台北”。电脑、手机与 AdsPower 同步所选时区，关闭自动时区和定位；已有选择直接复用。 |
+| 时区选择 | 询问一次“跟随节点（程序和作者推荐）／台北”。电脑、手机与 AdsPower 同步所选时区，关闭自动时区；Mac 仅关闭系统服务“设定时区”，保留总定位并禁止 Claude 网页位置权限；其他平台按对应步骤设置定位。已有选择直接复用。 |
 | Apple 准备与订阅 | `03-apple.md`：核对美区 Apple ID 和养号记录，默认约两天从本人手机首次 App Store 登录成功计算；客户明确选择现在继续时记录后推进。就绪后保持节点开启、下载官方 Claude、Google 登录并直接订阅 Pro。 |
 | Android | `11-android-web-pay.md`：按官网支付条件继续，使用 Android 字段，不套用 Apple 等待和商店字段。 |
 | 售后 | `04-recovery.md`、`07-apple-purchase-support.md`：仅实际需要时进入。本人验证与付款由客户完成。 |

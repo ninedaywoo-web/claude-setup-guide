@@ -68,13 +68,13 @@ def customer_output(result, state, now):
                                  '尚未选择先确认跟随节点或台北，再完成设置、核对电脑／手机／AdsPower 一致，按实际结果提交。')
         if data.get('choice') in ('node', 'taipei'):
             target = 'Asia/Taipei' if data['choice'] == 'taipei' else facts(state, 'vps').get('node_timezone', '节点所在城市')
-            messages.append('**接下来关闭电脑和手机的定位，并统一时区。**沿用您已选的时区：' + target + '，AdsPower 也采用相同时区。')
+            messages.append('**接下来统一电脑、手机和浏览器的时区，并按设备设置定位权限。**沿用您已选的时区：' + target + '，AdsPower 也采用相同时区。')
         else:
-            messages.append('**接下来关闭电脑和手机的定位，并统一时区。**推荐跟随 VPS 节点所在城市；想保留东八区作息也可以选台北。您选哪一种？电脑、手机和 AdsPower 会统一按这个选择设置。')
+            messages.append('**接下来统一电脑、手机和浏览器的时区，并按设备设置定位权限。**推荐跟随 VPS 节点所在城市；想保留东八区作息也可以选台北。您选哪一种？电脑、手机和 AdsPower 会统一按这个选择设置。')
         if device.get('computer') == 'windows':
             messages.append('**Windows 电脑：**打开「设置 → 时间和语言 → 日期和时间」，关闭「自动设置时区」，手动选择刚才确定的时区，保留「自动设置时间」，按所选地区处理夏令时。然后打开 Windows 11 的「设置 → 隐私和安全性 → 位置」（Windows 10 为「设置 → 隐私 → 位置」），关闭设备定位服务。')
         else:
-            messages.append('**Mac 电脑：**打开「系统设置 → 通用 → 日期与时间」，关闭自动设置时区，选择确定的城市，保留自动设置日期与时间。再到「隐私与安全性 → 定位服务 → 系统服务」关闭「设定时区」，返回关闭定位服务总开关。')
+            messages.append('**Mac 电脑：**打开「系统设置 → 通用 → 日期与时间」，关闭自动设置时区，选择确定的城市，保留自动设置日期与时间。再到「隐私与安全性 → 定位服务 → 系统服务 → 详细信息」关闭「设定时区」。Mac 的定位服务总开关保持原有状态；Claude 网页的位置权限设为禁止，核对 AdsPower 地理位置为「禁止」。')
         if device.get('phone') == 'android':
             messages.append('**安卓手机：**在设置中搜索「日期和时间」，关闭「自动设置时区／使用网络提供的时区」，手动选择确定的地区与时区，保留自动设置日期和时间。如果页面另有「使用位置信息设置时区」，也将它关闭。再在设置中搜索「位置／定位服务」，关闭「使用位置信息」总开关。不同品牌菜单名称不同，Codex 会按您的实际系统版本指导操作。')
         else:

@@ -70,10 +70,10 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
                     view = case.flow.next()
                     self.assertEqual(view['stage'], 'timezone')
                     msg = view['customer_message']
-                    self.assertIn('关闭电脑和手机的定位', msg)
+                    self.assertIn('按设备设置定位权限', msg)
                     self.assertIn('Windows 11' if computer == 'windows' else 'Mac 电脑', msg)
                     self.assertIn('使用网络提供的时区' if phone == 'android' else 'iPhone／iPad', msg)
-                    self.assertIn('computer_location_off', view['required_fields'])
+                    self.assertEqual('computer_location_off' in view['required_fields'], computer == 'windows')
                     self.assertIn('phone_location_off', view['required_fields'])
                     self.assertIn('直接展示', view['display_instruction'])
                     if phone == 'android':
@@ -82,6 +82,22 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
                     self.assertEqual(case.flow.next()['stage'], 'phone_network')
                 finally:
                     case.doCleanups()
+
+    def test_mac_global_location_is_not_required_but_timezone_and_web_permission_are(self):
+        self.reach('timezone')
+        view = self.flow.next()
+        self.assertNotIn('computer_location_off', view['required_fields'])
+        self.assertIn('computer_timezone_location_off', view['required_fields'])
+        mac_text = view['customer_message'].split('**Mac 电脑：**')[1].split('**iPhone')[0]
+        self.assertIn('总开关保持原有状态', mac_text)
+        self.assertNotIn('关闭定位服务总开关', mac_text)
+        data = self.data('timezone')
+        data.update(computer_location_off=False, computer_timezone_location_off=False, browser_location_blocked=False)
+        self.flow.submit(self.payload(data))
+        resumed = Workflow(self.root).next()
+        self.assertEqual(set(resumed['missing']), {'computer_timezone_location_off', 'browser_location_blocked'})
+        self.flow.submit(self.payload({'computer_timezone_location_off': True, 'browser_location_blocked': True}))
+        self.assertEqual(self.flow.next()['stage'], 'phone_network')
 
     def test_windows_old_progress_requires_missing_location_and_reuses_timezone(self):
         self.computer, self.phone, self.choice = 'windows', 'android', 'taipei'

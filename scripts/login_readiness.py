@@ -15,13 +15,14 @@ def requirements(computer, phone):
         ('browser_network', '完成 AdsPower 网络验收'),
         ('phone_proxy', '手机导入同一节点，开启全局代理与 VPN'),
         ('computer_timezone_auto_off', '电脑关闭自动设置时区'),
-        ('computer_location_off', '电脑关闭定位服务总开关'),
         ('computer_timezone_matches_choice', '电脑手动时区符合所选时区（节点城市或台北），并返回设置页复查'),
     ]
     if computer == 'mac':
         checks += [
             ('computer_timezone_location_off', 'Mac 系统服务“设定时区”关闭或随定位总开关停用'),
         ]
+    else:
+        checks.append(('computer_location_off', 'Windows 关闭定位服务总开关'))
     checks += [
         ('phone_timezone_auto_off', '手机关闭日期与时间中的“自动设置”'),
         ('phone_timezone_matches_choice', '手机手动时区符合所选时区（节点城市或台北），并返回设置页复查'),
@@ -80,6 +81,8 @@ def main():
             workflow = Workflow(ROOT)
             workflow.sync()
             result = workflow.next()
+        from update import workflow_output
+        result = workflow_output(ROOT, result)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     parser = argparse.ArgumentParser(description=__doc__)

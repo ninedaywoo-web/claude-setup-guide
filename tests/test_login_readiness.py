@@ -55,7 +55,8 @@ class LoginReadinessTests(unittest.TestCase):
 
     def test_windows_ipad_has_phone_settings_without_mac_fields(self):
         record = self.completed('windows', 'ipad')
-        self.assertNotIn('computer_location_off', record['checks'])
+        self.assertIn('computer_location_off', record['checks'])
+        self.assertNotIn('computer_timezone_location_off', record['checks'])
         self.assertIn('phone_location_off', record['checks'])
         self.assertEqual(flow.evaluate(record)['status'], 'ready')
 

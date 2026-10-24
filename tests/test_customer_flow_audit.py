@@ -59,6 +59,45 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertIn('payment_route_status',view['missing'])
         self.assertNotIn('apple_account_ref',view['required_fields'])
 
+    def test_timezone_messages_match_all_device_combinations(self):
+        for computer, phone in (('windows', 'android'), ('windows', 'iphone'), ('mac', 'android'), ('mac', 'iphone')):
+            with self.subTest(computer=computer, phone=phone):
+                case = fixtures.WorkflowTests()
+                case.setUp()
+                try:
+                    case.computer, case.phone = computer, phone
+                    case.reach('phone_proxy'); case.advance()
+                    view = case.flow.next()
+                    self.assertEqual(view['stage'], 'timezone')
+                    msg = view['customer_message']
+                    self.assertIn('关闭电脑和手机的定位', msg)
+                    self.assertIn('Windows 11' if computer == 'windows' else 'Mac 电脑', msg)
+                    self.assertIn('使用网络提供的时区' if phone == 'android' else 'iPhone／iPad', msg)
+                    self.assertIn('computer_location_off', view['required_fields'])
+                    self.assertIn('phone_location_off', view['required_fields'])
+                    self.assertIn('直接展示', view['display_instruction'])
+                    if phone == 'android':
+                        self.assertNotIn('phone_timezone_location_off', view['required_fields'])
+                    case.advance()
+                    self.assertEqual(case.flow.next()['stage'], 'phone_network')
+                finally:
+                    case.doCleanups()
+
+    def test_windows_old_progress_requires_missing_location_and_reuses_timezone(self):
+        self.computer, self.phone, self.choice = 'windows', 'android', 'taipei'
+        self.reach('timezone')
+        data = self.data('timezone'); data.pop('computer_location_off')
+        self.flow.submit(self.payload(data))
+        view = Workflow(self.root).next()
+        self.assertEqual(view['stage'], 'timezone')
+        self.assertEqual(view['missing'], ['computer_location_off'])
+        self.assertIn('沿用您已选的时区：Asia/Taipei', view['customer_message'])
+        self.assertNotIn('您选哪一种', view['customer_message'])
+        self.flow.submit(self.payload({'computer_location_off': False}))
+        self.assertEqual(self.flow.next()['stage'], 'timezone')
+        self.flow.submit(self.payload({'computer_location_off': True}))
+        self.assertEqual(self.flow.next()['stage'], 'phone_network')
+
     def test_android_phone_and_timezone_reference_platform_guide(self):
         self.phone='android';self.computer='windows'
         for stage in ('phone_proxy','timezone'):

@@ -64,9 +64,22 @@ def customer_output(result, state, now):
     if key == 'phone_proxy' and device.get('phone') != 'android':
         messages.append('先确认您是否已有可用的小火箭。有就直接使用，无需重复购买；没有且需要用新 Apple ID 购买，先在 App Store 登录并查看新号等待安排。')
     if key == 'timezone':
-        result['next_action'] = '沿用已选时区，展示当前设备的设置入口，再核对电脑、手机和 AdsPower 一致。'
-        if device.get('computer') == 'windows' or device.get('phone') == 'android':
-            messages.append('Windows／安卓的固定图解步骤正在补充。Codex 会按您实际系统版本查找时区和定位入口，或带您在系统设置中搜索；找到并展示实际路径后再记录完成。')
+        result['next_action'] = ('在客户对话展示当前电脑和手机的时区、定位设置步骤。已有时区选择直接沿用；'
+                                 '尚未选择先确认跟随节点或台北，再完成设置、核对电脑／手机／AdsPower 一致，按实际结果提交。')
+        if data.get('choice') in ('node', 'taipei'):
+            target = 'Asia/Taipei' if data['choice'] == 'taipei' else facts(state, 'vps').get('node_timezone', '节点所在城市')
+            messages.append('**接下来关闭电脑和手机的定位，并统一时区。**沿用您已选的时区：' + target + '，AdsPower 也采用相同时区。')
+        else:
+            messages.append('**接下来关闭电脑和手机的定位，并统一时区。**推荐跟随 VPS 节点所在城市；想保留东八区作息也可以选台北。您选哪一种？电脑、手机和 AdsPower 会统一按这个选择设置。')
+        if device.get('computer') == 'windows':
+            messages.append('**Windows 电脑：**打开「设置 → 时间和语言 → 日期和时间」，关闭「自动设置时区」，手动选择刚才确定的时区，保留「自动设置时间」，按所选地区处理夏令时。然后打开 Windows 11 的「设置 → 隐私和安全性 → 位置」（Windows 10 为「设置 → 隐私 → 位置」），关闭设备定位服务。')
+        else:
+            messages.append('**Mac 电脑：**打开「系统设置 → 通用 → 日期与时间」，关闭自动设置时区，选择确定的城市，保留自动设置日期与时间。再到「隐私与安全性 → 定位服务 → 系统服务」关闭「设定时区」，返回关闭定位服务总开关。')
+        if device.get('phone') == 'android':
+            messages.append('**安卓手机：**在设置中搜索「日期和时间」，关闭「自动设置时区／使用网络提供的时区」，手动选择确定的地区与时区，保留自动设置日期和时间。如果页面另有「使用位置信息设置时区」，也将它关闭。再在设置中搜索「位置／定位服务」，关闭「使用位置信息」总开关。不同品牌菜单名称不同，Codex 会按您的实际系统版本指导操作。')
+        else:
+            messages.append('**iPhone／iPad：**打开「设置 → 通用 → 日期与时间」，关闭「自动设置」，选择确定的时区城市。再到「隐私与安全性 → 定位服务 → 系统服务」关闭「设定时区」，返回关闭定位服务总开关。')
+        messages.append('设置后返回页面核对实际时区和定位开关，并核对 AdsPower 的时区与地理位置「禁止」。系统语言可以保留中文；关闭定位会影响地图等依赖位置的功能。')
     apple_stage = key in ('phone_proxy', 'payment_preparation') and device.get('phone') != 'android'
     if apple_stage:
         result['account_history'] = state.get('apple_accounts', {})

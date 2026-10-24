@@ -223,7 +223,8 @@ class WorkflowTests(unittest.TestCase):
     def test_windows_android_branch_has_no_apple_requirements(self):
         self.computer, self.phone, self.choice = 'windows', 'android', 'taipei'
         self.reach('timezone')
-        self.assertNotIn('computer_location_off', self.flow.next()['required_fields'])
+        self.assertIn('computer_location_off', self.flow.next()['required_fields'])
+        self.assertNotIn('computer_timezone_location_off', self.flow.next()['required_fields'])
         self.advance(); self.reach('payment_preparation')
         self.assertNotIn('account_type', self.flow.next()['required_fields'])
         self.advance(); self.assertIn('official_site_open', self.flow.next()['required_fields'])

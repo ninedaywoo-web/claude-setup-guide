@@ -39,7 +39,8 @@ STAGES = [
     ('timezone', '选择时区并展示、完成电脑与手机设置路径', '02-browser-iphone.md',
      {'choice': ('node', 'taipei'), 'target': 'text', 'computer_zone': 'text',
       'phone_zone': 'text', 'browser_zone': 'text', 'paths_shown': True,
-      'computer_auto_off': True, 'phone_auto_off': True, 'phone_location_off': True,
+      'computer_auto_off': True, 'computer_location_off': True,
+      'phone_auto_off': True, 'phone_location_off': True,
       'browser_location_blocked': True}),
     ('phone_network', '在手机独立验收网络', '06-before-login.md',
      {'node_label': 'text', 'network_type': ('wifi', 'cellular', 'both'), 'exit_matches': True,
@@ -135,7 +136,7 @@ def catalog(state):
             reference = '11-android-web-pay.md'
         if key == 'timezone':
             if device.get('computer') == 'mac':
-                fields.update(computer_location_off=True, computer_timezone_location_off=True)
+                fields['computer_timezone_location_off'] = True
             if not android:
                 fields['phone_timezone_location_off'] = True
         if key == 'payment_preparation':

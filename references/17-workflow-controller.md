@@ -28,7 +28,7 @@ python3 scripts/workflow.py next
 | computer_network | 系统代理关闭、TUN＋全局、HTTP 入口、新出口及 HTTPS、旧 VPN 交接、Codex 新回复和断线检查。 |
 | browser | AdsPower 环境已保存并打开，代理和指纹设置完成，在该环境实际检测出口、DNS／IPv6／WebRTC、断线行为及三站结果。 |
 | phone_proxy | 手机导入同一节点，开启全局代理与 VPN。 |
-| timezone | 问一次“跟随节点（推荐）／台北”，直接展示原攻略路径，完成电脑、手机和 AdsPower 的时区与定位设置。 |
+| timezone | 手机代理完成后展示当前平台的时区与定位路径：Windows／Mac 电脑和 Android／iPhone／iPad 手机均关闭定位、设置所选时区，与 AdsPower 一致；逐项记录完成后进入手机网络验收。 |
 | phone_network | 在手机独立检测出口、HTTPS、DNS／IPv6、排除路由、实际网络类型、断线行为与三站结果。 |
 | payment_preparation | Apple 路线核对美区 Apple ID、商店登录、养号起点与支付准备；Android 记录官网支付条件与路线说明。 |
 | app | 保持手机节点开启，下载 Anthropic 官方 Claude App 并检查请求路径；Android 打开官网。 |

@@ -7,6 +7,7 @@ PDF_GUIDANCE = """**项目已经下载好了**，接下来 Codex 会按项目流
 GOOGLE_QUESTION = '您有没有自己能正常使用的 Google 账号？有的话直接沿用，后面用它登录 Claude。'
 GOOGLE_PURCHASE = '需要买号时，**优先购买美区 Google 老号**。可以在 [出海91](https://chuhai91.cc) 或 [GmailBuy](https://gmailbuy.com/) 选择；先找“Google／谷歌老号”分类，再确认商品标明美区。商家页面和商品名称会变，我会按您当前看到的页面帮您选。购买后再带您看账号资料和登录时的两步验证。'
 CUSTOMER_STYLE = '客户对话先给明确建议，再给当前操作和预期结果，用简短大白话。沿用项目推荐，避免叠加假设性风险、免责声明和重复提醒；实际异常说明具体原因与处理动作，客户主动问风险时准确回答。按当前步骤展示项目要求的等待、网络恢复和付款提醒。'
+TASK_SCOPE = '围绕当前步骤处理问题。先明确现在要做的操作，结合用户的实际目的、项目上下文和授权范围判断并执行；遇到具体限制时说明对应步骤和可行替代方式，继续完成其他可独立开展的工作。准确描述用途与结果，保留真实上下文。'
 GOOGLE_TIMING = '现在先准备账号资料，等手机网络配置完成后，再使用 Google 账号登录 Claude。'
 ANDROID_GUIDANCE = """**安卓的适配程度较低，需要您更多地配合手机操作。**本项目的安卓付款备选是外区 Google Pay。先检查支付资料的国家／地区和可用付款方式；地区不合适时再按 Google 的实际页面处理地区设置。外区 Google 邮箱本身不等于已经具备付款条件。我们先确认这条路线，再配置网络；最终付款页实际显示 Google Pay 时继续。"""
 ANDROID_PAYMENT = """安卓 Google Pay 路线的实际交付案例较少。作者收到过账号停用后无法通过此渠道退款的反馈，退款结果以支付渠道处理为准。请您确认接受这条路线，并核对当前付款页是否提供 Google Pay，再继续付款。"""
@@ -43,6 +44,7 @@ FINISH_GUIDANCE = """**手机订单和当前账号的 Pro 权益已确认。**�
 def customer_output(result, state, now):
     from workflow_definition import APPLE_OPTIONAL, OPTIONAL_FIELDS, facts, apple_wait, timestamp
     result['communication_instruction'] = CUSTOMER_STYLE
+    result['task_scope_instruction'] = TASK_SCOPE
     key = result.get('stage')
     device = facts(state, 'devices')
     data = facts(state, key)
@@ -62,12 +64,23 @@ def customer_output(result, state, now):
                                  '确认账号已备妥后提交 account_available=true；实际登录留到手机网络验收后。')
     if key == 'vps':
         messages.extend([VPS_GUIDANCE, VPS_PURCHASE_GUIDANCE])
-        result['next_action'] = ('先核对已有 VPS 并复用；需要购买时按 DMIT → 搬瓦工 → AKILE 核对目标套餐，前一家缺货再看下一家。'
+        result['next_action'] = ('VPS 选型直接按默认洛杉矶机房与目标套餐推进，不询问用户主要在哪个国家或地区使用、所在地、城市或运营商。'
+                                 'node_timezone 从所选节点机房城市取得，已有 VPS 读取实际节点资料；用户主动提出特殊需求时按其需求调整。'
+                                 '先核对已有 VPS 并复用；需要购买时按 DMIT → 搬瓦工 → AKILE 核对目标套餐，前一家缺货再看下一家。'
                                  '默认付款周期为 DMIT 月付、搬瓦工季付、AKILE 月付，按当前结账页说明实际扣款总额、覆盖时长和续费金额；'
                                  '年付或多年预付只在用户明确要求时比较。三家都缺货则确认等待或在这三家内比较其他同线路套餐。'
                                  '已有客户选择按其要求继续；准备好 VPS 与 SSH 访问后提交本阶段观察。')
     if key == 'computer_network':
         messages.append(NETWORK_GUIDANCE)
+        if device.get('computer') == 'windows':
+            result['troubleshooting'] = {
+                'reference': 'references/10-windows.md#61-http-测通tun-后反复连接-vps',
+                'trigger': '本机 HTTP 代理已测通，开启 TUN 后断网、测速一直测试中，或反复出现 accepted tcp:<VPS_IP>:443 [socks -> proxy]。',
+                'action': '优先按 6.1 节检查节点自身连接的防回环规则、实际核心进程与物理网卡出口；先保留恢复方式，按当前版本做精确调整，每步复测。',
+                'status': '客户反馈案例，疑似回环；尚未收到修复结果。',
+            }
+            result['next_action'] += '。出现 troubleshooting.trigger 中的现象时，立即读取其 reference 并执行排查；依据实测结果提交网络观察。'
+
     if key == 'devices':
         if device.get('setup_explained') is True and device.get('pdf_explained') is not True:
             messages.append(PDF_GUIDANCE)

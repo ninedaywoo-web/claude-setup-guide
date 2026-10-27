@@ -1,4 +1,6 @@
-# Claude Max 防封奶妈级教程
+# 更好地用上 Claude Max 教学
+
+我们希望帮助用户更好地使用 Claude，把服务器部署、电脑与手机网络配置、登录和订阅操作整理成清楚的步骤。Codex 根据用户的设备和实际进度协助操作、解释原理并排查故障，配套 PDF 提供图文指引；日常使用目标是电脑上的 Claude 桌面端或 CLI。
 
 带做由[统一控制层](17-workflow-controller.md)返回当前阶段：完成启动读取后运行 `python3 scripts/workflow.py init`，每阶段取得实际结果后提交，再按程序返回的下一步继续。
 

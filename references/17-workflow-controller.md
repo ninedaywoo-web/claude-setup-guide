@@ -17,6 +17,8 @@ python3 scripts/workflow.py next
 
 ## 在客户需要的时候解释用途
 
+VPS 阶段按既定商家与默认机房推进，不询问使用国家／地区、所在地或运营商；`node_timezone` 读取所选节点机房城市。已有 VPS 和客户主动提出的需求按实际情况处理。
+
 每次返回的 `communication_instruction` 统一约束客户对话：先给建议和当前动作，简短解释；实际问题按事实处理，按阶段展示必要提醒。`customer_message` 中的选购建议直接展示，商品页和截图追问沿用同一标准。
 
 控制层把下列说明放入对应阶段的 `customer_message`，AI 首次进入该阶段时直接讲给客户，再执行当前动作。同一阶段连续操作复用已讲过的说明，客户追问时再展开；恢复带做时结合对话记录补上尚未讲过的部分。
@@ -31,6 +33,8 @@ python3 scripts/workflow.py next
 | phone_network | 手机独立检查三站与实际出口，和电脑的目标线路核对后再登录订阅。 |
 | payment_preparation | 说明礼品卡充值 → App Store 余额 → Claude Pro 内购；已有余额复用。先落实账号等待安排，等待或申诉期间展示当前安排，到期后继续充值步骤。 |
 | subscription | 订单及权益确认后，说明回电脑桌面端或 CLI 使用同一账号，网页登录授权仍走 AdsPower。 |
+
+每阶段的 `task_scope_instruction` 要求结合真实目的与上下文按当前操作判断。Windows 的 `computer_network` 还返回 `troubleshooting`：发生本机 HTTP 已通、TUN 后重复连接 VPS 等现象时读取 Windows 第 6.1 节。该案例仍待客户复测，完成判定沿用实际出口、HTTPS、Codex 回复及原网络检查字段。
 
 ## 手机验收对话与结果
 

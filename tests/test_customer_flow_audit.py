@@ -14,6 +14,35 @@ from workflow_definition import catalog
 
 class CustomerFlowAudit(fixtures.WorkflowTests):
     # Reuse the isolated state machine fixture, not live devices/accounts.
+    def test_windows_tun_case_is_available_on_failure_and_resume(self):
+        self.computer = 'windows'
+        self.reach('computer_network')
+        view = self.flow.next()
+        self.assertIn('6.1', view['troubleshooting']['action'])
+        self.assertIn('socks -> proxy', view['troubleshooting']['trigger'])
+        self.assertTrue((Path(__file__).resolve().parents[1] / view['troubleshooting']['reference'].split('#')[0]).exists())
+        data = self.data('computer_network')
+        data.update(https_ok=False, exit_matches=False, codex_reply_received=False)
+        self.flow.submit(self.payload(data))
+        resumed = Workflow(self.root).next()
+        self.assertEqual(resumed['stage'], 'computer_network')
+        self.assertIn('troubleshooting', resumed)
+        self.assertIn('https_ok', resumed['missing'])
+        self.assertIn('exit_matches', resumed['missing'])
+        self.assertIn('codex_reply_received', resumed['missing'])
+        self.flow.submit(self.payload(self.data('computer_network')))
+        self.assertEqual(self.flow.next()['stage'], 'browser')
+        self.assertNotIn('troubleshooting', self.flow.next())
+
+    def test_scope_guidance_preserves_opening_and_mac_network(self):
+        view = self.flow.next()
+        self.assertEqual(view['stage'], 'intake')
+        self.assertIn('封禁', view['customer_message'])
+        self.assertIn('真实上下文', view['task_scope_instruction'])
+        self.reach('computer_network')
+        self.assertNotIn('troubleshooting', self.flow.next())
+        self.assertIn('旧 VPN', self.flow.next()['customer_message'])
+
     def test_beginner_explanations_follow_each_platform_stage(self):
         for computer, phone in (('mac', 'iphone'), ('windows', 'iphone'), ('windows', 'android')):
             with self.subTest(computer=computer, phone=phone):
@@ -412,6 +441,8 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertIn('实际付款总额', message)
         action = self.flow.next()['next_action']
         self.assertIn('前一家缺货再看下一家', action)
+        self.assertIn('不询问用户主要在哪个国家或地区使用', action)
+        self.assertIn('node_timezone 从所选节点机房城市取得', action)
         self.assertIn('年付或多年预付只在用户明确要求时比较', action)
         self.assertIn('三家都缺货', action)
         self.assertNotIn('Hostinger', message + action)

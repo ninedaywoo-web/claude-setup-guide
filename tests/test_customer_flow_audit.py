@@ -36,6 +36,8 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
                         for phrase in phrases:
                             self.assertIn(phrase, view['customer_message'])
                         self.assertIn('首次进入当前阶段', view['display_instruction'])
+                        self.assertIn('communication_instruction', view['display_instruction'])
+                        self.assertIn('先给明确建议', view['communication_instruction'])
                         if phone == 'android':
                             self.assertNotIn('Apple 账号用于', view['customer_message'])
                             self.assertNotIn('iOS 内购', view['customer_message'])
@@ -81,6 +83,10 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         view = Workflow(self.root).next()
         self.assertEqual(view['stage'], 'google')
         self.assertIn('购买', view['customer_message'])
+        self.assertIn('**优先购买美区 Google 老号**', view['customer_message'])
+        self.assertIn('先明确推荐', view['next_action'])
+        self.assertIn('按实际页面定位老号分类并核对美区', view['next_action'])
+        self.assertIn('避免叠加假设性风险', view['communication_instruction'])
         self.assertNotIn('您有没有', view['customer_message'])
         self.flow.submit(self.payload({'account_available': True}))
         self.assertEqual(self.flow.next()['stage'], 'vps')

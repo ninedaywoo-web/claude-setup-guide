@@ -2,10 +2,10 @@
   "files": {
     ".gitattributes": "547f59603028195ff9f8a87d04c4651551e8bd0d68f075257dfd549cd846b25b",
     ".gitignore": "29d98e57738b3097cf43d3f351df9be6766d48a0b522393e1b5437a9587988f0",
-    "AGENTS.md": "36ed577de0a7d1d93042ef01067ee411dd1e45bf5a940eb6a2b99bc9f122e8de",
-    "CHANGELOG.md": "04919755bff01a62caa7f29b946c78c2abcaa5b32feb65fce4ce7583c87c0160",
+    "AGENTS.md": "d60a6a4ea1e3bdd9f717a43b8f5f3bb4ca00d20279afbe5ead9fd5e07f71aa5e",
+    "CHANGELOG.md": "3ca10257f25ef751523c454ea1353248d5f43f281bfa82740d52b00cbbfa0c78",
     "README.md": "2aac9ce59f50a060a16fcfe00dd88bd92820e6322d497da76e7d7fcf839c839b",
-    "SKILL.md": "671794d0d32a174745c8758db7322fe4ba493e628fbd7d50a4d3b162761f53cf",
+    "SKILL.md": "7adf822b242f09939859f0f9c98a2b13e708670740dc030f5ecf8ed4ff2a7fac",
     "agents/openai.yaml": "77f7b07e49ad3a01d1cd9f61e5ef30867346474bb53a4af6b77a84ad6cf22014",
     "assets/images/apple/01.jpg": "f8c3ef0157153840a111cdc2654e4da8f5ddf5079502e4f28921e879f5ea1f19",
     "assets/images/apple/02.jpg": "4517e514a089d19e643323f24efd06ea843339019c3760c36029037d49eba28e",
@@ -95,7 +95,7 @@
     "references/05-ai-walkthrough.md": "31cec518b6b66b047ebe6f113c350bc103f4136340a86332240943072db7c28a",
     "references/06-before-login.md": "77083ddabef1ce8ce0631dd9db505aee9ab6abe8a49cfb8ff65a34094c46eb05",
     "references/07-apple-purchase-support.md": "9a2c2d73a0fd4037ff14e0f528bc8356413e024e41f0649ff25c632f1bd2571e",
-    "references/08-google-account.md": "4b26c451a53af76781eab6f9fb0c5961024a1d6e6a7a9ba0f819069356017a19",
+    "references/08-google-account.md": "90928eb45989b4c272f6362e3f79e6add6b95b425a225f5390f3da03b74dac98",
     "references/09-vps-purchase.md": "de84c9792784a787cb09b54abebdc5cdfaa00fc306466b4908a9bc76f8023737",
     "references/10-windows.md": "40dfd56a0be865fea25efc967bd6f0ec8bb8dd6989affe49de9bbda5b5f097db",
     "references/11-android-web-pay.md": "c4361710e7afea9719a7cb28a709100a624ec3d641fabddd653dc5aa0ff206ed",
@@ -104,7 +104,7 @@
     "references/14-scripted-execution.md": "33900cd593f5b0564f79d9736bdb5735319bd63bf18fdf2604c1f59e52a72690",
     "references/15-mac-cleanup.md": "2873d49a8bc1ccb031641b2bf8d1acd5b0f08cd52f352e1a5ffd8222bedb8529",
     "references/16-windows-cleanup.md": "410e053f11d56cb52a1ce5a79fd323ce36131f371ae2e08bc25dc3f549399093",
-    "references/17-workflow-controller.md": "d7542f7902fab16fd8f6e29240c89876486a718bd71e877d449fd76d2b0321fc",
+    "references/17-workflow-controller.md": "d9eb09ef3c6e2b443d253c480fa12a9945f30d373c9501c22210bece8f77271a",
     "scripts/cleanup.py": "cf91cee37f8307afaf2e8fa6c852377203bbdb815090b69d6919069b02edd7e3",
     "scripts/cleanup_windows.py": "960a28b6a9ca1c20c7fbe6f031209a3a1b9602924b2021e067cad6993cf7d186",
     "scripts/download_karing.py": "7391d188e539bd1ef12bf5906fdef45dfc450735bd933356e910fddf128469ad",
@@ -119,9 +119,9 @@
     "scripts/workflow.py": "6fc62c6f2f31fd76cdce6c9634b9dfe0656219c344bf79fe067367807c35b73b",
     "scripts/workflow_definition.py": "d9c4b9c4d52f9bc5d3ab688d662524501e8f763e1544fc5ee9e31a3f7af2ce4d",
     "scripts/workflow_guard.py": "5276d1357e4adaa69704ff2cdaefd399b364d2d4fac29aa8f4595dbfdbb38bae",
-    "scripts/workflow_messages.py": "adb4df564bb9803b4a82dc31a26337481266d96ce24b702d1e849a8a2146ba0c",
+    "scripts/workflow_messages.py": "f2f3b62fdb44c55e8a37c0c9c3b068918277fdcf954f02c4e543bb19a9ac2011",
     "tests/panel_contract_smoke.py": "bb7059e35488f569ec67a1720280cfff3718de5eabb5595ca98fefe5ccbcfb96",
-    "tests/test_customer_flow_audit.py": "8a1e59217a0542fa0617792d30c9353667a5ae98d84fb6cc5dc821ded38ebc81",
+    "tests/test_customer_flow_audit.py": "d66dce82a2b0b964280514414cb96dad6f047ea991522137ec477e0693d1b386",
     "tests/test_delivery_versions.py": "5028a8c0ce0cb308c40497ed9c22267f12576fe96b057376b59c48d2d124eb46",
     "tests/test_download.py": "3cebad299c30613768d84373da77e2f69964f1a2e8418eec1c252889ceff573a",
     "tests/test_login_readiness.py": "cf1e5fa0c1222887b37574f21759c2de113793525fc6b7e985770d6dc80e6267",
@@ -133,6 +133,6 @@
     "tests/test_windows_cleanup.py": "c169090fbe1a8b420ebd4414f1480461117b10d87114240146dcd2c2e3ba0507",
     "tests/test_workflow.py": "3f0e26f17318b469513a3f7368ed1547a30c5b8ef03d4319d9d19660a9923170",
     "tests/test_workflow_updates.py": "70b4d98904e32f6de176874d8267f89d8f59ba4e6e6d3475641bfc206ca62b4f",
-    "version.json": "bf23be85945400dad40f30527e0a965a1c3ec2a59c838d2738af31f0e4cbba0c"
+    "version.json": "8c59decb3703fcb1163a3a59f4f9cef2b95723dcac5290171efd44cbb8b9423c"
   }
 }

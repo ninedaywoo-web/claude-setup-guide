@@ -407,6 +407,15 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertIn('远程服务器',message)
         self.assertIn('已买但没配置',message)
         self.assertNotIn('云端运行',message)
+        self.assertIn('DMIT → 搬瓦工 → AKILE', message)
+        self.assertIn('月付、季付、月付', message)
+        self.assertIn('实际付款总额', message)
+        action = self.flow.next()['next_action']
+        self.assertIn('前一家缺货再看下一家', action)
+        self.assertIn('年付或多年预付只在用户明确要求时比较', action)
+        self.assertIn('三家都缺货', action)
+        self.assertNotIn('Hostinger', message + action)
+
 
     def test_purchase_restriction_during_actual_subscription_routes_support(self):
         self.reach('subscription')

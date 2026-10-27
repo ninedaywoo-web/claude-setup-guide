@@ -92,4 +92,4 @@ Windows 本机连接 Linux VPS，默认用 v2rayN 与 AdsPower。先保留旧 VP
 
 ## 3. 给 AI 的带做说明
 
-[AI 从零带做指南](05-ai-walkthrough.md)。开始前完整读取网络与浏览器两篇，其他资料按阶段读取。VPS 选购以文档推荐的 DMIT 套餐为对照。DMIT 缺货时，最推荐[搬瓦工](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9)；其次并列推荐 [AKILE Cloud](https://akile.ai/) 与 [Hostinger KVM 1](https://www.hostinger.com/vps-hosting)。先匹配 DMIT 的优化线路，再对照硬件、流量和带宽，最后列出价格，不以十美元预算筛选。搬瓦工默认选 USCA_9 的 1 GB 档（49.99 美元/季），AKILE 默认选 LAXPremium-Mini（79.99 元/月），Hostinger 默认选 KVM 1（1 vCPU、4 GB、50 GB NVMe、4 TB）；不为对齐 DMIT 的内存自动升级。Hostinger 美国机房为 Phoenix 或 Boston，当前未核实同级大陆优化线路；官网月价与续费金额按付款周期分别核对。具体配置、流量差别和库存见[网络教程的套餐对照](01-network.md)。套餐仅按网络节点用途选择。
+[AI 从零带做指南](05-ai-walkthrough.md)。开始前完整读取网络与浏览器两篇，其他资料按阶段读取。VPS 默认按 **DMIT → 搬瓦工 → AKILE Cloud** 推荐：先看 DMIT 洛杉矶 AN5 Premium，缺货看[搬瓦工 USCA_9 的 1 GB 档](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9)，搬瓦工也缺货再看 [AKILE LAXPremium-Mini](https://akile.ai/)。默认付款周期分别为月付、季付、月付；购买前按当前结账页说明实际扣款总额、覆盖时长和续费金额。三家目标套餐都缺货时，确认等待或在这三家内比较其他同线路套餐。具体配置、流量差别和库存见[网络教程的套餐对照](01-network.md)，套餐按网络节点用途选择。

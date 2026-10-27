@@ -8,6 +8,8 @@
 
 每次进入新阶段，先把控制层 `customer_message` 中的用途说明直接展示给客户，再执行操作；按 `display_instruction` 复用已讲过的内容。VPS、账号、浏览器、手机、网络检测和付款分别在对应步骤解释，具体时机见 references/17-workflow-controller.md。日常使用目标是电脑的 Claude 桌面端或 CLI，AdsPower 用于网页登录、相关邮件链接和授权。
 
+VPS 默认按 DMIT → 搬瓦工 → AKILE 逐家核对，目标套餐缺货再看下一家；默认付款周期分别为月付、季付、月付，下单前说明实际扣款总额和覆盖时长。年付或多年预付只在用户明确要求时比较。
+
 正式教程源为公开仓库 `ninedaywoo-web/claude-setup-guide`，后续更新发布到这里。公开版客户读取和下载不需要邀请码或申请权限。另有组织私有交付版 `ninedaywoo-course/claude-setup-guide`，按用户指定同步教程正文，保留其独立版本与鉴权更新机制；领取服务另行维护。
 
 用户发公开仓库链接开始或恢复带做时，先读 references/12-latest-start.md，实时下载并校验最新完整包；成功前不推荐 VPS、不复用本地旧 Skill 或更新缓存。由 AI 使用本机终端／下载工具完成，不默认要求客户点击 Code → Download ZIP；失败按启动流程检查原因和官方备用通道。成功后只从返回的新目录读取资料，显示版本并保留原进度，明确完整包已包含程序／流程和给人看的 PDF；后续询问只针对 PDF 是否另存到方便阅读的位置。用户仅给本地文件夹时读取 SKILL.md 的日常规则。开始前必须完整阅读 references/01-network.md 和 references/02-browser-iphone.md，其余章节按阶段读。完成启动后的第一个实质问题是设备是否登录过被 Claude 封禁的账号，早于 VPS 询问；已有答案复用，有封禁经历按 references/04-recovery.md 的开场分支安排适用清理，详情见 references/13-reader-guide.md。

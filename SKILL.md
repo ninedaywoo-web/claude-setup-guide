@@ -21,6 +21,8 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Mac Ka
 4. 阅读 `references/00-start.md` 和 `references/05-ai-walkthrough.md`。恢复时读取 `.local/progress.md`（如存在），结合本轮上下文确认进度。更新涉及前两篇时重新完整读取。
 5. 完成启动和资料读取后，运行 `python3 scripts/workflow.py init`，按返回的当前阶段继续。每次进入新阶段，先在客户对话展示 `customer_message` 的用途解释，再操作；同一阶段已讲过的内容按 `display_instruction` 复用。解释时机见 `references/17-workflow-controller.md`，日常使用目标是电脑桌面端或 CLI，AdsPower 负责网页登录与授权。首次带做先读 `references/13-reader-guide.md`；第一个实质问题由 `intake` 阶段给出：“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”已有答案直接复用。其后的设备说明、Google、VPS、浏览器、手机和订阅均由统一阶段定义推进。`devices` 阶段确认设备后，当场展示返回的 `customer_message`，展示完成再提交 `setup_explained=true`；接着介绍阅读版，继续账号准备。原教程保留具体操作和配图。
 
+VPS 默认按 DMIT → 搬瓦工 → AKILE 逐家核对，目标套餐缺货再看下一家；默认付款周期分别为月付、季付、月付，下单前说明实际扣款总额和覆盖时长。年付或多年预付只在用户明确要求时比较。
+
 ## 统一执行入口
 
 **先读 `references/17-workflow-controller.md`。从开场到手机订阅完成，当前阶段和下一步都由 `scripts/workflow.py` 返回。**其他章节提供当前动作的具体方法，章节排列和旧进度中的“下一步”不单独决定跳转。

@@ -91,7 +91,10 @@ ACTIONS = {
 }
 
 
-APPLE_OPTIONAL = {'apple_account_ref': 'text', 'account_type': ('longstanding', 'new'),
+APPLE_ORIGINS = ('self_used', 'newly_registered', 'purchased')
+
+
+APPLE_OPTIONAL = {'account_origin': APPLE_ORIGINS, 'apple_account_ref': 'text', 'account_type': ('longstanding', 'new'),
                   'store_signed_in': True, 'first_used_at': 'timestamp',
                   'wait_choice': ('wait', 'continue'), 'apple_reminder_shown': True,
                   'purchase_restricted': False, 'support_case': 'text', 'support_retry_at': 'date'}
@@ -141,12 +144,14 @@ def catalog(state):
                 fields['computer_location_off'] = True
             if not android:
                 fields['phone_timezone_location_off'] = True
+        if key == 'phone_proxy' and not android and facts(state, key).get('client_available') is False:
+            fields.update(account_origin=APPLE_ORIGINS, account_type=('longstanding', 'new'))
         if key == 'payment_preparation':
             if android:
                 title, reference = '确认 Android 官网支付准备', '11-android-web-pay.md'
                 fields = {'payment_method_available': True, 'route_explained': True, 'route_accepted': True}
             else:
-                fields = {'apple_account_ref': 'text', 'region': ('US',), 'store_signed_in': True,
+                fields = {'account_origin': APPLE_ORIGINS, 'apple_account_ref': 'text', 'region': ('US',), 'store_signed_in': True,
                           'account_type': ('longstanding', 'new'), 'purchase_restricted': False,
                           'payment_ready': True}
                 if facts(state, key).get('account_type') == 'new':
@@ -186,6 +191,11 @@ def validation(stage, data, state, now):
             fields.pop('payment_route_status', None)
     apple_stage = stage['id'] in ('payment_preparation', 'phone_proxy') and facts(state, 'devices').get('phone') != 'android'
     if apple_stage:
+        if stage['id'] == 'phone_proxy':
+            fields.pop('account_origin', None)
+            fields.pop('account_type', None)
+        if stage['id'] == 'payment_preparation' or data.get('client_available') is False or data.get('account_type') is not None:
+            fields.update(account_origin=APPLE_ORIGINS, account_type=('longstanding', 'new'))
         fields.pop('first_used_at', None)
         if data.get('account_type') == 'new':
             fields.update(first_used_at='timestamp', apple_account_ref='text', store_signed_in=True, apple_reminder_shown=True)
@@ -221,7 +231,7 @@ def validation(stage, data, state, now):
                         valid = False
                         break
                     score = observation.get('value')
-                    valid &= assessment('netcoffee', score) != 'invalid'
+                    valid &= assessment('netcoffee', score) not in ('invalid', 'unverified')
                     valid &= isinstance(observation.get('result'), str) and bool(observation['result'].strip())
         if not valid:
             issues.append(name)

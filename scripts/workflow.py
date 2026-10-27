@@ -250,6 +250,8 @@ class Workflow:
             account_ref = merged.get('apple_account_ref')
             history = self.state.get('apple_accounts', {}).get(account_ref, {}) if isinstance(account_ref, str) else {}
             merged = {**history, **merged}
+            if merged.get('account_origin') in ('newly_registered', 'purchased'):
+                merged['account_type'] = 'new'
             if merged.get('account_type') == 'longstanding':
                 merged.pop('first_used_at', None)
         checked = self.checked(stage, merged)
@@ -261,7 +263,7 @@ class Workflow:
         if view['stage'] in ('payment_preparation', 'phone_proxy') and isinstance(merged.get('apple_account_ref'), str) and merged['apple_account_ref'].strip():
             if merged.get('store_signed_in') is True and 'first_used_at' not in checked.get('missing', []):
                 self.state.setdefault('apple_accounts', {})[merged['apple_account_ref']] = {
-                    key: merged[key] for key in ('account_type', 'first_used_at', 'apple_reminder_shown', 'wait_choice',
+                    key: merged[key] for key in ('account_origin', 'account_type', 'first_used_at', 'apple_reminder_shown', 'wait_choice',
                                                  'purchase_restricted', 'support_case', 'support_retry_at') if key in merged}
             elif isinstance(merged.get('purchase_restricted'), bool):
                 account = self.state.setdefault('apple_accounts', {}).setdefault(merged['apple_account_ref'], {})

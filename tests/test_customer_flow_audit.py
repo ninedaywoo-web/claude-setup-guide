@@ -14,6 +14,57 @@ from workflow_definition import catalog
 
 class CustomerFlowAudit(fixtures.WorkflowTests):
     # Reuse the isolated state machine fixture, not live devices/accounts.
+    def test_beginner_explanations_follow_each_platform_stage(self):
+        for computer, phone in (('mac', 'iphone'), ('windows', 'iphone'), ('windows', 'android')):
+            with self.subTest(computer=computer, phone=phone):
+                case = fixtures.WorkflowTests()
+                case.setUp()
+                try:
+                    case.computer, case.phone = computer, phone
+                    expected = [
+                        ('google', ('Google 账号用于登录', '同一个 Google 账号')),
+                        ('vps', ('远程服务器', '网站完成购买')),
+                        ('computer_network', ('TUN', '旧 VPN', '单独测通')),
+                        ('browser', ('独立登录环境', '登录记录', '授权链接', '桌面端', '三个网站')),
+                        ('phone_proxy', ('手机', '订阅', '桌面端')),
+                        ('phone_network', ('三个网站', '目标线路')),
+                        ('payment_preparation', ('Google Pay',) if phone == 'android' else ('礼品卡就是', '账户余额', '等待安排')),
+                    ]
+                    for stage, phrases in expected:
+                        case.reach(stage)
+                        view = case.flow.next()
+                        for phrase in phrases:
+                            self.assertIn(phrase, view['customer_message'])
+                        self.assertIn('首次进入当前阶段', view['display_instruction'])
+                        if phone == 'android':
+                            self.assertNotIn('Apple 账号用于', view['customer_message'])
+                            self.assertNotIn('iOS 内购', view['customer_message'])
+                            self.assertNotIn('礼品卡就是', view['customer_message'])
+                    case.reach('subscription')
+                    self.assertNotIn('权益已确认', case.flow.next().get('customer_message', ''))
+                    case.advance()
+                    message = case.flow.next()['customer_message']
+                    self.assertIn('Claude 桌面端或 Claude Code／CLI', message)
+                    self.assertIn('授权', message)
+                    self.assertNotIn('日常请回电脑的 AdsPower', message)
+                finally:
+                    case.doCleanups()
+
+    def test_apple_wait_and_support_keep_payment_explanation_at_right_time(self):
+        self.reach('payment_preparation')
+        self.flow.submit(self.payload({'account_origin': 'purchased', 'account_type': 'new',
+            'apple_account_ref': 'new-account', 'store_signed_in': True,
+            'first_used_at': self.now.isoformat(), 'apple_reminder_shown': True}))
+        view = self.flow.next()
+        self.assertEqual(view['status'], 'waiting')
+        self.assertNotIn('礼品卡就是', view['customer_message'])
+        self.now += timedelta(hours=49)
+        self.flow = Workflow(self.root, lambda: self.now)
+        self.assertIn('礼品卡就是', self.flow.next()['customer_message'])
+        self.flow.submit(self.payload({'purchase_restricted': True}))
+        self.assertEqual(self.flow.next()['status'], 'needs_support')
+        self.assertNotIn('礼品卡就是', self.flow.next()['customer_message'])
+
     def test_google_preparation_shows_reuse_purchase_and_login_timing(self):
         self.reach('google')
         view = self.flow.next()
@@ -121,6 +172,64 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
             self.assertEqual(self.flow.next()['reference'],'references/11-android-web-pay.md')
         self.assertIn('实际系统版本',self.flow.next()['customer_message'])
 
+    def test_apple_preparation_first_message_asks_source_before_payment(self):
+        self.reach('payment_preparation')
+        view = self.flow.next()
+        self.assertIn('account_origin', view['missing'])
+        self.assertIn('刚购买／刚接手', view['customer_message'])
+        self.assertIn('卖家称为', view['customer_message'])
+        data = self.data('payment_preparation'); data.pop('account_origin')
+        self.flow.submit(self.payload(data))
+        self.assertEqual(self.flow.next()['stage'], 'payment_preparation')
+        self.assertIn('account_origin', self.flow.next()['missing'])
+
+    def test_purchased_seller_old_account_gets_new_account_warning_and_wait(self):
+        self.reach('payment_preparation')
+        data = self.data('payment_preparation')
+        data.update(account_origin='purchased', account_type='longstanding', first_used_at=self.now.isoformat())
+        self.flow.submit(self.payload(data))
+        view = self.flow.next()
+        self.assertEqual(view['observed']['account_type'], 'new')
+        self.assertEqual(view['status'], 'waiting')
+        for text in ('强烈建议', '新买或新注册', '两天', '苹果风控', '人工客服', '72 小时', '不要登录 iCloud'):
+            self.assertIn(text, view['customer_message'])
+        self.assertIn('apple_reminder_shown', view['missing'])
+
+    def test_missing_shadowrocket_prompts_apple_source_and_new_registration_warning(self):
+        self.reach('phone_proxy')
+        self.flow.submit(self.payload({'client_available': False}))
+        self.assertIn('刚购买／刚接手', self.flow.next()['customer_message'])
+        self.assertIn('account_origin', self.flow.next()['missing'])
+        self.flow.submit(self.payload({'account_origin': 'newly_registered', 'account_type': 'longstanding'}))
+        view = self.flow.next()
+        self.assertEqual(view['observed']['account_type'], 'new')
+        self.assertIn('先不买礼品卡和付费 App', view['customer_message'])
+        self.assertIn('first_used_at', view['missing'])
+
+    def test_new_account_payment_recheck_and_subscription_reminder(self):
+        self.account_type = 'new'
+        self.reach('payment_preparation')
+        data = self.data('payment_preparation'); data.update(account_origin='purchased', payment_ready=False)
+        self.flow.submit(self.payload(data))
+        self.assertIn('付款前再确认一次', self.flow.next()['customer_message'])
+        self.assertEqual(self.flow.next()['stage'], 'payment_preparation')
+        self.flow.submit(self.payload({'payment_ready': True}))
+        self.reach('subscription')
+        self.assertIn('付款前再确认一次', self.flow.next()['customer_message'])
+        self.advance()
+        self.assertEqual(self.flow.next()['status'], 'complete')
+
+    def test_existing_longstanding_account_and_android_skip_new_account_warning(self):
+        self.reach('payment_preparation')
+        data = self.data('payment_preparation'); data['payment_ready'] = False
+        self.flow.submit(self.payload(data))
+        self.assertNotIn('强烈建议', self.flow.next().get('customer_message', ''))
+        self.flow.invalidate('devices', 'switch to Android')
+        self.phone = 'android'; self.computer = 'windows'
+        self.reach('payment_preparation')
+        self.assertNotIn('account_origin', self.flow.next()['required_fields'])
+        self.assertNotIn('Apple ID', self.flow.next().get('customer_message', ''))
+
     def test_new_apple_wait_without_gift_card_or_reminder_ack(self):
         self.reach('payment_preparation')
         data=self.data('payment_preparation')
@@ -147,12 +256,15 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
 
     def test_early_shadowrocket_purchase_wait_and_formal_reuse(self):
         self.reach('phone_proxy')
-        self.flow.submit(self.payload({'client_available':False,'apple_account_ref':'early-a','account_type':'new',
+        self.flow.submit(self.payload({'client_available':False,'apple_account_ref':'early-a','account_origin':'purchased','account_type':'new',
             'store_signed_in':True,'first_used_at':self.now.isoformat(),'apple_reminder_shown':True}))
         self.assertEqual(self.flow.next()['status'],'waiting')
         self.now+=timedelta(hours=49)
-        self.advance();self.reach('payment_preparation')
-        data=self.data('payment_preparation');data.pop('account_type');data['apple_account_ref']='early-a'
+        phone_data = self.data('phone_proxy')
+        phone_data.pop('account_type', None); phone_data.pop('account_origin', None)
+        phone_data['client_available'] = True
+        self.flow.submit(self.payload(phone_data));self.reach('payment_preparation')
+        data=self.data('payment_preparation');data.pop('account_type');data.pop('account_origin');data['apple_account_ref']='early-a'
         self.flow.submit(self.payload(data))
         self.assertEqual(self.flow.next()['stage'],'app')
         self.assertEqual(self.flow.state['records']['payment_preparation']['data']['first_used_at'],(self.now-timedelta(hours=49)).isoformat())
@@ -177,6 +289,62 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.reach('phone_proxy');self.flow.submit(self.payload({'client_available':False,'purchase_restricted':True}))
         self.assertEqual(self.flow.next()['status'],'needs_support')
         self.assertEqual(self.flow.next()['reference'],'references/07-apple-purchase-support.md')
+
+    def test_windows_iphone_phone_network_displays_manual_checks_and_links(self):
+        self.computer, self.phone = 'windows', 'iphone'
+        self.reach('phone_network')
+        view = self.flow.next(); message = view['customer_message']
+        for text in ('Windows', '手机操作', 'https://ping0.cc/', 'https://ip.net.coffee/claude/',
+                     'https://scamalytics.com/ip', '页面截图', 'Wi-Fi', '蜂窝', 'AdsPower',
+                     'VPS', '电脑分数不代填', '检测时间'):
+            self.assertIn(text, message)
+        self.assertIn('source.reference', view['next_action'])
+        self.assertIn('直接展示', view['display_instruction'])
+
+    def test_phone_scores_must_be_complete_numeric_results(self):
+        self.computer, self.phone = 'windows', 'iphone'
+        self.reach('phone_network')
+        original = self.data('phone_network')
+        cases = [None, {}, {k:v for k,v in original['scores'].items() if k != 'scamalytics'}]
+        for missing_site in ('netcoffee', 'ping0', 'scamalytics'):
+            scores = deepcopy(original['scores']); scores[missing_site]['value'] = None
+            cases.append(scores)
+        scores = deepcopy(original['scores'])
+        for observation in scores.values():
+            observation.update(value=None, result='Phone page has no score')
+        cases.append(scores)
+        for scores in cases:
+            with self.subTest(scores=scores):
+                data = deepcopy(original); data['scores'] = scores
+                self.flow.submit(self.payload(data))
+                view = Workflow(self.root).next()
+                self.assertEqual(view['stage'], 'phone_network')
+                self.assertIn('scores', view['missing'])
+        self.flow.submit(self.payload({'scores':original['scores']}))
+        self.assertEqual(self.flow.next()['stage'], 'payment_preparation')
+
+    def test_phone_exit_mismatch_blocks_even_with_three_real_scores(self):
+        self.computer, self.phone = 'windows', 'iphone'
+        self.reach('phone_network')
+        data = self.data('phone_network'); data['exit_matches'] = False
+        self.flow.submit(self.payload(data))
+        self.assertEqual(self.flow.next()['stage'], 'phone_network')
+        self.assertIn('exit_matches', self.flow.next()['missing'])
+        self.flow.submit(self.payload({'exit_matches':True}))
+        self.assertEqual(self.flow.next()['stage'], 'payment_preparation')
+
+    def test_unverified_scores_cannot_be_overridden_by_score_review(self):
+        for target in ('browser', 'phone_network'):
+            self.reach(target)
+            data = self.data(target)
+            for observation in data['scores'].values(): observation['value'] = None
+            data.update(score_review='continue', score_review_note='Customer wants to proceed')
+            payload = self.payload(data); payload['source'] = {'kind':'user','reference':'customer reply'}
+            self.flow.submit(payload)
+            self.assertEqual(self.flow.next()['stage'], target)
+            self.assertIn('scores', self.flow.next()['missing'])
+            self.flow.submit(self.payload({'scores':self.data(target)['scores']}))
+            self.assertNotEqual(self.flow.next()['stage'], target)
 
     def test_extreme_scores_cannot_silently_advance_and_new_scores_clear_review(self):
         self.reach('browser');d=self.data('browser')
@@ -259,7 +427,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertEqual(v['status'],'waiting')
         self.assertNotIn('wait_choice',v['observed'])
         self.assertIn('apple_reminder_shown',v['missing'])
-        self.assertIn('新 Apple ID',v['customer_message'])
+        self.assertIn('新买或新注册的 Apple ID',v['customer_message'])
 
     def test_wait_expiry_does_not_fill_missing_payment_details(self):
         self.reach('payment_preparation')

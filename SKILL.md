@@ -19,7 +19,7 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Mac Ka
 2. `update.status` 返回 `update_available` 时，主流程已将更新建议追加到 `customer_message`；独立检查使用顶层结果。此时，先完成客户当前这一步的回答，在本次调用的首个实质回答末尾单独一行展示脚本返回的 `update_notice`，例如“已有最新更新（v1.0.10），建议更新。”必要时补充更新摘要，不能只在工具输出中显示。同一次连续带做不在每条回复重复提醒；下次调用即使复用缓存，仍在首个回答末尾提醒。`current`、`local_ahead` 或检查失败时不编造新版提醒；失败的缓存结果也不能说当前已是最新版。更新提醒不阻断带做。客户未同意或拒绝就继续本地版本；明确同意后才执行返回的 `python3 scripts/update.py apply --commit <已检查的提交>`。成功后停止旧版提醒，重新读取本文件和变更章节；本地版本变化会使旧检查缓存失效。不要未经检查直接执行远程脚本；链接交付按专门启动流程保存并检查脚本后运行。
 3. **在第一次带做前完整阅读** `references/01-network.md`（纯净魔法从零部署）与 `references/02-browser-iphone.md`（指纹浏览器与 iPhone 网络配置）。两篇必须都通读，长文分段读至末尾，不能以检索片段、目录、摘要或 PDF 文字抽取代替全文。图片在相关步骤打开查看，并按下方“图文带做”规则展示给用户。
 4. 阅读 `references/00-start.md` 和 `references/05-ai-walkthrough.md`。恢复时读取 `.local/progress.md`（如存在），结合本轮上下文确认进度。更新涉及前两篇时重新完整读取。
-5. 完成启动和资料读取后，运行 `python3 scripts/workflow.py init`，按返回的当前阶段继续。首次带做先读 `references/13-reader-guide.md`；第一个实质问题由 `intake` 阶段给出：“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”已有答案直接复用。其后的设备说明、Google、VPS、浏览器、手机和订阅均由统一阶段定义推进。`devices` 阶段确认设备后，当场展示返回的 `customer_message`，展示完成再提交 `setup_explained=true`；接着介绍阅读版，继续账号准备。原教程保留具体操作和配图。
+5. 完成启动和资料读取后，运行 `python3 scripts/workflow.py init`，按返回的当前阶段继续。每次进入新阶段，先在客户对话展示 `customer_message` 的用途解释，再操作；同一阶段已讲过的内容按 `display_instruction` 复用。解释时机见 `references/17-workflow-controller.md`，日常使用目标是电脑桌面端或 CLI，AdsPower 负责网页登录与授权。首次带做先读 `references/13-reader-guide.md`；第一个实质问题由 `intake` 阶段给出：“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”已有答案直接复用。其后的设备说明、Google、VPS、浏览器、手机和订阅均由统一阶段定义推进。`devices` 阶段确认设备后，当场展示返回的 `customer_message`，展示完成再提交 `setup_explained=true`；接着介绍阅读版，继续账号准备。原教程保留具体操作和配图。
 
 ## 统一执行入口
 

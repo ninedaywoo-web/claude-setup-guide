@@ -6,7 +6,7 @@
 
 本流程只走“已有账号复用、没有账号购买”，不引导用户注册 Google 账号。`google` 阶段将账号说明与购买渠道直接输出到客户对话，确认备妥后再记录 `account_available=true`。
 
-没有可用账号时，直接提供[原有购号网站](https://chuhai91.cc)以及 [Google 账号补充渠道 GmailBuy](https://gmailbuy.com/)，提示选择商家标明的美区 Google 账号，核对交付字段和售后说明。付款由用户在商家页面完成。Google 账号用于登录 Claude；美区 Apple 账户用于 App Store 下载与订阅，两者分别准备，不能混为同一个账号。邮箱后缀本身不能证明账号地区。
+没有可用账号时，直接提供[原有购号网站](https://chuhai91.cc)以及 [Google 账号补充渠道 GmailBuy](https://gmailbuy.com/)，默认选择商家标明的美区 Google 账号，结合目标节点与使用地区核对；按作者选购经验优先挑使用时间较长的老号。商家页面和套餐会变动，按地区、账号使用时间及售后说明挑选，核对交付字段。付款由用户在商家页面完成。Google 账号用于登录 Claude；美区 Apple 账户用于 App Store 下载、礼品卡充值和订阅付款。后续电脑上的 Claude 桌面端或 CLI 沿用手机登录的同一个 Google 账号。
 
 ## 商家发来的一串文字怎么看
 

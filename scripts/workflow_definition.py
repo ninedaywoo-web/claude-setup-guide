@@ -8,7 +8,7 @@ DEVICE_GUIDANCE = """**这套程序最推荐 Mac＋iPhone，其次是 Windows＋
 - **Windows＋iPhone：也可以使用。**电脑配置由 Codex 协助完成，手机部分需要您手动操作，Codex 会按步骤指导您，遇到问题可以发截图一起排查。
 - **Windows＋Android：目前暂不推荐。**安卓的订阅付款流程还没有完成整套交付验证，现阶段优先选择 iPhone／iPad 的订阅路线。
 
-账号验证和付款由您本人完成。iPad 也能用于 Apple 内购，手机／平板的具体操作按实际设备继续。"""
+流程先配置电脑，再完成手机网络、手机登录和订阅；日常使用回到电脑。iPad 也能承担登录与内购，具体操作按实际设备继续。账号验证和付款由您本人完成。"""
 
 
 # Field rules: true/false, text, timestamp, scores, or an explicit choice tuple.
@@ -99,6 +99,8 @@ APPLE_OPTIONAL = {'account_origin': APPLE_ORIGINS, 'apple_account_ref': 'text', 
                   'wait_choice': ('wait', 'continue'), 'apple_reminder_shown': True,
                   'purchase_restricted': False, 'support_case': 'text', 'support_retry_at': 'date'}
 OPTIONAL_FIELDS = {
+    'google': {'account_origin': ('self_used', 'purchased'),
+               'purchase_channel': ('chuhai91', 'gmailbuy'), 'materials_explained': True},
     'devices': {'pdf_save_choice': ('yes', 'no', 'unanswered'), 'pdf_saved_path': 'text'},
     'phone_proxy': {**APPLE_OPTIONAL, 'client_available': True},
     'payment_preparation': {**APPLE_OPTIONAL, 'route_accepted': True},
@@ -133,6 +135,8 @@ def catalog(state):
         if key == 'cleanup' and facts(state, 'intake').get('banned_login') != 'yes':
             continue
         fields = dict(fields)
+        if key == 'google' and facts(state, key).get('account_origin') == 'purchased':
+            fields['materials_explained'] = True
         if key == 'devices' and android:
             fields.update(android_route_explained=True, payment_route_status=('available', 'needs_setup', 'unknown'))
         if android and key in ('phone_proxy', 'timezone'):
@@ -183,6 +187,10 @@ def validation(stage, data, state, now):
     if stage['id'] == 'timezone' and facts(state, 'devices').get('computer') == 'mac':
         # Prior Mac observations can contain the retired global-location field.
         data = {key: value for key, value in data.items() if key != 'computer_location_off'}
+    if stage['id'] == 'google':
+        fields.pop('materials_explained', None)
+        if data.get('account_origin') == 'purchased':
+            fields['materials_explained'] = True
     if stage['id'] == 'devices':
         if data.get('phone') == 'android':
             fields.update(android_route_explained=True, payment_route_status=('available', 'needs_setup', 'unknown'))
@@ -201,7 +209,7 @@ def validation(stage, data, state, now):
             fields.update(first_used_at='timestamp', apple_account_ref='text', store_signed_in=True, apple_reminder_shown=True)
     optional = OPTIONAL_FIELDS.get(stage['id'], {})
     # Apple fields never leak into the Android route.
-    if facts(state, 'devices').get('phone') == 'android':
+    if stage['id'] != 'google' and facts(state, 'devices').get('phone') == 'android':
         optional = {k: v for k, v in optional.items() if k not in APPLE_OPTIONAL and k != 'client_available'}
     for key, rule in optional.items():
         if key in data:

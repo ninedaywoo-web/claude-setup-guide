@@ -14,6 +14,188 @@ from workflow_definition import catalog
 
 class CustomerFlowAudit(fixtures.WorkflowTests):
     # Reuse the isolated state machine fixture, not live devices/accounts.
+    def test_browser_cleanup_then_computer_first_still_prepares_phone_and_google(self):
+        self.flow.submit(self.payload({'banned_login': 'yes'}))
+        self.assertIn('Google 账号准备 → VPS', self.flow.next()['next_action'])
+        self.flow.submit(self.payload({'outcome': 'cleaned',
+            'handled_scope': 'Customer confirmed Claude site data cleared in Chrome and Firefox'}))
+        self.assertEqual(self.flow.next()['stage'], 'devices')
+        self.flow.submit(self.payload({'computer': 'windows'}))
+        self.flow = Workflow(self.root, lambda: self.now)
+        view = self.flow.next()
+        self.assertEqual(view['stage'], 'devices')
+        self.assertIn('phone', view['missing'])
+        self.assertIn('iPhone、iPad 还是安卓手机', view['customer_message'])
+        self.assertIn('手机网络、手机登录和订阅', view['customer_message'])
+        premature = self.payload(self.data('vps'))
+        premature['stage'] = 'vps'
+        with self.assertRaises(WorkflowError):
+            self.flow.submit(premature)
+        self.flow.submit(self.payload({'setup_explained': True, 'pdf_explained': True}))
+        self.assertIn('iPhone、iPad 还是安卓手机', self.flow.next()['customer_message'])
+        self.flow.submit(self.payload({'phone': 'iphone'}))
+        self.assertEqual(self.flow.next()['stage'], 'google')
+        self.assertIn('您有没有能正常登录 Claude、没有被 Claude 封禁的 Google 账号', self.flow.next()['customer_message'])
+        self.flow.submit(self.payload({'account_available': False}))
+        self.assertEqual(self.flow.next()['stage'], 'google')
+        self.flow.submit(self.payload({'account_available': True}))
+        if self.flow.next()['stage'] == 'google':
+            self.assertIn('materials_explained', self.flow.next()['missing'])
+            self.flow.submit(self.payload({'materials_explained': True}))
+        self.assertEqual(self.flow.next()['stage'], 'vps')
+
+    def test_cleanup_outcomes_keep_phone_network_login_and_subscription_in_delivery(self):
+        for computer, phone, outcome in (('mac', 'iphone', 'cleaned'),
+                ('windows', 'iphone', 'deferred'), ('mac', 'ipad', 'not_applicable'),
+                ('windows', 'android', 'cleaned')):
+            with self.subTest(computer=computer, phone=phone, outcome=outcome):
+                case = fixtures.WorkflowTests()
+                case.setUp()
+                try:
+                    case.computer, case.phone = computer, phone
+                    case.flow.submit(case.payload({'banned_login': 'yes'}))
+                    case.flow.submit(case.payload({'outcome': outcome, 'handled_scope': 'Actual cleanup scope recorded'}))
+                    case.reach('browser')
+                    self.assertIn('phone_proxy → timezone → phone_network', case.flow.next()['next_action'])
+                    case.advance()
+                    for stage in ('phone_proxy', 'timezone', 'phone_network'):
+                        self.assertEqual(case.flow.next()['stage'], stage)
+                        premature = case.payload(case.data('login'))
+                        premature['stage'] = 'login'
+                        with self.assertRaises(WorkflowError):
+                            case.flow.submit(premature)
+                        if stage == 'phone_network':
+                            partial = case.data(stage)
+                            partial['exit_matches'] = False
+                            case.flow.submit(case.payload(partial))
+                            self.assertEqual(case.flow.next()['stage'], stage)
+                        case.advance()
+                    for stage in ('payment_preparation', 'app', 'login', 'subscription'):
+                        self.assertEqual(case.flow.next()['stage'], stage)
+                        case.advance()
+                    self.assertIsNone(case.flow.next().get('stage'))
+                finally:
+                    case.doCleanups()
+
+    def test_cleanup_on_resume_reuses_device_and_google_observations(self):
+        self.flow.submit(self.payload({'banned_login': 'yes'}))
+        self.reach('browser')
+        self.flow.invalidate('cleanup', 'Recheck actual browser login residue')
+        self.assertEqual(self.flow.next()['stage'], 'cleanup')
+        self.flow.submit(self.payload({'outcome': 'cleaned', 'handled_scope': 'Selected browser site data'}))
+        self.flow = Workflow(self.root, lambda: self.now)
+        self.assertEqual(self.flow.next()['stage'], 'browser')
+        self.advance()
+        self.assertEqual(self.flow.next()['stage'], 'phone_proxy')
+
+    def test_purchased_materials_survive_submit_restart_and_duplicate(self):
+        self.reach('google')
+        self.flow.submit(self.payload({'account_available': False}))
+        bought = self.payload({'account_available': True})
+        view = self.flow.submit(bought)
+        self.assertEqual(view['stage'], 'google')
+        self.assertEqual(view['observed']['account_origin'], 'purchased')
+        self.assertIn('materials_explained', view['missing'])
+        self.assertIn('https://2fa.run/', view['customer_message'])
+        self.assertEqual(view['customer_images'], ['assets/google-account/01-order-original.png'])
+        self.assertNotIn('购买美区', view['customer_message'])
+        self.flow = Workflow(self.root, lambda: self.now)
+        self.assertEqual(self.flow.submit(bought)['customer_message'], view['customer_message'])
+        shown = self.payload({'materials_explained': True})
+        self.assertEqual(self.flow.submit(shown)['stage'], 'vps')
+        self.assertEqual(self.flow.submit(shown)['stage'], 'vps')
+
+    def test_google_account_origin_and_materials_on_android(self):
+        self.phone = 'android'
+        self.reach('google')
+        self.assertIn('account_origin', self.flow.next()['optional_fields'])
+        self.flow.submit(self.payload({'account_available': False, 'purchase_channel': 'gmailbuy'}))
+        view = self.flow.submit(self.payload({'account_available': True, 'account_origin': 'purchased'}))
+        self.assertEqual(view['stage'], 'google')
+        self.assertIn('https://2fa.run/', view['customer_message'])
+        self.flow.submit(self.payload({'materials_explained': True}))
+        self.assertEqual(self.flow.next()['stage'], 'vps')
+        self.flow.invalidate('google', 'Recovered own account for Android')
+        view = self.flow.submit(self.payload({'account_available': True, 'account_origin': 'self_used'}))
+        self.assertEqual(view['stage'], 'vps')
+
+    def test_direct_purchased_account_receives_materials_before_vps(self):
+        self.reach('google')
+        view = self.flow.submit(self.payload({'account_origin': 'purchased', 'account_available': True}))
+        self.assertEqual(view['stage'], 'google')
+        self.assertIn('https://2fa.run/', view['customer_message'])
+        self.assertIn('customer_images', view)
+        self.flow.submit(self.payload({'materials_explained': True}))
+        self.assertEqual(self.flow.next()['stage'], 'vps')
+
+    def test_recovered_personal_account_skips_purchase_materials(self):
+        self.reach('google')
+        self.flow.submit(self.payload({'account_available': False, 'purchase_channel': 'chuhai91'}))
+        view = self.flow.submit(self.payload({'account_available': True, 'account_origin': 'self_used'}))
+        self.assertEqual(view['stage'], 'vps')
+        self.assertNotIn('purchase_channel', self.flow.state['records']['google']['data'])
+
+    def test_seller_choice_survives_resume_and_can_change(self):
+        self.reach('google')
+        self.flow.submit(self.payload({'account_available': False, 'purchase_channel': 'gmailbuy'}))
+        self.flow = Workflow(self.root, lambda: self.now)
+        view = self.flow.next()
+        self.assertIn('[GmailBuy](https://gmailbuy.com/)', view['customer_message'])
+        self.assertNotIn('出海91', view['customer_message'])
+        self.assertNotIn('purchase_images', view)
+        view = self.flow.submit(self.payload({'purchase_channel': 'chuhai91'}))
+        self.assertIn('QQ 邮箱也可以', view['customer_message'])
+        self.assertEqual(set(view['purchase_images']), {'register', 'category', 'product'})
+
+    def test_login_guidance_uses_current_stage_and_actual_verification(self):
+        self.reach('login')
+        view = self.flow.next()
+        self.assertIn('手机网络已经验收完成', view['customer_message'])
+        self.assertNotIn('等手机网络配置完成', view['customer_message'])
+        self.assertNotIn('收到账号资料后', view['customer_message'])
+        self.assertIn('自己的 Google 账号', view['customer_message'])
+        self.assertIn('已绑定的身份验证器', view['customer_message'])
+        self.assertEqual(len(view['verification_images']), 2)
+        self.assertIn('实际验证方式', view['display_instruction'])
+
+    def test_cleanup_branches_all_devices_keep_new_route_boundaries(self):
+        for computer in ('mac', 'windows'):
+            for phone in ('iphone', 'ipad', 'android'):
+                for ban, outcome in (('no', None), ('unknown', None), ('yes', 'cleaned'),
+                                     ('yes', 'deferred'), ('yes', 'not_applicable')):
+                    with self.subTest(computer=computer, phone=phone, ban=ban, outcome=outcome):
+                        case = fixtures.WorkflowTests(); case.setUp()
+                        try:
+                            case.computer, case.phone = computer, phone
+                            case.flow.submit(case.payload({'banned_login': ban}))
+                            if outcome:
+                                case.flow.submit(case.payload({'outcome': outcome, 'handled_scope': 'Isolated actual scope'}))
+                            self.assertEqual(case.flow.next()['stage'], 'devices')
+                            case.reach('google')
+                            self.assertIn('您有没有', case.flow.next()['customer_message'])
+                            case.reach('browser')
+                            case.advance()
+                            for expected in ('phone_proxy', 'timezone', 'phone_network'):
+                                case.flow = Workflow(case.root, lambda: case.now)
+                                self.assertEqual(case.flow.next()['stage'], expected)
+                                invalid = case.payload(case.data('login')); invalid['stage'] = 'login'
+                                with self.assertRaises(WorkflowError): case.flow.submit(invalid)
+                                case.advance()
+                            self.assertEqual(case.flow.next()['stage'], 'payment_preparation')
+                        finally: case.doCleanups()
+
+    def test_browser_explanation_survives_partial_resume_and_stops_repeating(self):
+        self.reach('browser')
+        self.flow.submit(self.payload({'profile_ref': 'profile-a', 'saved': True}))
+        self.flow = Workflow(self.root, lambda: self.now)
+        message = self.flow.next()['customer_message']
+        for phrase in ('Claude 桌面版', 'Claude Code', '有人担心', '目前使用正常', 'https://ping0.cc/'):
+            self.assertIn(phrase, message)
+        self.flow.submit(self.payload({'usage_explained': True}))
+        self.assertNotIn('有人担心', self.flow.next().get('customer_message', ''))
+        self.advance()
+        self.assertEqual(self.flow.next()['stage'], 'phone_proxy')
+
     def test_windows_tun_case_is_available_on_failure_and_resume(self):
         self.computer = 'windows'
         self.reach('computer_network')
@@ -54,7 +236,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
                         ('google', ('Google 账号用于登录', '同一个 Google 账号')),
                         ('vps', ('远程服务器', '网站完成购买')),
                         ('computer_network', ('TUN', '旧 VPN', '单独测通')),
-                        ('browser', ('独立登录环境', '登录记录', '授权链接', '桌面端', '三个网站')),
+                        ('browser', ('独立登录环境', '登录链接', '授权链接', '桌面版', '三个网站')),
                         ('phone_proxy', ('手机', '订阅', '桌面端')),
                         ('phone_network', ('三个网站', '目标线路')),
                         ('payment_preparation', ('Google Pay',) if phone == 'android' else ('礼品卡就是', '账户余额', '等待安排')),
@@ -67,6 +249,15 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
                         self.assertIn('首次进入当前阶段', view['display_instruction'])
                         self.assertIn('communication_instruction', view['display_instruction'])
                         self.assertIn('先给明确建议', view['communication_instruction'])
+                        if stage == 'browser':
+                            self.assertIn('电脑浏览器中所有需要登录 Claude 账号的场景', view['customer_message'])
+                            self.assertIn('有人担心，Claude 桌面版可能', view['customer_message'])
+                            self.assertIn('一直在用 Claude 桌面版，目前使用正常', view['customer_message'])
+                            self.assertIn('下载安装到电脑上的 Claude 软件', view['customer_message'])
+                            self.assertIn('电脑“终端”里使用的 Claude 编程工具', view['customer_message'])
+                            self.assertIn('关于 Claude 桌面版', view['customer_message'])
+                            for site in ('https://ip.net.coffee/claude/', 'https://ping0.cc/', 'https://scamalytics.com/ip'):
+                                self.assertIn(site, view['customer_message'])
                         if phone == 'android':
                             self.assertNotIn('Apple 账号用于', view['customer_message'])
                             self.assertNotIn('iOS 内购', view['customer_message'])
@@ -99,9 +290,16 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
     def test_google_preparation_shows_reuse_purchase_and_login_timing(self):
         self.reach('google')
         view = self.flow.next()
+        self.assertIn('能正常登录 Claude、没有被 Claude 封禁', view['customer_message'])
+        self.assertIn('Google／Gmail 能登录，但对应的 Claude 账号已被封禁', view['next_action'])
+        self.assertIn('记录 account_available=false', view['next_action'])
+        self.assertIn('不为回答这个问题提前登录', view['next_action'])
         self.assertIn('直接沿用', view['customer_message'])
         for url in ('https://chuhai91.cc', 'https://gmailbuy.com/'):
-            self.assertIn(url, view['customer_message'])
+            self.assertNotIn(url, view['customer_message'])
+        self.flow.submit(self.payload({'account_available': False}))
+        for url in ('https://chuhai91.cc/', 'https://gmailbuy.com/'):
+            self.assertIn(url, self.flow.next()['customer_message'])
         self.assertIn('手机网络配置完成后', view['customer_message'])
         self.assertIn('直接展示', view['display_instruction'])
         self.assertIn('不引导注册 Google 账号', view['next_action'])
@@ -113,11 +311,26 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertEqual(view['stage'], 'google')
         self.assertIn('购买', view['customer_message'])
         self.assertIn('**优先购买美区 Google 老号**', view['customer_message'])
+        self.assertIn('首选 [出海91]', view['customer_message'])
+        self.assertIn('QQ 邮箱也可以', view['customer_message'])
+        self.assertIn('Google 谷歌账户 → 谷歌精品老号', view['customer_message'])
+        self.assertIn('美国 IP 创建／注册', view['customer_message'])
+        self.assertIn('当前价格和库存', view['customer_message'])
+        self.assertIn('价格相对贵一点', view['customer_message'])
+        self.assertIn('被封的可能性也大一点', view['customer_message'])
+        self.assertIn('看您个人选择', view['customer_message'])
+        self.assertIn('[GmailBuy](https://gmailbuy.com/)', view['customer_message'])
+        self.assertIn('[2FA 取码工具：https://2fa.run/](https://2fa.run/)', view['account_materials_message'])
+        self.assertIn('客户说买好并收到资料时', view['next_action'])
+        self.assertIn('展示对应本地图片', view['next_action'])
         self.assertIn('先明确推荐', view['next_action'])
         self.assertIn('按实际页面定位老号分类并核对美区', view['next_action'])
         self.assertIn('避免叠加假设性风险', view['communication_instruction'])
         self.assertNotIn('您有没有', view['customer_message'])
         self.flow.submit(self.payload({'account_available': True}))
+        if self.flow.next()['stage'] == 'google':
+            self.assertIn('materials_explained', self.flow.next()['missing'])
+            self.flow.submit(self.payload({'materials_explained': True}))
         self.assertEqual(self.flow.next()['stage'], 'vps')
 
     def test_existing_google_account_advances_without_purchase_requirement(self):
@@ -126,6 +339,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertEqual(self.flow.next()['stage'], 'vps')
         self.reach('login')
         self.assertEqual(self.flow.next()['next_action'], '使用 Google 账号登录 Claude')
+        self.assertIn('[2FA 取码工具：https://2fa.run/](https://2fa.run/)', self.flow.next()['customer_message'])
 
     def test_pdf_unanswered_does_not_block_after_display(self):
         self.reach('devices')

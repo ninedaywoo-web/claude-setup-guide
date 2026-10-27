@@ -33,6 +33,8 @@ py -3 scripts/workflow.py run --action cleanup_apply --input .local/workflow/cle
 
 检查失败时按具体报错处理；部分完成的操作保存在批次 `manifest.json`，供续查或恢复。并发调用由执行锁阻止。
 
+完成后按[清理后接回主流程](04-recovery.md#清理后接回主流程)提交实际结果并继续当前任务：首次交付接回设备与阅读版说明、Google 账号、VPS，电脑验收后继续手机网络、登录和订阅。
+
 ## 恢复
 
 控制层当前不是清理阶段时，用 `change --scope cleanup` 记录恢复原因。将实际批次写入 `.local/workflow/restore-options.json` 的 `backup_directory` 字段。

@@ -243,6 +243,17 @@ class Workflow:
         if view['stage'] == 'devices' and any(k in data and k in existing and data[k] != existing[k] for k in ('computer', 'phone')):
             existing = {k: v for k, v in existing.items() if k not in ('setup_explained', 'android_route_explained', 'payment_route_status')}
         merged = {**existing, **data}
+        if view['stage'] == 'google':
+            # A missing account becoming available follows the purchase route;
+            # an explicitly recovered personal account still takes the reuse route.
+            if data.get('account_available') is True and 'account_origin' not in data:
+                if existing.get('account_available') is False or existing.get('purchase_channel'):
+                    merged['account_origin'] = 'purchased'
+            if data.get('account_available') is False:
+                merged.pop('materials_explained', None)
+            if merged.get('account_origin') == 'self_used':
+                merged.pop('purchase_channel', None)
+                merged.pop('materials_explained', None)
         if view['stage'] == 'devices' and merged.get('phone') != 'android':
             merged.pop('android_route_explained', None)
             merged.pop('payment_route_status', None)

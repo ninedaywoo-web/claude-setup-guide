@@ -1,9 +1,13 @@
 {
-  "version": "1.0.48",
+  "version": "1.0.49",
   "published_at": "2026-10-27",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "明确在当前阶段内继续操作，验收通过后再进入下一步"
+    "清理后接回主流程，电脑配置后继续手机网络、登录与订阅",
+    "按 Claude 可用状态确认 Google 账号，同时提供两家购号渠道并保留用户选择",
+    "新增出海91清晰箭头图解，收到账号资料时直接展示 2FA 链接和原教学图片",
+    "明确 AdsPower、Claude 桌面版与 Claude Code 用途，并展示桌面版使用反馈",
+    "修复账号准备与登录衔接，198 项测试通过，原三页账号与 2FA 教学保留"
   ]
 }

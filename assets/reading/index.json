@@ -1,34 +1,34 @@
 {
-  "revision": "2026-10-23",
+  "revision": "2026-10-27",
   "files": [
     {
       "file": "01-纯净魔法从零部署.pdf",
       "pages": 24,
-      "sha256": "cdb9c0039026d7af592bfb0449e6a0e90de9d5e470fa9bd4db73fe9fafea1149",
+      "sha256": "d83b617fc13bfc3a0e17f9cef1c5a7848ab4eeca8cb58cd5cf0b30a9c1e19176",
       "revised_at": "2026-10-23"
     },
     {
       "file": "02-指纹浏览器与 iPhone 网络配置.pdf",
-      "pages": 8,
-      "sha256": "c4628a7a62f3ec518344a3fec71094823e75e08d04154e504adea03b1b3d463d",
-      "revised_at": "2026-10-23"
+      "pages": 9,
+      "sha256": "a99cbbf33ecdf1cdddb17fdf61ab97248fee1d51fed449d382afd583aec56554",
+      "revised_at": "2026-10-27"
     },
     {
       "file": "03-Apple 账号、礼品卡与内购.pdf",
       "pages": 17,
-      "sha256": "428a422a145383d4b04e86e5a2604020825394ebdc9e5d72f033640d3efe5c9c",
+      "sha256": "db3f9adc840454da045b7dfa617436b7f7a50a353c0a01d87b4cfeb8f81abfde",
       "revised_at": "2026-10-23"
     },
     {
       "file": "04-退款、封号申诉与旧账号清理.pdf",
       "pages": 4,
-      "sha256": "5cdb983f38232801ef34496c980334c41205a356c03b1f09dcd694c92534d3fd",
-      "revised_at": "2026-10-23"
+      "sha256": "fbcab221a44d06a153248dfb3db4aa8294a25763f15c2096c44f2b58c1422125",
+      "revised_at": "2026-10-27"
     },
     {
       "file": "05-注册与登录前自检.pdf",
       "pages": 2,
-      "sha256": "f3b95cf0a169f7137c8b8a85495946c7a859869878ede6aa1c45fa0fa91b0dd0",
+      "sha256": "de758b849ab8adfa99a9ff8abad7b576cd6f6878e43335d2c95326b8fee847f5",
       "revised_at": "2026-10-23"
     },
     {
@@ -39,14 +39,14 @@
     },
     {
       "file": "07-Google 账号准备与两步验证.pdf",
-      "pages": 2,
-      "sha256": "ccd2ae414e7cbaf85f2d9d16d168c6b7e5f6c37a65dc12e25a2753bab45f3a7b",
-      "revised_at": "2026-10-18"
+      "pages": 6,
+      "sha256": "a9d2bbec3a5c6e6c451e9c5c6a3fca2a098778c504975ba9db3d5b412b023604",
+      "revised_at": "2026-10-27"
     },
     {
       "file": "08-VPS 注册与购买图解.pdf",
       "pages": 8,
-      "sha256": "6898bba7f342e74ac2b5a2ef0c86e780f036de6747a249832ae48ad28599c703",
+      "sha256": "a8506a2f0da5973ba3b6d655f09816884a4dbfeb639dfa3b023eae7433edffd5",
       "revised_at": "2026-10-18"
     },
     {
@@ -58,7 +58,7 @@
     {
       "file": "10-VPS购买推荐官网图解_原始配图版.pdf",
       "pages": 2,
-      "sha256": "f22edb603284ac582329b8d97b95792ab7a73935f11472c7cba013d9128166a0",
+      "sha256": "861b3dc6ac1d87c13338269b631627d47b0b7a9a4a4399278eb6de33a97243f6",
       "revised_at": "2026-10-18"
     }
   ]

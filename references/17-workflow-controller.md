@@ -25,16 +25,26 @@ VPS 阶段按既定商家与默认机房推进，不询问使用国家／地区�
 
 | 进入阶段 | 当场解释 |
 | --- | --- |
-| google | Google 用于登录，Apple 用于 iOS 下载、充值与付款；已有账号复用，购买先明确推荐美区 Google 老号，再按当前页面定位商品。安卓只解释适用的 Google 登录用途。 |
+| google | 先问有没有能正常登录 Claude、未被 Claude 封禁的 Google 账号；没有时同时展示出海91与 GmailBuy 的链接及选购差别，推荐美区 Google 老号。记住选择；收到购买资料后展示 2FA 链接和原资料图，再继续。已有账号复用；安卓只解释适用的 Google 登录用途。 |
 | vps | VPS 是租来的远程服务器，用来搭建自己的节点；客户购买，Codex 部署。推荐顺序 DMIT → 搬瓦工 → AKILE，默认月付／季付／月付，确认实际扣款金额与覆盖时长。家宽问题按网络篇解释搭配与最终出口。 |
 | computer_network | 客户端连接节点，TUN 接管流量，全局走选定节点；保留旧 VPN 测通后再切换。 |
-| browser | 指纹浏览器隔开登录记录与日常浏览器设置，用于网页登录、邮件链接与授权；日常使用电脑桌面端或 CLI。顺带解释三站检查用途。 |
+| browser | 区分 Claude 桌面版、Claude Code 与 AdsPower；电脑浏览器中的 Claude 登录、邮件链接和授权使用 AdsPower，桌面版与 CLI 可正常使用。展示桌面版权限风险说法与已交付用户正常使用反馈，并给出三站链接。 |
 | phone_proxy | iOS 手机负责首次登录与内购，Apple 处理订单及退款申请；安卓使用自己的官网付款路线。 |
 | phone_network | 手机独立检查三站与实际出口，和电脑的目标线路核对后再登录订阅。 |
 | payment_preparation | 说明礼品卡充值 → App Store 余额 → Claude Pro 内购；已有余额复用。先落实账号等待安排，等待或申诉期间展示当前安排，到期后继续充值步骤。 |
 | subscription | 订单及权益确认后，说明回电脑桌面端或 CLI 使用同一账号，网页登录授权仍走 AdsPower。 |
 
 每阶段的 `task_scope_instruction` 要求结合真实目的与上下文按当前操作判断。Windows 的 `computer_network` 还返回 `troubleshooting`：发生本机 HTTP 已通、TUN 后重复连接 VPS 等现象时读取 Windows 第 6.1 节。该案例仍待客户复测，完成判定沿用实际出口、HTTPS、Codex 回复及原网络检查字段。
+
+## Google 购号、资料图解与登录衔接
+
+先按 Claude 的可用状态询问账号。Google 能登录但对应 Claude 账号已被封禁时，记录 `account_available=false`；已有能正常登录 Claude 的账号继续复用。实际登录仍留到手机网络验收后。`account_available=false` 时同条回复展示两家购号链接和价格、稳定性差别。客户选择后记录 `purchase_channel=chuhai91` 或 `gmailbuy`；`purchase_images` 只给出海91路线使用，按当前步骤将路径转为项目绝对路径嵌入图片，已有选择和操作进度继续沿用。
+
+收到购买资料时提交 `account_origin=purchased`、`account_available=true`。程序仍返回 `google`，在 `customer_message` 直接提供 https://2fa.run/，`customer_images` 给出原账号资料图。Codex 在同条回复展示说明、链接和图片后，直接提交 `materials_explained=true` 接续下一阶段。这是展示完成记录，无需用户再确认。未买到账号时展示标记不代替账号准备完成。
+
+已有可用账号提交 `account_origin=self_used`、`account_available=true` 直接复用。为接续现有输入，“没有账号”变为“已备妥”时默认走购买资料说明；用户后来找回自己的可用账号时，明确使用 `self_used`。旧进度已完成 Google 阶段时保留原结果，不重新购号。
+
+`login` 使用独立的当前登录说明，不再要求等待已经验收的手机网络。Google 页面要求身份验证器验证码时，显示取码链接和 `verification_images` 中的原取码、回填图解；自有账号使用已绑定的验证方式。各图片路径由当前项目目录解析，不保存用户的账号凭据。
 
 ## 手机验收对话与结果
 

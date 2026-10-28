@@ -2,8 +2,8 @@
   "files": {
     ".gitattributes": "547f59603028195ff9f8a87d04c4651551e8bd0d68f075257dfd549cd846b25b",
     ".gitignore": "29d98e57738b3097cf43d3f351df9be6766d48a0b522393e1b5437a9587988f0",
-    "AGENTS.md": "f9d02985b81f3419f4b61273cb7eb10edab814d7d4dbceb26b83b94ca3edf4e8",
-    "CHANGELOG.md": "6ddcedc255adc3602fa03d69ea29336d5f639aebaa03f44e438ee2872d90e84b",
+    "AGENTS.md": "a5d8ab6316a919146a8fb1d5ba450f7c4a41fdaba7922b26772e8088117233de",
+    "CHANGELOG.md": "b8aedd8899c3c3bab12bf5ed1ef37dd7124e1fbd40904764c1088151a691ee8c",
     "README.md": "8dcc8de1d272897469d467a129dd668098fb28253969aae8e568ffcc18c5f3bc",
     "SKILL.md": "24f4e5a11e0baa8940f75ba38553cc3b8c64590cac7407bcd3630a1da495f6eb",
     "agents/openai.yaml": "77f7b07e49ad3a01d1cd9f61e5ef30867346474bb53a4af6b77a84ad6cf22014",
@@ -97,11 +97,11 @@
     "licenses/windows-cleanup-MIT.txt": "acfcbb3fdae956821acce7ad72ba5c83a3b12d5dc5bc37a78bf2a95e9dbad111",
     "references/00-start.md": "a3bf6ad414f147dc702cdb5d0cb30c5ec1d42e686a2dcc4310e1a9b461df6830",
     "references/01-network.md": "d0dc0a6bfdb155b01639994f5d246090ea49243fe9984f1210d34fad92396ab0",
-    "references/02-browser-iphone.md": "d3c9784966f688ac2806c0be8f0f1bcf9ee7a12518148bc95296dbf915670570",
+    "references/02-browser-iphone.md": "c542802ab4a87f7b0c42c3d482ff8f184984c49293e364c0edda36b95db80a48",
     "references/03-apple.md": "fa474f30ecf1791ae1e8b0549da2b0e35cde665f5e0f7371a5f71f05e7fc1022",
     "references/04-recovery.md": "035f2601a2d3f8cea1a1892b04900202797e73a5efb95ecf7376a0c27a2edcfc",
     "references/05-ai-walkthrough.md": "9005d46078872a258f12fc1453373203b74a73c008afdb2550e015417dd470e5",
-    "references/06-before-login.md": "eeaa3017b1dd9ea6625b541778db9e8bbb7003fcdf879bfda8077ab9181e899d",
+    "references/06-before-login.md": "02b05c0c690b04a8b1e09428da51087bd01f1a3aa7d85bf77c4d0b0df08ff09a",
     "references/07-apple-purchase-support.md": "9a2c2d73a0fd4037ff14e0f528bc8356413e024e41f0649ff25c632f1bd2571e",
     "references/08-google-account.md": "86dd216f6a0e5954a3303347d70327de1b615b2aa7ebcce7d0cf95f573a0eaff",
     "references/09-vps-purchase.md": "6b59cee58ea0fd6d27ec5298dcb83ea6dec33dbcc8dd4aab8c7ecf1c3ade1ad1",
@@ -127,9 +127,9 @@
     "scripts/workflow.py": "8ce109fa6bbf9e7d668f7fffd8fd031aa077150103d4b741779535fd3096be83",
     "scripts/workflow_definition.py": "8291fab970fc8cf4aa7e0df269e51ab17abe65c5f67a3689c3cbb5bbe9755552",
     "scripts/workflow_guard.py": "5276d1357e4adaa69704ff2cdaefd399b364d2d4fac29aa8f4595dbfdbb38bae",
-    "scripts/workflow_messages.py": "dd6acd49ac2104996090d3a2c877e796f9c559e0db0c6fb035a5cce6f118fd21",
+    "scripts/workflow_messages.py": "bdd33b7663c431fe7e21936d4fc305ebe3c9507321f8e0a94a81f580373320bf",
     "tests/panel_contract_smoke.py": "bb7059e35488f569ec67a1720280cfff3718de5eabb5595ca98fefe5ccbcfb96",
-    "tests/test_customer_flow_audit.py": "e86d806c4fb0de53b6d33c7b2baf29a8a6042047d5fcec11e65663f0f2593fee",
+    "tests/test_customer_flow_audit.py": "595c27952e5e2cec8d0ca94ae41120e367e5bbf2716056644d57775b0b7c5647",
     "tests/test_delivery_versions.py": "5028a8c0ce0cb308c40497ed9c22267f12576fe96b057376b59c48d2d124eb46",
     "tests/test_download.py": "3cebad299c30613768d84373da77e2f69964f1a2e8418eec1c252889ceff573a",
     "tests/test_login_readiness.py": "cf1e5fa0c1222887b37574f21759c2de113793525fc6b7e985770d6dc80e6267",
@@ -141,6 +141,6 @@
     "tests/test_windows_cleanup.py": "c169090fbe1a8b420ebd4414f1480461117b10d87114240146dcd2c2e3ba0507",
     "tests/test_workflow.py": "3f0e26f17318b469513a3f7368ed1547a30c5b8ef03d4319d9d19660a9923170",
     "tests/test_workflow_updates.py": "70b4d98904e32f6de176874d8267f89d8f59ba4e6e6d3475641bfc206ca62b4f",
-    "version.json": "0586614909170491260b508485be649a2844eace69fa760ebc73f14ca0f708b8"
+    "version.json": "5824f1b0553684582bace7105656de0d96d6bf8287aaf1cc9ec53db606e17e6c"
   }
 }

@@ -173,6 +173,31 @@ def customer_output(result, state, now):
         result['next_action'] = ('在客户对话展示手机验收步骤和三站链接，先取得手机 Ping0 页面及网络类型，再逐站收集结果。'
                                  '将手机实际出口与电脑 AdsPower、目标 VPS 对照；依据手机页面或用户明确反馈提交，source.reference 写明实际反馈来源。'
                                  '三站均取得数值、实际出口一致且其余检查完成后继续；缺项留在手机验收。')
+    if key in ('phone_proxy', 'phone_network') and device.get('phone') in ('iphone', 'ipad'):
+        result['manual_guidance'] = {
+            'backup_reference': 'references/02-browser-iphone.md#224-windowsiphone保存配置与按目标恢复',
+            'dns_reference': 'references/02-browser-iphone.md#225-dns-添加输入加入列表保存回读',
+            'action': '按当前设备页面带做，每轮 1～3 个相连动作并说明可见结果。修改前记录原值和恢复目标；节点导入资料与 DNS／分流配置分别保存，复制到剪贴板后还要保存并重新打开核对。DNS 列表界面输入后点绿色＋，看到独立条目及红色－后保存，退出重开回读，再重连复测。当前正常时沿用原值；菜单与教程不同先读取页面。恢复目标冲突时先核对已执行动作，再继续。',
+        }
+        result['next_action'] += ' 需要保存配置、恢复原值或修改 DNS 时，先读取 manual_guidance 的对应章节；按当前动作逐轮展示，回读保存结果后再做联网复测。'
+        if device.get('computer') == 'windows':
+            result['communication_instruction'] += (' Windows＋iPhone／iPad 每轮先标明操作设备；电脑展示节点二维码与整理资料，手机执行小火箭、Safari、微信操作。'
+                                                      '每轮给 1～3 个相连动作与预期结果。默认在手机本地保存配置；Wi-Fi 上传持续超时就回到手机保存。')
+            if key == 'phone_proxy':
+                messages.append('**接下来在 iPhone／iPad 上操作。**我会在 Windows 电脑上打开节点二维码，您用手机小火箭扫描；导入后我先帮您核对首页刚新增的那一行，再带您连接。每次完成当前几步，我们看一下页面再继续。')
+    if key in ('phone_proxy', 'phone_network') and device.get('phone') in ('iphone', 'ipad'):
+        result['application_troubleshooting'] = {
+            'reference': 'references/02-browser-iphone.md#223-节点可用只有微信图片打不开',
+            'trigger': '目标节点的 HTTPS 与出口检测正常，只有微信图片等单个应用请求异常；或客户反馈最初仅微信异常，后续调整导致整体失联。',
+            'action': '整体失联时先恢复最后可用配置并验证 HTTPS 与目标出口，再处理微信分流。使用「配置」模式，核对实际加载的规则，让微信走直连（DIRECT），Claude 相关流量继续走原目标节点；已有正确规则复用，需要补充时只改相关规则并核对匹配优先级。保持节点参数与服务端原样。保存加载后查看实际请求命中，复测微信图片发送／加载与原网络；无改善恢复本次改动，原网络变差立即回到最后可用状态。此情形不触发 TLS 指纹尝试或断线测试。',
+        }
+        result['troubleshooting'] = {
+            'reference': 'references/02-browser-iphone.md#222-断线测试后恢复端口手机仍无法联网',
+            'trigger': 'Shadowrocket 在断线测试、改端口或切换配置后，恢复操作完成但实际网页仍打不开。',
+            'action': '先读取恢复步骤，回读当前选中节点保存后的原端口和参数；保留 DNS 与微信规则，按实际模式做代理对照，验证新的 IPv4 HTTPS 请求和出口。仍失败再核对连接日志与服务端当前监听。先恢复已知改动，再考虑 TLS 指纹案例。',
+            'status': '完整对话末尾客户确认网页与微信图片恢复；断线测试后恢复失败的具体原因未查明，恢复后参数和最新出口待回读。',
+        }
+        result['next_action'] += ' 微信单项异常或为修微信而越调越坏时，读取 application_troubleshooting；当前整体失联先恢复可用网络，再落实微信直连分流。出现 troubleshooting.trigger 时，先读取对应章节并恢复实际连接；恢复后的 HTTPS 与出口核对完成，再记录断线检查结果并继续验收。'
     if key in ('browser', 'phone_network'):
         bands = result.get('score_advice', {})
         if 'unverified' in bands.values():

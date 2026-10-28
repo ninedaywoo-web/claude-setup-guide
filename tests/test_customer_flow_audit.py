@@ -196,6 +196,76 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.advance()
         self.assertEqual(self.flow.next()['stage'], 'phone_proxy')
 
+    def test_phone_disconnect_restore_guidance_stays_at_failed_stage(self):
+        self.computer = 'windows'
+        self.reach('phone_proxy')
+        view = self.flow.next()
+        self.assertIn('断线测试', view['troubleshooting']['trigger'])
+        self.assertIn('先恢复已知改动', view['troubleshooting']['action'])
+        self.reach('phone_network')
+        data = self.data('phone_network')
+        data.update(https_ok=False, disconnect_checked=False)
+        self.flow.submit(self.payload(data))
+        self.flow = Workflow(self.root, lambda: self.now)
+        view = self.flow.next()
+        self.assertEqual(view['stage'], 'phone_network')
+        self.assertIn('https_ok', view['missing'])
+        self.assertIn('disconnect_checked', view['missing'])
+        self.assertIn('恢复后的 HTTPS 与出口核对完成', view['next_action'])
+        self.assertTrue((Path(__file__).resolve().parents[1] / view['troubleshooting']['reference'].split('#')[0]).is_file())
+        self.advance()
+        self.assertEqual(self.flow.next()['stage'], 'payment_preparation')
+
+    def test_wechat_only_failure_keeps_working_node_and_separate_recovery_path(self):
+        self.reach('phone_proxy')
+        for stage in ('phone_proxy', 'phone_network'):
+            self.reach(stage)
+            view = self.flow.next()
+            case = view['application_troubleshooting']
+            self.assertIn('HTTPS 与出口检测正常', case['trigger'])
+            self.assertIn('保持节点参数与服务端原样', case['action'])
+            self.assertIn('微信走直连（DIRECT）', case['action'])
+            self.assertIn('Claude 相关流量继续走原目标节点', case['action'])
+            self.assertIn('查看实际请求命中', case['action'])
+            self.assertLess(case['action'].index('先恢复最后可用配置'), case['action'].index('再处理微信分流'))
+            self.assertIn('后续调整导致整体失联', case['trigger'])
+            self.assertIn('不触发 TLS 指纹尝试或断线测试', case['action'])
+            self.assertIn('原网络变差立即回到最后可用状态', case['action'])
+            self.assertNotEqual(case['reference'], view['troubleshooting']['reference'])
+            self.assertTrue((Path(__file__).resolve().parents[1] / case['reference'].split('#')[0]).is_file())
+
+    def test_manual_phone_guidance_survives_failure_and_resume(self):
+        self.computer, self.phone = 'windows', 'iphone'
+        self.reach('phone_proxy')
+        view = self.flow.next()
+        self.assertIn('Windows 电脑上打开节点二维码', view['customer_message'])
+        self.assertIn('每轮先标明操作设备', view['communication_instruction'])
+        self.reach('phone_network')
+        data = self.data('phone_network')
+        data.update(https_ok=False, dns_checked=False)
+        self.flow.submit(self.payload(data))
+        self.flow = Workflow(self.root, lambda: self.now)
+        view = self.flow.next()
+        self.assertEqual(view['stage'], 'phone_network')
+        self.assertIn('dns_checked', view['missing'])
+        self.assertIn('manual_guidance', view['next_action'])
+        guidance = view['manual_guidance']
+        self.assertIn('绿色＋', guidance['action'])
+        self.assertIn('退出重开回读', guidance['action'])
+        for key in ('backup_reference', 'dns_reference'):
+            path = Path(__file__).resolve().parents[1] / guidance[key].split('#')[0]
+            self.assertTrue(path.is_file())
+        self.advance()
+        self.assertEqual(self.flow.next()['stage'], 'payment_preparation')
+        self.assertNotIn('manual_guidance', self.flow.next())
+
+    def test_android_does_not_receive_shadowrocket_recovery_steps(self):
+        self.phone = 'android'
+        self.reach('phone_network')
+        self.assertNotIn('troubleshooting', self.flow.next())
+        self.assertNotIn('application_troubleshooting', self.flow.next())
+        self.assertNotIn('manual_guidance', self.flow.next())
+
     def test_windows_tun_case_is_available_on_failure_and_resume(self):
         self.computer = 'windows'
         self.reach('computer_network')

@@ -14,6 +14,7 @@ import uuid
 from network import lock, private_file
 from network_server import Failure
 from workflow_messages import customer_output
+from workflow_teaching import CARDS, eligible, guide as teaching_guide
 from update import workflow_output
 from workflow_definition import ACTIONS, DEVICE_GUIDANCE, INVALIDATES, OBJECT_FIELDS, catalog, facts, validation
 
@@ -203,6 +204,17 @@ class Workflow:
     def next(self):
         return self.projection()
 
+    def guide(self, topic=None, step=None):
+        """Explain a topic again without changing delivery observations or tickets."""
+        self.require_state()
+        stage = self.next()['stage']
+        if topic is None:
+            return {'status': 'teaching_catalog', 'stage': stage, 'progress_unchanged': True,
+                    'topics': [dict(id=k, title=v['title'], reference=v['reference'])
+                               for k,v in CARDS.items() if eligible(k,self.state)],
+                    'instruction': '结合用户说法、当前页面与对话选主题，运行 guide --topic；每次当前小步有图就直接展示。'}
+        return teaching_guide(topic, self.state, stage, step)
+
     def save(self):
         private_file(self.path, json.dumps(self.state, ensure_ascii=False, indent=2) + '\n')
         view = self.projection()
@@ -242,6 +254,8 @@ class Workflow:
             existing = {k: v for k, v in existing.items() if k not in ('score_review', 'score_review_note')}
         if view['stage'] == 'devices' and any(k in data and k in existing and data[k] != existing[k] for k in ('computer', 'phone')):
             existing = {k: v for k, v in existing.items() if k not in ('setup_explained', 'android_route_explained', 'payment_route_status')}
+        if 'teaching_topic' in data and data['teaching_topic'] != existing.get('teaching_topic'):
+            existing = {k:v for k,v in existing.items() if k != 'teaching_step'}
         merged = {**existing, **data}
         if view['stage'] == 'google':
             # A missing account becoming available follows the purchase route;
@@ -249,11 +263,17 @@ class Workflow:
             if data.get('account_available') is True and 'account_origin' not in data:
                 if existing.get('account_available') is False or existing.get('purchase_channel'):
                     merged['account_origin'] = 'purchased'
+            if data.get('account_available') is True and not merged.get('account_origin'):
+                merged['account_origin'] = 'unknown'
+            if merged.get('account_origin') == 'purchased' and existing.get('materials_explained') is not True:
+                merged.setdefault('materials_images_shown', [])
             if data.get('account_available') is False:
                 merged.pop('materials_explained', None)
+                merged.pop('materials_images_shown', None)
             if merged.get('account_origin') == 'self_used':
                 merged.pop('purchase_channel', None)
                 merged.pop('materials_explained', None)
+                merged.pop('materials_images_shown', None)
         if view['stage'] == 'devices' and merged.get('phone') != 'android':
             merged.pop('android_route_explained', None)
             merged.pop('payment_route_status', None)
@@ -369,13 +389,18 @@ class Workflow:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('init', 'next', 'status', 'submit', 'run', 'change'))
+    parser.add_argument('action', choices=('init', 'next', 'status', 'submit', 'run', 'change', 'guide'))
     parser.add_argument('--input', type=Path)
     parser.add_argument('--action', dest='script_action', choices=tuple(ACTIONS))
     parser.add_argument('--scope', choices=tuple(INVALIDATES))
     parser.add_argument('--reason')
+    parser.add_argument('--topic', choices=tuple(CARDS))
+    parser.add_argument('--step', type=int)
     args = parser.parse_args()
     try:
+        if args.action == 'guide':
+            print(json.dumps(Workflow(ROOT).guide(args.topic, args.step), ensure_ascii=False, indent=2))
+            return 0
         with lock(ROOT / '.local/workflow'):
             workflow = Workflow(ROOT)
             if args.action == 'init':

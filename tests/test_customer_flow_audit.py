@@ -9,6 +9,7 @@ import unittest
 
 import test_workflow as fixtures
 from workflow import Workflow, WorkflowError
+from workflow_teaching import GOOGLE_IMAGES
 from workflow_definition import catalog
 
 
@@ -41,7 +42,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.flow.submit(self.payload({'account_available': True}))
         if self.flow.next()['stage'] == 'google':
             self.assertIn('materials_explained', self.flow.next()['missing'])
-            self.flow.submit(self.payload({'materials_explained': True}))
+            self.flow.submit(self.payload({'materials_explained': True, 'materials_images_shown': GOOGLE_IMAGES.copy()}))
         self.assertEqual(self.flow.next()['stage'], 'vps')
 
     def test_cleanup_outcomes_keep_phone_network_login_and_subscription_in_delivery(self):
@@ -97,11 +98,11 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertEqual(view['observed']['account_origin'], 'purchased')
         self.assertIn('materials_explained', view['missing'])
         self.assertIn('https://2fa.run/', view['customer_message'])
-        self.assertEqual(view['customer_images'], ['assets/google-account/01-order-original.png'])
+        self.assertEqual(view['customer_images'], GOOGLE_IMAGES)
         self.assertNotIn('购买美区', view['customer_message'])
         self.flow = Workflow(self.root, lambda: self.now)
         self.assertEqual(self.flow.submit(bought)['customer_message'], view['customer_message'])
-        shown = self.payload({'materials_explained': True})
+        shown = self.payload({'materials_explained': True, 'materials_images_shown': GOOGLE_IMAGES.copy()})
         self.assertEqual(self.flow.submit(shown)['stage'], 'vps')
         self.assertEqual(self.flow.submit(shown)['stage'], 'vps')
 
@@ -113,7 +114,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         view = self.flow.submit(self.payload({'account_available': True, 'account_origin': 'purchased'}))
         self.assertEqual(view['stage'], 'google')
         self.assertIn('https://2fa.run/', view['customer_message'])
-        self.flow.submit(self.payload({'materials_explained': True}))
+        self.flow.submit(self.payload({'materials_explained': True, 'materials_images_shown': GOOGLE_IMAGES.copy()}))
         self.assertEqual(self.flow.next()['stage'], 'vps')
         self.flow.invalidate('google', 'Recovered own account for Android')
         view = self.flow.submit(self.payload({'account_available': True, 'account_origin': 'self_used'}))
@@ -125,7 +126,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertEqual(view['stage'], 'google')
         self.assertIn('https://2fa.run/', view['customer_message'])
         self.assertIn('customer_images', view)
-        self.flow.submit(self.payload({'materials_explained': True}))
+        self.flow.submit(self.payload({'materials_explained': True, 'materials_images_shown': GOOGLE_IMAGES.copy()}))
         self.assertEqual(self.flow.next()['stage'], 'vps')
 
     def test_recovered_personal_account_skips_purchase_materials(self):
@@ -400,15 +401,15 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.flow.submit(self.payload({'account_available': True}))
         if self.flow.next()['stage'] == 'google':
             self.assertIn('materials_explained', self.flow.next()['missing'])
-            self.flow.submit(self.payload({'materials_explained': True}))
+            self.flow.submit(self.payload({'materials_explained': True, 'materials_images_shown': GOOGLE_IMAGES.copy()}))
         self.assertEqual(self.flow.next()['stage'], 'vps')
 
     def test_existing_google_account_advances_without_purchase_requirement(self):
         self.reach('google')
-        self.flow.submit(self.payload({'account_available': True}))
+        self.flow.submit(self.payload({'account_available': True, 'account_origin': 'self_used'}))
         self.assertEqual(self.flow.next()['stage'], 'vps')
         self.reach('login')
-        self.assertEqual(self.flow.next()['next_action'], '使用 Google 账号登录 Claude')
+        self.assertTrue(self.flow.next()['next_action'].startswith('使用 Google 账号登录 Claude'))
         self.assertIn('[2FA 取码工具：https://2fa.run/](https://2fa.run/)', self.flow.next()['customer_message'])
 
     def test_pdf_unanswered_does_not_block_after_display(self):

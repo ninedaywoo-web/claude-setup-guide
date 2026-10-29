@@ -50,6 +50,8 @@ class WorkflowTests(unittest.TestCase):
             data.update(computer=self.computer, phone=self.phone)
             if self.phone == 'android':
                 data.update(android_route_explained=True, payment_route_status='available')
+        if key == 'google':
+            data['account_origin'] = 'self_used'
         if key == 'vps':
             data.update(node_label='node-a', node_timezone='America/Los_Angeles')
         if key == 'server':

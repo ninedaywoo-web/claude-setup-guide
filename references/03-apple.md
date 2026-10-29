@@ -1,5 +1,7 @@
 # Apple 账号、礼品卡与内购｜客户交付版
 
+**图文带做入口：**当前步骤默认展示本章对应原图；用 `workflow.py guide` 的 `apple_store`、`gift_redeem`、`claude_app`、`claude_subscribe` 等主题按步骤取图。用户说不会就重新展示并拆细。手机操作方式按第 02 篇 2.1 节选择：Windows＋iPhone 手动带做，Mac 使用可用手机工具；已有核对通过的分流配置按实际结果沿用。
+
 进入本章时读取[统一控制层](17-workflow-controller.md)当前阶段。Apple 账户准备、App、登录和订阅各自提交观察；手机订单和当前账号权益确认后，在对话展示收尾使用说明与经验，再记录交付完成。
 
 ## 默认路线：先准备美区 Apple 账户

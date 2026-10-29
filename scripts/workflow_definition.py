@@ -100,7 +100,7 @@ APPLE_OPTIONAL = {'account_origin': APPLE_ORIGINS, 'apple_account_ref': 'text', 
                   'purchase_restricted': False, 'support_case': 'text', 'support_retry_at': 'date'}
 OPTIONAL_FIELDS = {
     'google': {'account_origin': ('self_used', 'purchased'),
-               'purchase_channel': ('chuhai91', 'gmailbuy'), 'materials_explained': True},
+               'purchase_channel': ('chuhai91', 'gmailbuy'), 'materials_explained': True, 'materials_images_shown': 'google_images'},
     'devices': {'pdf_save_choice': ('yes', 'no', 'unanswered'), 'pdf_saved_path': 'text'},
     'phone_proxy': {**APPLE_OPTIONAL, 'client_available': True},
     'payment_preparation': {**APPLE_OPTIONAL, 'route_accepted': True},
@@ -108,6 +108,11 @@ OPTIONAL_FIELDS = {
     'phone_network': {'score_review': ('rechecked', 'continue'), 'score_review_note': 'text'},
     'subscription': {'purchase_restricted': False, 'support_case': 'text', 'support_retry_at': 'date'},
 }
+
+
+# Teaching position describes what is being explained, never a completed operation.
+for _stage, *_rest in STAGES:
+    OPTIONAL_FIELDS.setdefault(_stage, {}).update(teaching_topic='teaching_topic', teaching_step='teaching_step')
 
 
 def apple_wait(data, now):
@@ -137,6 +142,8 @@ def catalog(state):
         fields = dict(fields)
         if key == 'google' and facts(state, key).get('account_origin') == 'purchased':
             fields['materials_explained'] = True
+            if 'materials_images_shown' in facts(state, key):
+                fields['materials_images_shown'] = 'google_images'
         if key == 'devices' and android:
             fields.update(android_route_explained=True, payment_route_status=('available', 'needs_setup', 'unknown'))
         if android and key in ('phone_proxy', 'timezone'):
@@ -231,6 +238,17 @@ def validation(stage, data, state, now):
                     timestamp(value)
             except (ValueError, TypeError):
                 pass
+        elif rule == 'teaching_topic':
+            from workflow_teaching import CARDS, eligible
+            valid = isinstance(value, str) and value in CARDS and stage['id'] in CARDS[value]['stages'] and eligible(value, state)
+        elif rule == 'teaching_step':
+            from workflow_teaching import CARDS
+            selected = data.get('teaching_topic')
+            topic = CARDS.get(selected) if isinstance(selected, str) else None
+            valid = type(value) is int and topic is not None and 1 <= value <= len(topic['images'])
+        elif rule == 'google_images':
+            from workflow_teaching import GOOGLE_IMAGES
+            valid = isinstance(value, list) and value == GOOGLE_IMAGES
         elif rule == 'scores':
             valid = isinstance(value, dict) and set(value) == {'netcoffee', 'ping0', 'scamalytics'}
             if valid:

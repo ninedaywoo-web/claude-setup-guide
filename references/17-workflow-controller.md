@@ -40,7 +40,7 @@ VPS 阶段按既定商家与默认机房推进，不询问使用国家／地区�
 
 先按 Claude 的可用状态询问账号。Google 能登录但对应 Claude 账号已被封禁时，记录 `account_available=false`；已有能正常登录 Claude 的账号继续复用。实际登录仍留到手机网络验收后。`account_available=false` 时同条回复展示两家购号链接和价格、稳定性差别。客户选择后记录 `purchase_channel=chuhai91` 或 `gmailbuy`；`purchase_images` 只给出海91路线使用，按当前步骤将路径转为项目绝对路径嵌入图片，已有选择和操作进度继续沿用。
 
-收到购买资料时提交 `account_origin=purchased`、`account_available=true`。程序仍返回 `google`，在 `customer_message` 直接提供 https://2fa.run/，`customer_images` 给出原账号资料图。Codex 在同条回复展示说明、链接和图片后，直接提交 `materials_explained=true` 接续下一阶段。这是展示完成记录，无需用户再确认。未买到账号时展示标记不代替账号准备完成。
+收到购买资料时提交 `account_origin=purchased`、`account_available=true`。程序仍返回 `google`，在 `customer_message` 直接提供 https://2fa.run/，`customer_images` 给出原账号资料、取码与回填三张图。Codex 在同条回复展示说明、链接和图片后，提交 `materials_explained=true` 与 `materials_images_shown` 接续下一阶段。这是展示完成记录，无需用户再确认。未买到账号时展示标记不代替账号准备完成。
 
 已有可用账号提交 `account_origin=self_used`、`account_available=true` 直接复用。为接续现有输入，“没有账号”变为“已备妥”时默认走购买资料说明；用户后来找回自己的可用账号时，明确使用 `self_used`。旧进度已完成 Google 阶段时保留原结果，不重新购号。
 
@@ -161,3 +161,26 @@ python3 scripts/workflow.py change --scope timezone --reason '用户选择台北
 - 三站明显偏离时返回 `score_advice`，先复查。提交 `score_review=rechecked` 和实际复查说明，或在客户明确选择继续时用用户来源提交 `score_review=continue` 与说明。轻微偏离保留可继续；换检测结果后重新记录复查处理。
 - 订阅订单与权益确认后直接展示收尾说明和使用经验，提交 `handoff_explained=true`。不增加 Claude Code 教学、重启验收或后续手机重装跟踪。
 - `customer_message` 是需要原样或自然转述到客户对话的内容；工具输出本身不算已展示。已展示且对象未变的说明沿用记录。
+
+## 默认出图与重复求助
+
+当前操作有对应图解就默认在聊天直接展示，配 1～3 个动作和完成标志。用户说「不会、找不到、看不懂、再讲一遍、图片没出来」时，结合上下文重新展示对应原图并把当前动作拆细；已有解释／展示记录用于避免无缘由重复，用户求助时立即重讲。每次展示当前小步骤需要的图，按进度继续；当前截图与教程不同就依据实际页面定位。
+
+每次 `next` 的 `customer_message` 已包含阶段起点的图片 Markdown，直接展示；`teaching_topics` 列出本阶段各小步骤的图解。阶段起点图不替代已确认的小步进度：客户已到后续页面时，先选对应主题和图片序号，再发当前操作的说明与图。用户用口语或模糊说法求助时，由 Codex 结合当前页面、设备、已买账号和前一句话选择主题，不要求客户说出准确术语或主题 ID；信息足够直接讲，确实无法区分时只问一个关键问题。
+
+当前小步骤确认后，可在本阶段提交 `teaching_topic` 和 `teaching_step`（图片序号）保存位置；这两个字段只记录教学位置，操作结果仍分别提交。切换主题时原图片序号自动清除，按新主题当前页继续。
+
+运行 `python3 scripts/workflow.py guide` 查看适用主题；用 `guide --topic <主题ID>` 取得原图与步骤，多页过程用 `--step <从1开始的图片序号>` 选择当前一张。`guide` 只读，不改变阶段、票据、等待时间或付款状态，可跨阶段、重复调用，也可在交付完成后调用。回复直接嵌入返回的 `image_markdown`；解释完回到原来卡住的步骤，只提交实际操作结果。
+
+| 用户的意思（不限于这些说法） | 取图与讲解 |
+| --- | --- |
+| 刚买好、账号一串看不懂、谷歌不知道怎么弄 | 结合购号上下文取 `google_materials`，按字段、取码、回填三张原图讲清楚；上下文不足时先确认是资料还是登录页面。 |
+| 那个码怎么用、2FA 密钥是什么、身份验证器验证码哪里拿 | `google_2fa`，直接给 https://2fa.run/ 及原取码、回填图。实际页面要求短信、恢复邮箱或备用码时用 `google_other_verification`。 |
+| 注册好了、分类找不到、买哪个号 | 按当前商家和进度选 `chuhai_register`／`chuhai_category`／`chuhai_product`；GmailBuy 使用 `gmailbuy` 与其实际页面。 |
+| 已到商家注册／套餐／付款页面 | 按商家选 `vps_dmit`／`vps_bandwagon`／`vps_akile`，用 `--step` 取当前页；已买好就继续部署。 |
+| 浏览器哪个框填什么 | 按当前标签页选 `browser_profile`／`browser_proxy`／`browser_fingerprint`。 |
+| 手机节点、DNS 不知道点哪里 | 按实际问题选 `phone_node`／`phone_dns`／`phone_backup`；配置分流参考用 `phone_config`。没有对应按钮图时读取客户当前页面逐步定位。 |
+| Apple 账号、充值卡不知道在哪里操作 | 按实际操作选 `apple_store`、`gift_official`、`gift_alipay`、`gift_redeem`；已准备好的部分复用。 |
+| 下载哪个 App、在哪里升级、付不了款 | `claude_app`、`claude_subscribe`、`apple_support`，按当前页面分别展示。 |
+
+讲解可以先进行；实际登录、网络切换、充值和付款遵循原阶段和用户选择。等待期间用户问兑换步骤，可以讲图，但保持原等待状态。原图中的设备、账户、价格和配置是示例，按当前实际信息操作。图片缺失或显示失败时给出可打开的原图片／对应 PDF 链接，并继续用当前页面说明；记录实际情况后补齐展示。保留原图片、箭头、顺序和后续教学正文。

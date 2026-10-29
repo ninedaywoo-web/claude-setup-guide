@@ -97,4 +97,6 @@ PDF 位于 `assets/reading/`，给客户阅读；AI 按 Markdown 和控制层执
 
 账号复用以 Claude 的可用状态为准。Google／Gmail 能登录，但对应的 Claude 账号已被封禁时，记录 account_available=false，继续准备其他可用账号；若后来找回的账号也已被 Claude 封禁，同样按此处理。尚未用过 Claude 的 Google 账号先确认既有情况，实际登录仍留到手机网络验收后，不为回答这个问题提前登录。
 
-客户选择购号网站后记录 purchase_channel 并沿用选择。收到商家账号资料时提交 account_origin=purchased 与 account_available=true，按返回的 customer_message 和 customer_images 在对话直接展示 [2FA 取码工具：https://2fa.run/](https://2fa.run/)，结合原账号资料图解说明密钥用途，展示后由 Codex 直接提交 materials_explained=true 继续，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。出海91新手图使用清晰原截图配编号、箭头与文字，按当前步骤展示。
+客户选择购号网站后记录 purchase_channel 并沿用选择。收到商家账号资料时提交 account_origin=purchased 与 account_available=true，按返回的 customer_message 和 customer_images 在对话直接展示 [2FA 取码工具：https://2fa.run/](https://2fa.run/)，结合原账号资料图解说明密钥用途，实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown（三张已展示原图的路径）继续，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。出海91新手图使用清晰原截图配编号、箭头与文字，按当前步骤展示。
+
+**默认出图：**当前操作有对应图解就直接展示在聊天中，配简短步骤和完成标志。用户说不会、找不到、没看懂或图片未显示时，结合上下文重新取图讲解，已有展示标记不抑制求助。各阶段读取 `teaching_topics`，按当前小步骤运行 `python3 scripts/workflow.py guide --topic <主题ID> [--step <图片序号>]`；先前进度已到后续步骤就取该步图，主题不明确时只补问一个关键问题。`guide` 只读，讲解后接回原阶段。完整用法与口语例子见 references/17-workflow-controller.md 的「默认出图与重复求助」。

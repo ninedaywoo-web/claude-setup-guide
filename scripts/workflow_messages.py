@@ -14,7 +14,8 @@ GOOGLE_PURCHASE = """需要买号时，**优先购买美区 Google 老号**，�
 GOOGLE_MATERIALS_GUIDANCE = '收到账号资料后，先找到 Google 邮箱、登录密码，以及商家标注的“2FA 密钥”。2FA 密钥是一串用来生成登录验证码的字母和数字。取码网址是 [2FA 取码工具：https://2fa.run/](https://2fa.run/)。等手机网络配置完成、Google 登录页面要求身份验证器验证码时，再按图用密钥生成验证码，并填回手机登录页面。'
 GOOGLE_LOGIN_GUIDANCE = '手机网络已经验收完成，接下来在手机上使用准备好的 Google 账号登录 Claude。按当前页面输入账号和密码；Google 要求身份验证器验证码时，再按下面的取码步骤操作。'
 GOOGLE_VERIFICATION_GUIDANCE = '取码入口：[2FA 取码工具：https://2fa.run/](https://2fa.run/)。使用商家提供的 2FA 密钥时，在已配置好的 AdsPower 中打开网站，将密钥填入上方“JS实现”区域，点击“点击获取验证码”，再把当前验证码填回手机 Google 页面。使用自己的 Google 账号时，也可以从自己已绑定的身份验证器取得验证码；其他验证方式按当前页面完成。'
-GOOGLE_ORDER_IMAGES = ['assets/google-account/01-order-original.png']
+from workflow_teaching import GOOGLE_IMAGES, attach as attach_teaching
+GOOGLE_ORDER_IMAGES = GOOGLE_IMAGES.copy()
 GOOGLE_VERIFICATION_IMAGES = ['assets/google-account/02-2fa-original.png', 'assets/google-account/03-google-code-original.png']
 GOOGLE_PURCHASE_IMAGES = {
     'register': 'assets/chuhai91/01-register.png',
@@ -90,11 +91,14 @@ def customer_output(result, state, now):
         channel = data.get('purchase_channel')
         result['account_materials_message'] = GOOGLE_MATERIALS_GUIDANCE
         result['account_materials_images'] = GOOGLE_ORDER_IMAGES.copy()
-        if available is True:
+        if available is True and data.get('account_origin') == 'unknown':
+            messages.append('这个 Google 账号是您原来自己在用的，还是刚购买拿到资料的？我按您的情况继续带您操作。')
+            result['next_action'] = '结合已有对话确认账号来源，提交 account_origin=self_used 或 purchased；购买账号继续展示资料与取码图解。'
+        elif available is True:
             messages.append(GOOGLE_MATERIALS_GUIDANCE)
             result['customer_images'] = GOOGLE_ORDER_IMAGES.copy()
             result['next_action'] = ('在当前回复直接展示 customer_message 中的 2FA 取码链接，并将 customer_images 转为当前项目的绝对路径嵌入聊天。'
-                                     '解释邮箱、密码及商家标注的密钥用途后，直接提交 materials_explained=true，按返回任务继续；这一步由 Codex 展示完成，无需客户额外确认。')
+                                     '解释邮箱、密码及商家标注的密钥用途，实际嵌入三张原图后提交 materials_explained=true 和 materials_images_shown（本次展示的三张图片路径），按返回任务继续；这一步由 Codex 展示完成，无需客户额外确认。')
         else:
             if available is not False:
                 messages.append(GOOGLE_QUESTION)
@@ -281,10 +285,10 @@ def customer_output(result, state, now):
         existing = result.get('customer_message')
         result['customer_message'] = '\n\n'.join(([existing] if existing else []) + messages)
         result['display_instruction'] = '把 customer_message 直接展示在客户对话中；相应说明完成后再记录展示字段。首次进入当前阶段时先展示用途解释，再带做当前操作；同一阶段连续操作复用已讲过的解释，客户追问时再展开。遵循 communication_instruction，先建议后动作，简短说明。'
-        if result.get('customer_images'):
-            result['display_instruction'] += ' 同条回复把 customer_images 转为项目绝对路径并嵌入图片，展示后再提交 materials_explained=true。'
+        if key == 'google' and result.get('customer_images'):
+            result['display_instruction'] += ' 同条回复嵌入 customer_images 的三张原图，实际展示后提交 materials_explained=true 与 materials_images_shown。'
         if key == 'login':
             result['display_instruction'] += ' 当前已进入登录阶段。Google 页面要求身份验证器验证码时，直接展示取码链接，并把 verification_images 转为项目绝对路径嵌入聊天；按实际验证方式继续。'
         if APPLE_PAYMENT_RECHECK in messages:
             result['display_instruction'] += '付款复查提醒在进入当前阶段时展示一次，同一阶段连续操作且账号与等待选择未变时不重复。'
-    return result
+    return attach_teaching(result, state)

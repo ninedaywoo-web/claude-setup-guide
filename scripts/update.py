@@ -256,7 +256,7 @@ def workflow_output(root, result):
     if notice:
         existing = view.get('customer_message')
         view['customer_message'] = '\n\n'.join(([existing] if existing else []) + [notice])
-        view['display_instruction'] = (
+        view['display_instruction'] = view.get('display_instruction', '') + ' ' + (
             '先展示当前步骤的客户说明，再在本次带做的首个实质回答末尾单独展示 update.update_notice。'
             '同一段连续带做已提醒过同一版本时不重复；恢复带做或发现新版本时再提醒。'
             '更新建议不影响当前步骤；用户同意后执行 update.apply_command，完成后重新读取 Skill 和变更章节。')

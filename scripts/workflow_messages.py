@@ -77,6 +77,11 @@ def customer_output(result, state, now):
     device = facts(state, 'devices')
     data = facts(state, key)
     messages = []
+    if key in ('vps', 'server'):
+        from network_server import SERVER_OS, SERVER_OS_INSTRUCTION
+        result['server_system'] = SERVER_OS.copy()
+        result['server_system_instruction'] = SERVER_OS_INSTRUCTION
+        messages.append('服务器系统默认选择 **' + SERVER_OS['name'] + '**，DMIT、搬瓦工和 AKILE 都按这一项选择。首次部署前我会读取服务器实际系统核对；已有正常节点继续复用。')
     if key == 'intake':
         result['customer_message'] = '先确认一件事：您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？'
     if key == 'cleanup':

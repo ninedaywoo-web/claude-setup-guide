@@ -20,7 +20,7 @@ import time
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from network_server import Failure, require, save, digest, validate
+from network_server import Failure, SystemMismatch, require, save, digest, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 EXIT_URLS = ("https://api.ipify.org", "https://ipv4.icanhazip.com")
@@ -172,6 +172,8 @@ def remote(action, c):
     except ValueError:
         raise Failure("ssh_or_remote_protocol_failed")
     if r.returncode != 0 or data.get("status") == "failed":
+        if data.get('error') == 'server_os_mismatch':
+            raise SystemMismatch(data['operating_system'])
         # Only the helper's bounded error codes may be shown to users.
         code = data.get("error", "remote_failed")
         raise Failure(code if re.fullmatch(r"[A-Za-z0-9_]{1,80}", code) else "remote_failed")
@@ -257,7 +259,7 @@ def execute(args, c, state):
     try:
         if action in ("preflight", "deploy", "export"):
             if action == "deploy":
-                remote("deploy", c)
+                deployed = remote("deploy", c)
             if action == "preflight":
                 result = remote("preflight", c)
             else:
@@ -266,6 +268,8 @@ def execute(args, c, state):
                 private_file(state.folder / "node.txt", verified.pop("uri") + "\n")
                 save(state.folder / "panel-private.json", verified.pop("panel"))
                 result = verified
+                if action == 'deploy' and 'operating_system' in deployed:
+                    result['operating_system'] = deployed['operating_system']
                 result["status"] = "configured" if action == "deploy" else "exported"
                 result["node_file"] = ".local/network/node.txt"
         elif action == "probe":
@@ -293,6 +297,8 @@ def execute(args, c, state):
     except (Exception, KeyboardInterrupt) as e:
         result = {"status": "interrupted" if isinstance(e, KeyboardInterrupt) else "failed",
                   "error": str(e) if isinstance(e, Failure) else type(e).__name__}
+        if isinstance(e, SystemMismatch):
+            result = e.result
         state.finish(step, result)
         state.write_report()
         return result

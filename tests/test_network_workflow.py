@@ -19,6 +19,10 @@ from pathlib import Path
 root = Path(os.environ['WORKFLOW_FIXTURE'])
 request = json.load(sys.stdin)
 action = request['action']
+if (root/'wrong-os').exists() and action in ('preflight', 'deploy'):
+    print(json.dumps({'status': 'failed', 'error': 'server_os_mismatch',
+                      'operating_system': {'id': 'ubuntu', 'version_id': '22.04', 'name': 'Ubuntu 22.04 LTS'}}))
+    sys.exit(1)
 if (root/'fail').exists():
     print('SSH connection lost', file=sys.stderr)
     sys.exit(1)
@@ -81,6 +85,17 @@ class NetworkWorkflowTests(unittest.TestCase):
         self.assertNotIn('fixture-secret', r.stdout)
         self.assertNotIn('fixture-password', r.stdout)
         return result
+
+    def test_system_mismatch_survives_ssh_and_local_receipt(self):
+        (self.fixture/'wrong-os').touch()
+        for action in ('preflight', 'deploy'):
+            result = self.run_cli(action, code=1)
+            self.assertEqual(result['error'], 'server_os_mismatch')
+            self.assertEqual(result['operating_system']['name'], 'Ubuntu 22.04 LTS')
+            self.assertIn('Debian 12', result['next_action'])
+        self.assertFalse((self.private/'node.txt').exists())
+        report = self.run_cli('status')
+        self.assertEqual(report['steps']['deploy']['result']['operating_system']['id'], 'ubuntu')
 
     def test_deploy_export_scores_and_changed_configuration(self):
         self.assertEqual(self.run_cli('preflight')['status'], 'passed')

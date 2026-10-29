@@ -12,6 +12,7 @@ import os
 import platform
 import re
 import secrets
+import shlex
 import shutil
 import socket
 import ssl
@@ -31,6 +32,12 @@ VERSION = "v3.10.2"
 XRAY_VERSION = "26.7.28"
 DEFAULT_SNI = "www.cloudflare.com"
 MIN_CLIENT_VERSION = "1.0.0"
+SERVER_OS = {"id": "debian", "version_id": "12", "name": "Debian 12"}
+SERVER_OS_INSTRUCTION = (
+    '新购 VPS 默认选择 ' + SERVER_OS['name'] + '，DMIT、搬瓦工和 AKILE 使用同一系统规则。'
+    '选系统时核对当前选中项；商家没有提供该系统时，先说明实际选项并与客户确认处理方式。'
+    '首次脚本部署从服务器 /etc/os-release 读取实际系统，符合规则后继续。'
+    '系统不同先处理差异；已有正常节点继续核对复用，重装需客户明确确认。')
 XRAY_ARCHIVES = {
     "x86_64": ("Xray-linux-64.zip", "8195d909f1109b8f3d99eefe401a3c451d7bf4af71f24d3815420f77e5dd2a40"),
     "aarch64": ("Xray-linux-arm64-v8a.zip", "f5698bb218ada3b4022db26fafc39601c5f53b46b19eb76c9616325985807501"),
@@ -47,6 +54,29 @@ FLOW = "xtls-rprx-vision"
 
 class Failure(Exception):
     pass
+
+
+class SystemMismatch(Failure):
+    def __init__(self, observed):
+        super().__init__('server_os_mismatch')
+        self.result = {'status': 'failed', 'error': 'server_os_mismatch',
+                       'operating_system': observed, 'expected_system': SERVER_OS.copy(),
+                       'next_action': '当前系统是 ' + observed['name'] + '，新部署默认使用 ' + SERVER_OS['name'] +
+                       '。先说明系统差异并确认处理方式；已有正常节点走复用流程，重装由客户明确确认。'}
+
+
+def check_server_os(managed, path=Path('/etc/os-release')):
+    values = {}
+    for line in path.read_text().splitlines():
+        key, separator, value = line.partition('=')
+        if separator and key in ('ID', 'VERSION_ID', 'PRETTY_NAME'):
+            values[key] = ''.join(shlex.split(value))
+    require(values.get('ID') and values.get('VERSION_ID'), 'server_os_unavailable')
+    observed = {'id': values['ID'], 'version_id': values['VERSION_ID'],
+                'name': values.get('PRETTY_NAME', values['ID'] + ' ' + values['VERSION_ID'])}
+    if not managed and (observed['id'], observed['version_id']) != (SERVER_OS['id'], SERVER_OS['version_id']):
+        raise SystemMismatch(observed)
+    return observed
 
 
 def require(condition, code):
@@ -114,11 +144,12 @@ def target_tls(sni):
 def preflight(c):
     validate(c)
     require(platform.system() == "Linux", "linux_required")
+    managed = (HOME / "receipt.json").exists()
+    operating_system = check_server_os(managed)
     require(platform.machine() in ARCHIVES, "unsupported_architecture")
     require(os.geteuid() == 0, "root_or_passwordless_sudo_required")
     require(Path("/run/systemd/system").is_dir() and shutil.which("systemctl"), "systemd_required")
     require(shutil.disk_usage("/usr/local").free >= 600 * 1024 * 1024, "insufficient_disk")
-    managed = (HOME / "receipt.json").exists()
     unit = subprocess.run(["systemctl", "show", "x-ui", "--property=LoadState", "--value"], capture_output=True, text=True, timeout=15)
     require(unit.returncode == 0, "systemd_query_failed")
     existing = INSTALL.exists() or Path("/etc/x-ui").exists() or UNIT.exists() or unit.stdout.strip() == "loaded"
@@ -128,6 +159,7 @@ def preflight(c):
     require(managed or port_free(c["panel_port"]), "panel_port_in_use")
     require(target_tls(c["sni"]), "target_tls13_failed")
     return {"status": "passed", "architecture": ARCHIVES[platform.machine()][0], "panel_version": VERSION,
+            "operating_system": operating_system,
             "deployment_xray_version": XRAY_VERSION, "managed_install": managed,
             "target_tls13": True, "external_firewall": "unverified"}
 
@@ -320,7 +352,7 @@ def wait_panel(receipt):
 
 
 def deploy(c):
-    preflight(c)
+    checked = preflight(c)
     HOME.mkdir(mode=0o700, parents=True, exist_ok=True)
     import fcntl
     with (HOME / "lock").open("w") as lock:
@@ -363,7 +395,8 @@ def deploy(c):
         panel = wait_panel(receipt)
         panel_listen_verified(c["panel_port"])
         ensure_node(panel, receipt, persist)
-        return {"status": "configured", "panel_version": VERSION, "client_route": "unverified"}
+        return {"status": "configured", "panel_version": VERSION, "client_route": "unverified",
+                "operating_system": checked['operating_system']}
 
 
 def verify(c):
@@ -399,7 +432,8 @@ def main():
         print(json.dumps(result))
     except Exception as e:
         # Never echo response bodies, subprocess arguments or credentials.
-        print(json.dumps({"status": "failed", "error": str(e) if isinstance(e, Failure) else type(e).__name__}))
+        print(json.dumps(e.result if isinstance(e, SystemMismatch) else
+                         {"status": "failed", "error": str(e) if isinstance(e, Failure) else type(e).__name__}))
         sys.exit(1)
 
 

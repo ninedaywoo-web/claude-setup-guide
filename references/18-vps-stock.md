@@ -2,6 +2,8 @@
 
 ## 固定入口与推荐顺序
 
+系统选择统一沿用 [网络教程「选系统」](01-network.md#二选系统) 的 Debian 12 规则，三家商家一致；付款前核对所选系统，首次脚本部署读取实际系统验证。
+
 1. 打开 [DMIT 实际订购目录](https://www.dmit.io/cart.php)，选 **Los Angeles → Premium → AS3 → LAX.AS3.Pro.TINY**。这是已成功交付的默认套餐，参考价 **10.90 美元/月**；本次金额读取实际页面。可直接打开 [已选分类](https://www.dmit.io/cart.php?region=los-angeles&network=premium&generation=as3)，打开后回读所选分类和完整型号。
 2. 默认套餐缺货就查看 [搬瓦工 USCA_9、1 GB、季付](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9)，这是有成熟适配经验的第二顺位，有货就首推搬瓦工。
 3. 搬瓦工目标套餐也缺货，再看 [AKILE](https://akile.ai/) 的 LAX Premium → LAXPremium-Mini，默认月付。

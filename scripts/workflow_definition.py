@@ -99,6 +99,8 @@ APPLE_OPTIONAL = {'account_origin': APPLE_ORIGINS, 'apple_account_ref': 'text', 
                   'wait_choice': ('wait', 'continue'), 'apple_reminder_shown': True,
                   'purchase_restricted': False, 'support_case': 'text', 'support_retry_at': 'date'}
 OPTIONAL_FIELDS = {
+    'vps': {'vps_origin': ('existing', 'purchase'), 'purchase_checks': 'mapping',
+            'dmit_alternatives': 'list', 'purchase_choice': 'text'},
     'google': {'account_origin': ('self_used', 'purchased'),
                'purchase_channel': ('chuhai91', 'gmailbuy'), 'materials_explained': True, 'materials_images_shown': 'google_images'},
     'devices': {'pdf_save_choice': ('yes', 'no', 'unanswered'), 'pdf_saved_path': 'text'},
@@ -140,6 +142,8 @@ def catalog(state):
         if key == 'cleanup' and facts(state, 'intake').get('banned_login') != 'yes':
             continue
         fields = dict(fields)
+        if key == 'vps' and not facts(state, key).get('access_ready'):
+            fields['vps_origin'] = ('existing', 'purchase')
         if key == 'google' and facts(state, key).get('account_origin') == 'purchased':
             fields['materials_explained'] = True
             if 'materials_images_shown' in facts(state, key):
@@ -191,6 +195,8 @@ def timestamp(value):
 def validation(stage, data, state, now):
     # Derive dynamic fields from the proposed account type, not only saved facts.
     fields = dict(stage['fields'])
+    if stage['id'] == 'vps' and not facts(state, 'vps').get('access_ready'):
+        fields['vps_origin'] = ('existing', 'purchase')
     if stage['id'] == 'timezone' and facts(state, 'devices').get('computer') == 'mac':
         # Prior Mac observations can contain the retired global-location field.
         data = {key: value for key, value in data.items() if key != 'computer_location_off'}
@@ -249,6 +255,10 @@ def validation(stage, data, state, now):
         elif rule == 'google_images':
             from workflow_teaching import GOOGLE_IMAGES
             valid = isinstance(value, list) and value == GOOGLE_IMAGES
+        elif rule == 'mapping':
+            valid = isinstance(value, dict)
+        elif rule == 'list':
+            valid = isinstance(value, list)
         elif rule == 'scores':
             valid = isinstance(value, dict) and set(value) == {'netcoffee', 'ping0', 'scamalytics'}
             if valid:
@@ -262,6 +272,11 @@ def validation(stage, data, state, now):
         if not valid:
             issues.append(name)
     key = stage['id']
+    if key == 'vps' and data.get('vps_origin') == 'purchase':
+        from vps_purchase import evaluate
+        if not evaluate(data.get('purchase_checks'), now,
+                        alternatives=data.get('dmit_alternatives'), choice=data.get('purchase_choice'))['can_purchase']:
+            issues.append('purchase_checks')
     if key == 'browser' and data.get('checked_profile_ref') != data.get('profile_ref'):
         issues.append('checked_profile_ref')
     if key in ('phone_proxy', 'phone_network') and data.get('node_label') != facts(state, 'vps').get('node_label'):

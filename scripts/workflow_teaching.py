@@ -40,7 +40,7 @@ CARDS = {
     'google_login': card('从手机 Claude 进入 Google 登录', 'login', '08-google-account.md', instruction='打开手机官方 Claude 的 Google 登录入口，输入准备好的账号。看当前验证页面，身份验证器用 google_2fa，短信／恢复邮箱／备用码用 google_other_verification。'),
     'google_other_verification': card('短信、恢复邮箱或备用码验证', 'login', '08-google-account.md', instruction='先辨认页面要求的验证方式，说明去哪里取得对应验证码；这类输入框按实际页面完成。需要更换验证方式时查看页面的“尝试其他方式”。'),
     'vps_dmit': card('DMIT 选购与开通', 'vps', '01-network.md', pics('images/network', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08-redacted.png'),
-                     '按当前小步骤选图：套餐、系统、订单、结算、服务器资料；价格库存以当前页面为准。'),
+                     '按当前小步骤选图：套餐、系统、订单、结算、服务器资料；原图 AN5 与 9.99 美元作界面示例，当前默认已交付套餐为 AS3 Premium 的 LAX.AS3.Pro.TINY，参考价 10.90 美元/月。库存从 cart.php 读取，按 references/18-vps-stock.md 核对及选择后再给付款指引。'),
     'vps_bandwagon': card('搬瓦工注册与购买', 'vps', '09-vps-purchase.md', pics('vps-purchase', 'bandwagon-register-1.png', 'bandwagon-register-2.png', 'bandwagon-register-3.png', 'bandwagon-register-4.png', 'bandwagon-plan.png'),
                          '按客户当前注册或选套餐页面选择对应的一张图，已有账号直接进入选套餐步骤。'),
     'vps_akile': card('AKILE 套餐选择', 'vps', '09-vps-purchase.md', pics('vps-purchase', 'akile-plan.png'), '当前是套餐选购图，注册字段按实际页面逐项说明。'),

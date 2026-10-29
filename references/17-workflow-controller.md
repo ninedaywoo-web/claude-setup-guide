@@ -26,7 +26,7 @@ VPS 阶段按既定商家与默认机房推进，不询问使用国家／地区�
 | 进入阶段 | 当场解释 |
 | --- | --- |
 | google | 先问有没有能正常登录 Claude、未被 Claude 封禁的 Google 账号；没有时同时展示出海91与 GmailBuy 的链接及选购差别，推荐美区 Google 老号。记住选择；收到购买资料后展示 2FA 链接和原资料图，再继续。已有账号复用；安卓只解释适用的 Google 登录用途。 |
-| vps | VPS 是租来的远程服务器，用来搭建自己的节点；客户购买，Codex 部署。推荐顺序 DMIT → 搬瓦工 → AKILE，默认月付／季付／月付，确认实际扣款金额与覆盖时长。家宽问题按网络篇解释搭配与最终出口。 |
+| vps | VPS 是租来的远程服务器，用来搭建自己的节点；客户购买，Codex 部署。按 [库存核对](18-vps-stock.md) 从 DMIT cart.php 核对 AS3 Premium TINY，参考价 10.90 美元/月，缺货首推搬瓦工；再缺货看 AKILE。新购买提交 purchase_checks，依据 purchase_decision 继续；其他 DMIT 选项独立验证、说明未交付实践后由客户选择。默认月付／季付／月付，确认实际扣款金额与覆盖时长。家宽问题按网络篇解释搭配与最终出口。 |
 | computer_network | 客户端连接节点，TUN 接管流量，全局走选定节点；保留旧 VPN 测通后再切换。 |
 | browser | 区分 Claude 桌面版、Claude Code 与 AdsPower；电脑浏览器中的 Claude 登录、邮件链接和授权使用 AdsPower，桌面版与 CLI 可正常使用。展示桌面版权限风险说法与已交付用户正常使用反馈，并给出三站链接。 |
 | phone_proxy | iOS 手机负责首次登录与内购，Apple 处理订单及退款申请；安卓使用自己的官网付款路线。 |

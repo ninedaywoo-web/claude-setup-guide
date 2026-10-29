@@ -94,4 +94,4 @@ Windows 本机连接 Linux VPS，默认用 v2rayN 与 AdsPower。先保留旧 VP
 
 ## 3. 给 AI 的带做说明
 
-[AI 从零带做指南](05-ai-walkthrough.md)。开始前完整读取网络与浏览器两篇，其他资料按阶段读取。VPS 默认按 **DMIT → 搬瓦工 → AKILE Cloud** 推荐：先看 DMIT 洛杉矶 AN5 Premium，缺货看[搬瓦工 USCA_9 的 1 GB 档](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9)，搬瓦工也缺货再看 [AKILE LAXPremium-Mini](https://akile.ai/)。默认付款周期分别为月付、季付、月付；购买前按当前结账页说明实际扣款总额、覆盖时长和续费金额。三家目标套餐都缺货时，确认等待或在这三家内比较其他同线路套餐。具体配置、流量差别和库存见[网络教程的套餐对照](01-network.md)，套餐按网络节点用途选择。
+[AI 从零带做指南](05-ai-walkthrough.md)。开始前完整读取网络与浏览器两篇，其他资料按阶段读取。VPS 默认按 **DMIT → 搬瓦工 → AKILE Cloud** 推荐：从 [DMIT 实际订购目录](https://www.dmit.io/cart.php) 查看洛杉矶 Premium → AS3 → LAX.AS3.Pro.TINY，参考价 10.90 美元/月；缺货看[搬瓦工 USCA_9 的 1 GB 档](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9)，搬瓦工也缺货再看 [AKILE LAXPremium-Mini](https://akile.ai/)。其他 DMIT 套餐独立核实后可供客户选择，说明目前没有交付实践，仍推荐有成熟适配经验的搬瓦工。默认付款周期分别为月付、季付、月付；购买前按当前结账页说明实际扣款总额、覆盖时长和续费金额。库存判断与客户选择见[库存核对](18-vps-stock.md)，配置对照见[网络教程](01-network.md)。

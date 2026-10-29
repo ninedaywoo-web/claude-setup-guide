@@ -44,7 +44,7 @@ BROWSER_GUIDANCE = """**这套流程完成后，您可以用 Claude 桌面版，
 VPS_GUIDANCE = """VPS 就是您租用的一台远程服务器，我们把它配置成自己的魔法节点。您在网站完成购买，Codex 会接着帮您部署，再把电脑和手机连接到这条线路。这里准备的是自己的节点，平时购买的共享梯子套餐另作配置期间的联网工具。
 
 您目前是还没买 VPS、已买但没配置，还是已经有可用的自建节点？已有的可以先核对并复用；没有就跟着下面的图解准备。"""
-VPS_PURCHASE_GUIDANCE = '需要购买时，默认按 **DMIT → 搬瓦工 → AKILE** 选：先看 DMIT 洛杉矶 AN5 Premium，缺货看搬瓦工 USCA_9 的 1 GB 档，搬瓦工也缺货再看 AKILE LAXPremium-Mini。默认分别按月付、季付、月付准备；我会在下单前列清本次实际付款总额、覆盖时长和续费金额。'
+VPS_PURCHASE_GUIDANCE = '需要购买时，默认按 **DMIT → 搬瓦工 → AKILE** 选：先从 [DMIT 实际订购目录](https://www.dmit.io/cart.php) 核对已成功交付的洛杉矶 Premium → AS3 → LAX.AS3.Pro.TINY，参考价 10.90 美元/月；缺货就核对并推荐有成熟适配经验的搬瓦工 USCA_9 的 1 GB 档，搬瓦工也缺货再看 AKILE LAXPremium-Mini。默认分别按月付、季付、月付准备；我会在下单前列清本次实际付款总额、覆盖时长和续费金额。'
 NETWORK_GUIDANCE = '电脑上的代理客户端负责连接 VPS 节点。TUN 负责接管电脑流量，全局模式让流量走选定的节点；我们会先保留旧 VPN，单独测通新节点，再切换并确认 Codex 能继续回复。'
 PHONE_GUIDANCE = '手机主要承担首次登录和订阅付款。我们先给手机配置好网络，再通过 Claude 的 iOS 内购完成订阅，之后回电脑的 Claude 桌面端或 CLI 使用。Apple 负责这笔内购订单，后续需要申请退款，也从 Apple 的入口处理。'
 CHECK_GUIDANCE = '配好后，我会带您用 [NetCoffee](https://ip.net.coffee/claude/)、[Ping0](https://ping0.cc/) 和 [Scamalytics](https://scamalytics.com/ip) 这三个网站检查网络。电脑先检查一次，手机配好后再检查一次，确认两台设备都在使用我们配置的目标线路，再继续登录和订阅。'
@@ -121,13 +121,40 @@ def customer_output(result, state, now):
         messages.extend([GOOGLE_LOGIN_GUIDANCE, GOOGLE_VERIFICATION_GUIDANCE])
         result['verification_images'] = GOOGLE_VERIFICATION_IMAGES.copy()
     if key == 'vps':
-        messages.extend([VPS_GUIDANCE, VPS_PURCHASE_GUIDANCE])
+        from vps_purchase import POLICY, evaluate
+        purchase = evaluate(data.get('purchase_checks'), now, alternatives=data.get('dmit_alternatives'), choice=data.get('purchase_choice'))
+        result['purchase_decision'] = purchase
+        result['purchase_instruction'] = POLICY
+        messages.extend([VPS_GUIDANCE, VPS_PURCHASE_GUIDANCE] if not data.get('vps_origin') else [VPS_PURCHASE_GUIDANCE])
         result['next_action'] = ('VPS 选型直接按默认洛杉矶机房与目标套餐推进，不询问用户主要在哪个国家或地区使用、所在地、城市或运营商。'
                                  'node_timezone 从所选节点机房城市取得，已有 VPS 读取实际节点资料；用户主动提出特殊需求时按其需求调整。'
                                  '先核对已有 VPS 并复用；需要购买时按 DMIT → 搬瓦工 → AKILE 核对目标套餐，前一家缺货再看下一家。'
                                  '默认付款周期为 DMIT 月付、搬瓦工季付、AKILE 月付，按当前结账页说明实际扣款总额、覆盖时长和续费金额；'
                                  '年付或多年预付只在用户明确要求时比较。三家都缺货则确认等待或在这三家内比较其他同线路套餐。'
                                  '已有客户选择按其要求继续；准备好 VPS 与 SSH 访问后提交本阶段观察。')
+        result['next_action'] += (' 先提交 vps_origin=existing 或 purchase；本次购买先按 purchase_instruction 核对并提交 purchase_checks，'
+                                  '用返回的 purchase_decision 决定查看哪家。can_purchase=true 才给付款指引。' + POLICY)
+        if facts(state, 'vps').get('vps_origin') == 'purchase':
+            for observation in purchase['checked']:
+                if observation['status'] == 'available':
+                    continue
+                name = {'dmit': 'DMIT', 'bandwagon': '搬瓦工', 'akile': 'AKILE'}[observation['vendor']]
+                messages.append(name + {'sold_out': '目标套餐显示缺货。', 'not_listed': '当前完整目录没有列出目标套餐。', 'unknown': '库存尚未核实。', 'login_required': '订购页要求登录，库存尚未核实。'}[observation['status']])
+            if purchase['can_purchase']:
+                messages.append('已核对目标套餐的实际配置页：' + purchase['plan'] + '，本次 ' + str(purchase['amount']) + ' ' + purchase['currency'] + '，付款周期 ' + {'monthly': '一个月', 'quarterly': '三个月'}[purchase['cycle']] + '，续费 ' + str(purchase['renewal_amount']) + ' ' + purchase['currency'] + '。付款前再核对同一套餐页面。')
+            else:
+                if purchase.get('vendor') and purchase['status'] != 'awaiting_choice':
+                    messages.append('接下来核对 ' + purchase['plan'] + ' 的实际订购页面：[打开官方订购入口](' + purchase['url'] + ')。')
+                elif not purchase.get('vendor'):
+                    messages.append('三家目标套餐目前都没有取得可购买结果，接下来按您的选择等待补货或比较同线路的其他套餐。')
+            if purchase['alternatives']:
+                messages.append('另外查到以下 DMIT 套餐的实际配置页可以购买，但这些套餐目前没有交付实践；搬瓦工已有成熟适配经验，我们仍优先推荐搬瓦工。')
+                for offer in purchase['alternatives']:
+                    messages.append('- ' + offer['plan'] + '，线路 ' + offer['network'] + '，本次月付 ' + str(offer['amount']) + ' ' + offer['currency'] + '，续费 ' + str(offer['renewal_amount']) + ' ' + offer['currency'] + '。[订购页](' + offer['url'] + ')')
+                    if offer['network'] != 'Premium':
+                        messages.append('这档是 ' + offer['network'] + '，与默认的 Premium 优化线路不同。')
+                if purchase['status'] == 'awaiting_choice':
+                    messages.append('已核对可购买，推荐 ' + purchase['recommended_plan'] + '，本次 ' + str(purchase['amount']) + ' ' + purchase['currency'] + '／' + {'monthly': '一个月', 'quarterly': '三个月'}[purchase['cycle']] + '，续费 ' + str(purchase['renewal_amount']) + ' ' + purchase['currency'] + '。[推荐套餐订购页](' + purchase['order_url'] + ')。您选推荐方案，还是上述其他 DMIT 套餐？')
     if key == 'computer_network':
         messages.append(NETWORK_GUIDANCE)
         if device.get('computer') == 'windows':

@@ -256,7 +256,21 @@ class Workflow:
             existing = {k: v for k, v in existing.items() if k not in ('setup_explained', 'android_route_explained', 'payment_route_status')}
         if 'teaching_topic' in data and data['teaching_topic'] != existing.get('teaching_topic'):
             existing = {k:v for k,v in existing.items() if k != 'teaching_step'}
+        if view['stage'] == 'vps':
+            if 'purchase_choice' in data and source['kind'] != 'user':
+                raise WorkflowError('替代套餐选择须记录客户原话，source.kind=user')
         merged = {**existing, **data}
+        if view['stage'] == 'vps':
+            if data.get('access_ready') is False or 'purchase_checks' in data:
+                merged.setdefault('vps_origin', 'purchase')
+            if merged.get('access_ready') is True and not existing.get('access_ready'):
+                if merged.get('vps_origin') not in ('existing', 'purchase'):
+                    raise WorkflowError('先记录 vps_origin=existing（已有 VPS）或 purchase（本次购买）')
+                if merged['vps_origin'] == 'purchase':
+                    from vps_purchase import evaluate
+                    if not evaluate(merged.get('purchase_checks'), self.clock(), alternatives=merged.get('dmit_alternatives'),
+                                    choice=merged.get('purchase_choice'))['can_purchase']:
+                        raise WorkflowError('先核对目标套餐实际订购页，取得可购买结果后再记录开通')
         if view['stage'] == 'google':
             # A missing account becoming available follows the purchase route;
             # an explicitly recovered personal account still takes the reuse route.

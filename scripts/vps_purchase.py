@@ -11,9 +11,13 @@ TARGETS = {
     'akile': {'plan': 'LAXPremium-Mini', 'network': 'Premium', 'cycle': 'monthly',
               'url': 'https://akile.ai/'},
 }
+DMIT_DESCRIPTION = '洛杉矶 Premium → AS3 → ' + TARGETS['dmit']['plan'] + '，参考价 10.90 美元/月'
+PURCHASE_GUIDANCE = ('需要购买时，默认按 **DMIT → 搬瓦工 → AKILE** 选：先从 [DMIT 实际订购目录](https://www.dmit.io/cart.php) 核对已成功交付的'
+    + DMIT_DESCRIPTION + '；缺货就核对并推荐有成熟适配经验的搬瓦工 ' + TARGETS['bandwagon']['plan'] +
+    '，搬瓦工也缺货再看 AKILE ' + TARGETS['akile']['plan'] + '。默认分别按月付、季付、月付准备；下单前列清实际付款总额、覆盖时长和续费金额。')
 POLICY = ('库存从实际订购目录和套餐配置页读取。DMIT 固定从 https://www.dmit.io/cart.php 进入，'
-          '选 Los Angeles → Premium → AS3 → LAX.AS3.Pro.TINY，已交付套餐参考价 10.90 美元/月。价格页的 Order Now、搜索摘要及旧图只作说明。'
-          '缺货、完整目录中目标未列出分别记录 sold_out、not_listed，继续搬瓦工 USCA_9 1GB，再到 AKILE LAXPremium-Mini。'
+          '默认已交付套餐为 ' + DMIT_DESCRIPTION + '。价格页的 Order Now、搜索摘要及旧图只作说明。'
+          '缺货、完整目录中目标未列出分别记录 sold_out、not_listed，继续搬瓦工 ' + TARGETS['bandwagon']['plan'] + '，再到 AKILE ' + TARGETS['akile']['plan'] + '。'
           'Cloudflare 验证、403、超时记 unknown；页面明确要求账户登录才记 login_required。优先复用客户已登录浏览器，'
           '仍无法读取就取得当前目标套餐区域的截图；查不到库存时继续核对下一家，并清楚说明前一家尚未核实。'
           '仅实际进入同一目标套餐配置页且取得计费周期、总额和续费金额，才可输出可购买。'
@@ -44,10 +48,10 @@ def default_offer(checks, errors):
     return {'status': 'no_verified_offer', 'can_purchase': False, 'checked': outcomes}
 
 
-def evaluate(checks, now, *, alternatives=None, choice=None):
+def evaluate(checks, now, *, alternatives=None, choice=None, captures=None):
     """Validate page observations once, then apply the agreed recommendation order."""
     checks = checks if isinstance(checks, dict) else {}
-    errors = {vendor: check_observation(vendor, checks[vendor], now) for vendor in TARGETS if vendor in checks}
+    errors = {vendor: (capture_error(vendor, checks[vendor], captures) or check_observation(vendor, checks[vendor], now)) for vendor in TARGETS if vendor in checks}
     result = default_offer(checks, errors)
     result['alternatives'] = []
     verified = {x['vendor']: x['status'] for x in result['checked']}
@@ -61,7 +65,7 @@ def evaluate(checks, now, *, alternatives=None, choice=None):
             if not match or plan == TARGETS['dmit']['plan']:
                 continue
             target = {'plan': plan, 'network': {'Pro': 'Premium', 'EB': 'Eyeball', 'T1': 'Tier 1'}[match[2]], 'cycle': 'monthly'}
-            if check_observation('dmit', item, now, target=target) is None:
+            if capture_error('dmit', item, captures) is None and check_observation('dmit', item, now, target=target) is None:
                 result['alternatives'].append({k: item[k] for k in ('plan', 'network', 'cycle', 'amount', 'currency', 'renewal_amount', 'url')})
     result['recommended_plan'] = result.get('plan') if result['can_purchase'] else None
     if result['alternatives'] and choice is None and result['recommended_plan']:
@@ -73,6 +77,45 @@ def evaluate(checks, now, *, alternatives=None, choice=None):
         return {**result, **selected, 'vendor': 'dmit', 'status': 'customer_selected',
                 'can_purchase': True, 'order_url': selected['url']}
     return {**result, 'status': 'choice_needs_recheck', 'can_purchase': False}
+
+
+def capture_error(vendor, item, captures):
+    # Pure policy tests may omit captures; the delivery controller always supplies receipts.
+    if captures is None:
+        return None
+    if not isinstance(item, dict):
+        return 'page_observation_required'
+    receipt_id = item.get('receipt_id')
+    capture = captures.get(receipt_id) if isinstance(receipt_id, str) else None
+    if not capture or capture.get('vendor') != vendor:
+        return 'page_capture_required'
+    if item.get('url') != capture['url'] or item.get('checked_at') != capture['checked_at']:
+        return 'capture_url_or_time_mismatch'
+    normalize = lambda value: re.sub(r'\s+', '', value).lower()
+    quote = item.get('evidence')
+    if not isinstance(quote, str) or not quote.strip() or normalize(quote) not in normalize(capture['text']):
+        return 'quote_not_in_captured_page'
+    if item.get('status') == 'not_listed' and isinstance(item.get('plan'), str) and normalize(item['plan']) in normalize(capture['text']):
+        return 'target_present_in_captured_catalog'
+    page = capture['page']
+    if item.get('page') != page:
+        return 'captured_page_type_mismatch'
+    if item.get('status') == 'available':
+        if any(x in capture['text'].lower() for x in ('out of stock', 'sold out', '缺货', '缺貨', '售罄')):
+            return 'conflicting_stock_evidence'
+        billing = item.get('billing_evidence', '')
+        if not isinstance(billing, str) or not billing or normalize(billing) not in normalize(capture['text']):
+            return 'billing_quote_required'
+        amounts = re.findall(r'\d+(?:\.\d+)?', billing)
+        if any(str(item.get(k)) not in amounts and not any(float(x) == item.get(k) for x in amounts) for k in ('amount', 'renewal_amount')):
+            return 'billing_amount_not_in_page'
+        cycles = {'monthly': ('monthly', '月付', '每月', '/month'), 'quarterly': ('quarterly', '季付', '三个月', '3 months')}
+        if not any(x in billing.lower() for x in cycles.get(item.get('cycle'), ())):
+            return 'billing_cycle_not_in_page'
+        currencies = {'USD': ('usd', 'us$', '$'), 'CNY': ('cny', 'rmb', '¥', '￥', '元')}
+        if not any(x in billing.lower() for x in currencies.get(item.get('currency'), ())):
+            return 'billing_currency_not_in_page'
+    return None
 
 
 def check_observation(vendor, item, now, *, target=None):

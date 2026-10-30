@@ -6,7 +6,7 @@
 
 目前，Claude 无法做到百分之百不封号。这份教程会尽可能全面地讲清楚网络环境、账号准备和使用中的注意事项，帮助你尽可能降低被封号的风险。如果不幸被封号，也有退款申请、申诉与清理的操作资料。
 
-把项目文件夹交给 AI，打开 [SKILL.md](../SKILL.md)，就可以开始。AI 会先通读网络部署、浏览器与 iPhone 配置两篇，再根据你的设备和进度，每次带你做一小步。你做完发截图，或告诉它页面上出现了什么，再继续下一步。有 Codex 且电脑操作工具可用时，可以让它协助操作。
+把项目文件夹交给 AI，打开 [SKILL.md](../SKILL.md)，就可以开始。AI 会先确认当前进度，再读取这一步的教程和配图，每次带你做一小步。你做完发截图，或告诉它页面上出现了什么，再继续下一步。有 Codex 且电脑操作工具可用时，可以让它协助操作。
 
 ## 第一个问题：设备有没有用过被封禁的 Claude 账号
 
@@ -94,4 +94,4 @@ Windows 本机连接 Linux VPS，默认用 v2rayN 与 AdsPower。先保留旧 VP
 
 ## 3. 给 AI 的带做说明
 
-[AI 从零带做指南](05-ai-walkthrough.md)。开始前完整读取网络与浏览器两篇，其他资料按阶段读取。VPS 默认按 **DMIT → 搬瓦工 → AKILE Cloud** 推荐：从 [DMIT 实际订购目录](https://www.dmit.io/cart.php) 查看洛杉矶 Premium → AS3 → LAX.AS3.Pro.TINY，参考价 10.90 美元/月；缺货看[搬瓦工 USCA_9 的 1 GB 档](https://bandwagonhost.com/order/ecommerce/Los%20Angeles/USCA_9)，搬瓦工也缺货再看 [AKILE LAXPremium-Mini](https://akile.ai/)。其他 DMIT 套餐独立核实后可供客户选择，说明目前没有交付实践，仍推荐有成熟适配经验的搬瓦工。默认付款周期分别为月付、季付、月付；购买前按当前结账页说明实际扣款总额、覆盖时长和续费金额。库存判断与客户选择见[库存核对](18-vps-stock.md)，配置对照见[网络教程](01-network.md)。
+[AI 从零带做指南](05-ai-walkthrough.md)。按当前阶段读取操作章节；套餐与默认顺序由 `workflow.py policy` 返回，购买前按[库存核对](18-vps-stock.md)采集实际页面，缺货时由流程返回下一家。配置对照见[网络教程](01-network.md)。

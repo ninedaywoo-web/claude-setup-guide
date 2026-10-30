@@ -13,7 +13,7 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Mac Ka
 
 ## 收到仓库链接：先下载最新版
 
-用户发来本公开仓库链接并要求开始或恢复带做时，先执行 [链接交付启动流程](references/12-latest-start.md)。此规则优先于下面的日常更新规则：实时核对远端 main，下载并校验最新完整包，不复用已安装 Skill、旧解压目录、对话记忆或 24 小时缓存。先取得 `start` 返回的 `ready`、版本、提交和目录，向用户显示“已下载并校验项目完整包 vX.X.X，包含供 Codex 执行的程序／流程和给您阅读的 PDF 教程”，附实际项目目录与 PDF 目录链接，再从该目录重读本文件和核心正文。用户发链接开始带做已包含下载授权，不重复询问是否下载新版。
+用户发来本公开仓库链接并要求开始或恢复带做时，先执行 [链接交付启动流程](references/12-latest-start.md)。此规则优先于下面的日常更新规则：实时核对远端 main，下载并校验最新完整包，不复用已安装 Skill、旧解压目录、对话记忆或 24 小时缓存。先取得 `start` 返回的 `ready`、版本、提交和目录，向用户显示“已下载并校验项目完整包 vX.X.X，包含供 Codex 执行的程序／流程和给您阅读的 PDF 教程”，附实际项目目录与 PDF 目录链接，再从该目录重读本文件，并按控制层 reading 读取当前操作小节。用户发链接开始带做已包含下载授权，不重复询问是否下载新版。
 
 下载或校验未完成，先解决访问问题，不进入 VPS 推荐、购买或网络配置，不静默退回旧教程；用户明确要求离线使用旧版时说明版本后按其要求处理。成功下载只完成一次启动，本轮后续不重复下载。恢复时从旧目录迁移 `.local/` 进度，旧目录不删除、不覆盖；旧进度只代表已完成的操作，旧推荐和旧规则不带入新教程。
 
@@ -21,13 +21,13 @@ description: 根据完整本地图文教程，逐步带新手完成 VPS、Mac Ka
 
 1. 以本文件所在目录为项目根目录，读 `version.json`。Windows 先确认可用的 Python 3.9+ 解释器；若入口是 `py -3` 或 `python`，将命令中的 `python3` 替换成已验证的入口。主流程 `workflow.py` 启动、继续和提交结果时，自动检查更新并返回 `update`；统一流程启用后的 `login_readiness.py` 同样返回检查结果。AI 直接使用返回结果，同一轮无需另外执行检查。检查结果保存在 `.local/update-check.json`，24 小时内复用，满 24 小时后的下一次调用重新联网；内部保存进度和计算阶段不触发联网。用户要求立即检查时运行 `python3 scripts/update.py check --force`，随后主流程沿用新结果。尚未进入主流程、只阅读本地教程时，执行 `python3 scripts/update.py check`。没有 Python 时由 AI 读取远端 `version.json`，记录检查时间并比较数字版本；无法联网时继续本地教程，简短说明本次未能检查。公开仓库无需登录。
 2. `update.status` 返回 `update_available` 时，主流程已将更新建议追加到 `customer_message`；独立检查使用顶层结果。此时，先完成客户当前这一步的回答，在本次调用的首个实质回答末尾单独一行展示脚本返回的 `update_notice`，例如“已有最新更新（v1.0.10），建议更新。”必要时补充更新摘要，不能只在工具输出中显示。同一次连续带做不在每条回复重复提醒；下次调用即使复用缓存，仍在首个回答末尾提醒。`current`、`local_ahead` 或检查失败时不编造新版提醒；失败的缓存结果也不能说当前已是最新版。更新提醒不阻断带做。客户未同意或拒绝就继续本地版本；明确同意后才执行返回的 `python3 scripts/update.py apply --commit <已检查的提交>`。成功后停止旧版提醒，重新读取本文件和变更章节；本地版本变化会使旧检查缓存失效。不要未经检查直接执行远程脚本；链接交付按专门启动流程保存并检查脚本后运行。
-3. **在第一次带做前完整阅读** `references/01-network.md`（纯净魔法从零部署）与 `references/02-browser-iphone.md`（指纹浏览器与 iPhone 网络配置）。两篇必须都通读，长文分段读至末尾，不能以检索片段、目录、摘要或 PDF 文字抽取代替全文。图片在相关步骤打开查看，并按下方“图文带做”规则展示给用户。
-4. 阅读 `references/00-start.md` 和 `references/05-ai-walkthrough.md`。恢复时读取 `.local/progress.md`（如存在），结合本轮上下文确认进度。更新涉及前两篇时重新完整读取。
+3. **按当前阶段读资料。**启动先读本文件与 `references/17-workflow-controller.md` 的使用说明，再运行 `workflow.py init`。按返回的 `reading` 读取当前小节及其必要依赖；原教程和配图完整保留，操作时打开对应图并展示给客户。
+4. 恢复时运行 `workflow.py next`，复用统一状态；旧 `.local/progress.md` 仅作历史来源。更新后重读入口及当前操作涉及的小节。首页和带做总览在需要了解整体时查阅。
 5. 完成启动和资料读取后，运行 `python3 scripts/workflow.py init`，按返回的当前阶段继续。每次进入新阶段，先在客户对话展示 `customer_message` 的用途解释，再操作；同一阶段已讲过的内容按 `display_instruction` 复用。解释时机见 `references/17-workflow-controller.md`，日常使用目标是电脑桌面端或 CLI，AdsPower 负责网页登录与授权。首次带做先读 `references/13-reader-guide.md`；第一个实质问题由 `intake` 阶段给出：“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”已有答案直接复用。其后的设备说明、Google、VPS、浏览器、手机和订阅均由统一阶段定义推进。`devices` 阶段确认设备后，当场展示返回的 `customer_message`，展示完成再提交 `setup_explained=true`；接着介绍阅读版，继续账号准备。原教程保留具体操作和配图。
 
 VPS 默认按 DMIT → 搬瓦工 → AKILE 逐家核对，目标套餐缺货再看下一家；默认付款周期分别为月付、季付、月付，下单前说明实际扣款总额和覆盖时长。年付或多年预付只在用户明确要求时比较。
 
-DMIT 库存入口固定为 https://www.dmit.io/cart.php ，默认已交付套餐是 Los Angeles → Premium → AS3 → LAX.AS3.Pro.TINY，参考价 10.90 美元/月。实际订购目录确认缺货后直接核对搬瓦工；价格页 Order Now、搜索摘要和旧图不作为有货依据。其他 DMIT 套餐需独立核实实际配置页，再说明“这个 DMIT 套餐目前没有交付实践；搬瓦工已有成熟适配经验，我们仍推荐搬瓦工”，展示线路和真实费用，由客户明确选择。其他套餐有货不改变默认推荐顺序。操作与程序字段见 references/18-vps-stock.md。
+VPS 型号、系统与软件版本由 `python3 scripts/workflow.py policy` 返回，源头为现有脚本常量；库存采集、缺货分流及替代套餐说明统一见 references/18-vps-stock.md。进入 VPS 阶段按 purchase_decision 继续。
 
 VPS 选型直接按默认商家、洛杉矶机房与目标套餐推进，不询问用户主要在哪个国家或地区使用，也不把所在地、城市、运营商作为默认选型的前置问题。用户主动提出特殊需求时再针对该需求调整；node_timezone 从所选节点机房城市取得。商家注册表中的本人资料由客户在实际注册步骤填写。
 
@@ -83,7 +83,7 @@ python3 scripts/workflow.py next
 
 ## 固定交付与故障修复
 
-新交付固定 Karing `1.2.25.2802`、3x-ui `3.10.2`、Xray `26.7.28`、REALITY `minClientVer=1.0.0`、目标 `www.cloudflare.com:443`、两端 SNI `www.cloudflare.com`。Mac 下载由当前阶段的 `download_karing` 动作执行。VLESS 参数导入客户端；AdsPower 使用实际可用的本机 HTTP 入口，混合端口也优先 HTTP。
+新交付版本、REALITY 与 SNI 固定组合从 `workflow.py policy` 读取。Mac 下载由当前阶段的 `download_karing` 动作执行。VLESS 参数导入客户端；AdsPower 使用实际可用的本机 HTTP 入口，混合端口也优先 HTTP。
 
 Karing 连接失败或 REALITY 握手错误，直接执行网络章节第十节：适用时 mixed → gvisor，校正节点参数、服务与时间，再用已有固定 REALITY 组合逐步修复并实测。切换后 Codex 断线先恢复可用线路，继续修复；每步实际结果由 AI 读取。
 
@@ -93,7 +93,7 @@ Windows 本机 HTTP 代理测通，但开启 TUN 后反复连接 VPS、测速卡
 
 ## 图文与资料复用
 
-首次完整阅读核心两篇；同版本连续带做按当前阶段回查具体小节，不重复通读。购买、配置、礼品卡兑换和订阅主动展示原教程对应图片，先核对内容和当前页面，再用本地图片绝对路径嵌入聊天。每次一个小目标，通常一张图。没有对应图时按实际页面指导。
+每轮按 reading 读取当前小节，完整诊断用 `next --full`，固定规则用 `policy`。购买、配置、礼品卡兑换和订阅主动展示原教程对应图片，先核对内容和当前页面，再用本地图片绝对路径嵌入聊天。每次一个小目标，通常一张图。没有对应图时按实际页面指导。
 
 PDF 位于 `assets/reading/`，给客户阅读；AI 按 Markdown 和控制层执行。开场说明与保存选择按阅读版章节完成，已有选择复用。找 PDF 内容时实际核对篇目和页码。进度和凭据只保存在 `.local/`，不提交到仓库。
 

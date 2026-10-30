@@ -284,6 +284,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertIn('exit_matches', resumed['missing'])
         self.assertIn('codex_reply_received', resumed['missing'])
         self.flow.submit(self.payload(self.data('computer_network')))
+        self.advance()
         self.assertEqual(self.flow.next()['stage'], 'browser')
         self.assertNotIn('troubleshooting', self.flow.next())
 

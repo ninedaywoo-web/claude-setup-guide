@@ -2,6 +2,7 @@
 from copy import deepcopy
 from pathlib import Path
 from network_server import SERVER_OS_INSTRUCTION
+from vps_purchase import DMIT_DESCRIPTION
 
 ROOT = Path(__file__).resolve().parents[1]
 GOOGLE_IMAGES = [f'assets/google-account/{name}-original.png' for name in
@@ -41,7 +42,7 @@ CARDS = {
     'google_login': card('从手机 Claude 进入 Google 登录', 'login', '08-google-account.md', instruction='打开手机官方 Claude 的 Google 登录入口，输入准备好的账号。看当前验证页面，身份验证器用 google_2fa，短信／恢复邮箱／备用码用 google_other_verification。'),
     'google_other_verification': card('短信、恢复邮箱或备用码验证', 'login', '08-google-account.md', instruction='先辨认页面要求的验证方式，说明去哪里取得对应验证码；这类输入框按实际页面完成。需要更换验证方式时查看页面的“尝试其他方式”。'),
     'vps_dmit': card('DMIT 选购与开通', 'vps', '01-network.md', pics('images/network', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08-redacted.png'),
-                     '按当前小步骤选图：套餐、系统、订单、结算、服务器资料；原图 AN5 与 9.99 美元作界面示例，当前默认已交付套餐为 AS3 Premium 的 LAX.AS3.Pro.TINY，参考价 10.90 美元/月。库存从 cart.php 读取，按 references/18-vps-stock.md 核对及选择后再给付款指引。' + SERVER_OS_INSTRUCTION),
+                     '按当前小步骤选图：套餐、系统、订单、结算、服务器资料；原图 AN5 与 9.99 美元作界面示例，当前默认已交付套餐为 ' + DMIT_DESCRIPTION + '。库存从 cart.php 读取，按 references/18-vps-stock.md 核对及选择后再给付款指引。' + SERVER_OS_INSTRUCTION),
     'vps_bandwagon': card('搬瓦工注册与购买', 'vps', '09-vps-purchase.md', pics('vps-purchase', 'bandwagon-register-1.png', 'bandwagon-register-2.png', 'bandwagon-register-3.png', 'bandwagon-register-4.png', 'bandwagon-plan.png'),
                          '按客户当前注册或选套餐页面选择对应的一张图，已有账号直接进入选套餐步骤。'),
     'vps_akile': card('AKILE 套餐选择', 'vps', '09-vps-purchase.md', pics('vps-purchase', 'akile-plan.png'), '当前是套餐选购图，注册字段按实际页面逐项说明。'),
@@ -108,12 +109,26 @@ def eligible(topic, state):
     return True
 
 
+def alipay_instructions():
+    import re
+    chapter = (ROOT / 'references/03-apple.md').read_text(encoding='utf-8')
+    url = re.search(r'\[(https://render\.alipay\.com/[^\]]+)\]', chapter)[1]
+    return ('**买礼品卡首推支付宝。iPhone 直接用备忘录跳转小程序：**\n'
+            '1. 复制下面这条完整链接，打开「备忘录」，新建一条备忘录并粘贴。\n'
+            '2. 点备忘录里的链接，出现打开支付宝的提示时，选择「打开」。\n'
+            '3. 看到支付宝内的礼品卡购买页面后，核对美区、金额和商家，再继续购买。\n\n'
+            '[复制这条完整跳转链接](' + url + ')\n\n' + url + '\n\n'
+            '若点开后没有进入小程序，停在当前页面，告诉我页面提示或发截图，我按这个跳转入口继续帮您定位。')
+
+
 def guide(topic, state, stage, step=None):
     if not isinstance(topic, str) or topic not in CARDS:
         raise ValueError('unknown_teaching_topic')
     if not eligible(topic, state):
         raise ValueError('teaching_topic_not_for_current_device_or_seller')
     item = deepcopy(CARDS[topic])
+    if topic == 'gift_alipay':
+        item['instruction'] = alipay_instructions()
     images = item['images']
     if step is None and len(images) > 1 and topic not in ('google_materials', 'google_2fa'):
         step = 1
@@ -164,7 +179,11 @@ def attach(result, state):
     if result.get('status') == 'needs_support' or data.get('purchase_restricted') is True:
         default = 'apple_support' if eligible('apple_support', state) else None
     elif result.get('status') != 'waiting':
-        if stage == 'google' and data.get('account_origin') == 'purchased' and data.get('account_available') is True:
+        if (stage == 'payment_preparation' and data.get('store_signed_in') is True
+                and data.get('gift_channel') in (None, 'alipay') and data.get('gift_entry') != 'opened'
+                and data.get('payment_ready') is not True):
+            default = 'gift_alipay'
+        elif stage == 'google' and data.get('account_origin') == 'purchased' and data.get('account_available') is True:
             default = 'google_materials'
         elif stage == 'google' and data.get('account_available') is False:
             default = {'chuhai91':'chuhai_register', 'gmailbuy':'gmailbuy'}.get(data.get('purchase_channel'))
@@ -189,6 +208,10 @@ def attach(result, state):
     if (isinstance(selected, str) and selected in CARDS and stage in CARDS[selected]['stages'] and eligible(selected,state)
             and result.get('status') not in ('waiting', 'needs_support')
             and data.get('purchase_restricted') is not True
+            and not (stage == 'payment_preparation' and data.get('gift_channel') == 'alipay' and selected == 'gift_official')
+            and not (stage == 'payment_preparation' and data.get('store_signed_in') is True
+                     and data.get('gift_channel') in (None, 'alipay') and data.get('gift_entry') != 'opened'
+                     and data.get('payment_ready') is not True)
             and not (stage == 'subscription' and data.get('order_confirmed') is True)):
         default = selected
     if default and eligible(default,state):
@@ -204,7 +227,8 @@ def attach(result, state):
         if not result.get('customer_message'):
             result['customer_message'] = result['default_teaching']['customer_message']
         elif result['default_teaching']['image_markdown']:
-            result['customer_message'] += '\n\n' + '\n\n'.join(result['default_teaching']['image_markdown'])
+            result['customer_message'] += ''.join('\n\n' + markup for markup in result['default_teaching']['image_markdown']
+                                                 if markup not in result['customer_message'])
         if result['default_teaching']['missing_images'] and result['default_teaching']['fallback_document']:
             result['customer_message'] += '\n\n图片暂未能读取，' + result['default_teaching']['fallback_document']
     result['display_instruction'] = result.get('display_instruction','') + ' ' + POLICY + ' 已到后续小步时，先用 guide 对应页替换阶段起点参考图，本轮只展示当前操作的图。'

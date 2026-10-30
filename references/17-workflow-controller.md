@@ -184,3 +184,29 @@ python3 scripts/workflow.py change --scope timezone --reason '用户选择台北
 | 下载哪个 App、在哪里升级、付不了款 | `claude_app`、`claude_subscribe`、`apple_support`，按当前页面分别展示。 |
 
 讲解可以先进行；实际登录、网络切换、充值和付款遵循原阶段和用户选择。等待期间用户问兑换步骤，可以讲图，但保持原等待状态。原图中的设备、账户、价格和配置是示例，按当前实际信息操作。图片缺失或显示失败时给出可打开的原图片／对应 PDF 链接，并继续用当前页面说明；记录实际情况后补齐展示。保留原图片、箭头、顺序和后续教学正文。
+
+## 当前操作资料与实际回执
+
+`init`、`next`、`submit`、`run` 默认返回精简视图：当前阶段、缺项、提交入口、客户说明与原图、当前阅读小节。完整诊断使用 `next --full`；图解目录使用 `guide`，固定型号、系统和软件版本使用 `policy`。精简只影响返回资料，完整观察、历史和等待安排仍保存在统一状态。
+
+- 新购服务器的服务端阶段要求 `server_deploy` 或 `server_export` 成功读回；`mode=existing` 不能替代本次新购部署验收。已有正常节点沿原复用路径继续。
+- 电脑网络阶段统一要求 `probe_proxy`、`probe_system` 两个实际回执。先按 references/14-scripted-execution.md 填好 `.local/network/input.json` 的本机 HTTP 入口和预期出口，再通过 `run` 检测；缺少检测配置时先补配置。回执分别填写 HTTP 代理、实际出口和 HTTPS 结果，其余界面与手机动作按实际观察或客户反馈提交。
+- VPS 库存先通过 `vps_capture` 采集本次页面，再在观察中引用回执和原文。具体输入、浏览器采集方法见 references/18-vps-stock.md。
+- 需要买礼品卡时首推支付宝，直接调用 `guide --topic gift_alipay`，直接展示原图、完整跳转链接及“复制到 iPhone 备忘录 → 点链接 → 打开支付宝”的步骤。已完成 Apple 账户检查并进入充值准备时主动返回这条路径，省去支付宝内搜索步骤。沿用用户选择的支付宝渠道；跳转异常先查看实际提示，客户选择其他渠道后再切换。
+
+维护时，普通回归继续使用 `python3 -m unittest discover -s tests`。真实模型演练单独运行 `python3 tests/model_replay.py --output .local/model-replay`，使用本机 Codex CLI 的当前模型与登录状态，在临时项目副本中处理真实口语，保存调用日志和客户回复。演练只写临时流程状态，不操作真实设备或支付；常规测试不会调用模型。
+
+
+观察提交可直接使用标准输入，减少中间 JSON 文件：
+
+```bash
+python3 scripts/workflow.py submit --input - <<'JSON'
+{"stage":"当前阶段","ticket":"next 返回的票据","source":{"kind":"user","reference":"客户本轮具体反馈"},"data":{"填写当前实际观察字段":"实际值"}}
+JSON
+```
+
+使用当前票据和真实字段替换示例。`source` 是观察来源说明；检测结果以执行回执为准。
+
+连续场景验收用 `python3 tests/model_replay.py --journey gift --journey vps --journey google --journey server --journey network --model <本机可用模型> --output .local/journey-validation`。按本次改动选择相关旅程：礼品卡入口到兑换、库存采集到服务器交接、Google 购买到账号资料和重复求助、系统检查失败后恢复、网络检测失败后复测；每轮保存输入、模型执行日志、实际回复与流程状态。VPS 演练使用固定页面快照；server 和 network 旅程只替换 SSH／网络外部边界，流程控制、系统规则与回执使用真实实现。报告明确区分模拟外部结果与现场检查。真实模型测试完成后逐轮复核回复；普通回归同时覆盖检测回执、失败重试和实际脚本入口。
+
+Windows PowerShell 提交观察时可用单引号 here-string（`@'` 与 `'@` 各占一行）将 JSON 原文通过管道传给 `python scripts/workflow.py submit --input -`；或继续使用现有 JSON 文件输入。

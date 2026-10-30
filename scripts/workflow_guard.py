@@ -5,6 +5,7 @@ from pathlib import Path
 
 
 PERMITS = {
+    'vps:capture': ('vps_capture',),
     'cleanup:audit': ('cleanup_audit',), 'cleanup:apply': ('cleanup_apply',),
     'cleanup:restore': ('cleanup_restore',),
     'download_karing': ('download_karing',),

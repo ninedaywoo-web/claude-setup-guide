@@ -121,10 +121,9 @@ class Workflow:
         result = validation(stage, data, self.state, self.clock())
         missing = list(result.get('missing', []))
         required = []
-        if stage['id'] == 'server' and data.get('mode') == 'scripted':
+        if stage['id'] == 'server' and (data.get('mode') == 'scripted' or facts(self.state, 'vps').get('vps_origin') == 'purchase'):
             required = [('server_readback', ('server_deploy', 'server_export'))]
-        config_path = self.root / '.local/network/input.json'
-        if stage['id'] == 'computer_network' and config_path.exists() and 'probe' in read(config_path):
+        if stage['id'] == 'computer_network':
             required = [('probe_proxy', ('probe_proxy',)), ('probe_system', ('probe_system',))]
         for name, actions in required:
             receipt = next((item for item in reversed(self.state['receipts'])
@@ -142,6 +141,17 @@ class Workflow:
         if missing:
             return {**result, 'valid': False, 'missing': sorted(set(missing))}
         return result
+
+    def purchase_decision(self, data):
+        from vps_purchase import evaluate
+        latest = {}
+        for receipt in self.state['receipts']:
+            if receipt['action'] == 'vps_capture' and receipt['success']:
+                page = receipt['result']
+                latest[(page['vendor'], page['url'])] = (receipt['id'], page)
+        return evaluate(data.get('purchase_checks'), self.clock(),
+                        alternatives=data.get('dmit_alternatives'), choice=data.get('purchase_choice'),
+                        captures=dict(latest.values()))
 
     def projection(self):
         self.require_state()
@@ -188,6 +198,8 @@ class Workflow:
                   'progress': progress}
         if 'score_advice' in checked:
             result['score_advice'] = checked['score_advice']
+        if stage['id'] == 'vps':
+            result['purchase_decision'] = self.purchase_decision(facts(self.state, 'vps'))
         if stage['id'] == 'devices' and facts(self.state, 'devices').get('setup_explained') is not True:
             result['customer_message'] = DEVICE_GUIDANCE
             result['next_action'] = ('确认电脑和手机类型后，在对话中展示 customer_message 的设备搭配说明；'
@@ -250,6 +262,8 @@ class Workflow:
             raise WorkflowError('立即继续需记录客户明确选择，source.kind=user')
         if data.get('score_review') == 'continue' and source['kind'] != 'user':
             raise WorkflowError('继续使用偏离结果需记录客户选择，source.kind=user')
+        if view['stage'] == 'payment_preparation' and data.get('gift_channel') in ('apple_official', 'already_funded') and source['kind'] != 'user':
+            raise WorkflowError('其他购买渠道或已有余额按客户明确反馈记录，source.kind=user；默认首推支付宝备忘录入口')
         if view['stage'] in ('browser', 'phone_network') and 'scores' in data and data['scores'] != existing.get('scores'):
             existing = {k: v for k, v in existing.items() if k not in ('score_review', 'score_review_note')}
         if view['stage'] == 'devices' and any(k in data and k in existing and data[k] != existing[k] for k in ('computer', 'phone')):
@@ -267,9 +281,7 @@ class Workflow:
                 if merged.get('vps_origin') not in ('existing', 'purchase'):
                     raise WorkflowError('先记录 vps_origin=existing（已有 VPS）或 purchase（本次购买）')
                 if merged['vps_origin'] == 'purchase':
-                    from vps_purchase import evaluate
-                    if not evaluate(merged.get('purchase_checks'), self.clock(), alternatives=merged.get('dmit_alternatives'),
-                                    choice=merged.get('purchase_choice'))['can_purchase']:
+                    if not self.purchase_decision(merged)['can_purchase']:
                         raise WorkflowError('先核对目标套餐实际订购页，取得可购买结果后再记录开通')
         if view['stage'] == 'google':
             # A missing account becoming available follows the purchase route;
@@ -324,6 +336,10 @@ class Workflow:
             raise WorkflowError('action_out_of_stage: ' + str(view['stage']))
         _, args = ACTIONS[action]
         args = list(args)
+        if action == 'vps_capture':
+            if input_path is None:
+                raise WorkflowError('提供包含 vendor、url 的页面采集输入')
+            args += ['--input', str(input_path)]
         if action == 'cleanup_apply':
             args.append('--apply')
         if action == 'cleanup_restore':
@@ -403,7 +419,8 @@ class Workflow:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('init', 'next', 'status', 'submit', 'run', 'change', 'guide'))
+    parser.add_argument('action', choices=('init', 'next', 'status', 'submit', 'run', 'change', 'guide', 'policy'))
+    parser.add_argument('--full', action='store_true', help='返回完整诊断字段；默认只返回当前操作所需资料')
     parser.add_argument('--input', type=Path)
     parser.add_argument('--action', dest='script_action', choices=tuple(ACTIONS))
     parser.add_argument('--scope', choices=tuple(INVALIDATES))
@@ -412,6 +429,10 @@ def main():
     parser.add_argument('--step', type=int)
     args = parser.parse_args()
     try:
+        if args.action == 'policy':
+            from workflow_view import policy
+            print(json.dumps(policy(), ensure_ascii=False, indent=2))
+            return 0
         if args.action == 'guide':
             print(json.dumps(Workflow(ROOT).guide(args.topic, args.step), ensure_ascii=False, indent=2))
             return 0
@@ -423,7 +444,7 @@ def main():
             if args.action == 'submit':
                 if args.input is None:
                     raise WorkflowError('submission_input_required')
-                result = workflow.submit(read(args.input))
+                result = workflow.submit(json.load(sys.stdin) if str(args.input) == '-' else read(args.input))
             elif args.action == 'run':
                 result = workflow.run(args.script_action, args.input)
             elif args.action == 'change':
@@ -432,6 +453,9 @@ def main():
                 result = workflow.next()
                 workflow.save()
         result = workflow_output(ROOT, result)
+        if not args.full:
+            from workflow_view import compact
+            result = compact(result)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return int(args.action == 'run' and not result['execution']['success'])
     except (ValueError, OSError, KeyError, Failure) as exc:

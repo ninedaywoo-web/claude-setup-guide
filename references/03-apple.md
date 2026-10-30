@@ -156,13 +156,13 @@ AI 按下面的情况接着带做：
 
 ![](../assets/images/apple/13.jpg)
 
-### 2. 支付宝购买礼品卡（最方便）
+### 2. 支付宝购买礼品卡（首推：备忘录直达小程序）
 
-没有信用卡的话，只能找第三方平台用支付宝买。 我的建议是：挑口碑好、有售后的平台，别贪那几块钱的差价去找来路不明的小店。先完成账户检查和等待安排，准备充值时再购买礼品卡；卡密拿到后按本次充值流程兑换，兑换前别截图发给任何人。
+需要购买礼品卡时，首推支付宝小程序，直接按下面的备忘录链接进入。我的建议是：挑口碑好、有售后的平台，别贪那几块钱的差价去找来路不明的小店。先完成账户检查和等待安排，准备充值时再购买礼品卡；卡密拿到后按本次充值流程兑换，兑换前别截图发给任何人。
 
 ![](../assets/images/apple/14.jpg)
 
-找不到可以复制这一段到备忘录，直接跳转支付宝小程序：[https://render.alipay.com/p/s/i/?scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FappId%3D2021001165662428%26page%3Dpages%252Fredirect%252Fredirect%253FappId%253D2021003191605547%26enbsv%3D0.2.2507280946.43%26chInfo%3Dch_share__chsub_CopyLink%26fxzjshareChinfo%3Dch_share__chsub_CopyLink%26apshareid%3DA6364F5A-E354-477C-A944-0B4A1390FC24%26shareBizType%3DH5App_XCX%26shareTimestamp%3D1772934191191](https://render.alipay.com/p/s/i/?scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FappId%3D2021001165662428%26page%3Dpages%252Fredirect%252Fredirect%253FappId%253D2021003191605547%26enbsv%3D0.2.2507280946.43%26chInfo%3Dch_share__chsub_CopyLink%26fxzjshareChinfo%3Dch_share__chsub_CopyLink%26apshareid%3DA6364F5A-E354-477C-A944-0B4A1390FC24%26shareBizType%3DH5App_XCX%26shareTimestamp%3D1772934191191)
+**iPhone 操作：**复制下面完整链接 → 打开「备忘录」并新建一条 → 粘贴链接 → 点备忘录中的链接 → 提示打开支付宝时点「打开」。看到支付宝内的礼品卡页面就完成入口步骤，接着选择美区与所需金额，购买后按下方原教程兑换。原图用于辨认小程序和商品，入口直接用这个链接：[https://render.alipay.com/p/s/i/?scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FappId%3D2021001165662428%26page%3Dpages%252Fredirect%252Fredirect%253FappId%253D2021003191605547%26enbsv%3D0.2.2507280946.43%26chInfo%3Dch_share__chsub_CopyLink%26fxzjshareChinfo%3Dch_share__chsub_CopyLink%26apshareid%3DA6364F5A-E354-477C-A944-0B4A1390FC24%26shareBizType%3DH5App_XCX%26shareTimestamp%3D1772934191191](https://render.alipay.com/p/s/i/?scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FappId%3D2021001165662428%26page%3Dpages%252Fredirect%252Fredirect%253FappId%253D2021003191605547%26enbsv%3D0.2.2507280946.43%26chInfo%3Dch_share__chsub_CopyLink%26fxzjshareChinfo%3Dch_share__chsub_CopyLink%26apshareid%3DA6364F5A-E354-477C-A944-0B4A1390FC24%26shareBizType%3DH5App_XCX%26shareTimestamp%3D1772934191191)
 
 ### 礼品卡兑换 ✅
 

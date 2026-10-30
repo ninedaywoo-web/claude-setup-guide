@@ -315,7 +315,7 @@ def start_latest(destination,auth=None,progress_from=None):
                 raise UpdateError('目标目录已被创建，停止覆盖。')
             new.rename(dest)
         return dict(receipt,status='ready',read_next=str(dest/'SKILL.md'),reader_directory=str(dest/'assets/reading'),
-                    message='已下载并校验最新项目完整包，包含供 AI 执行的程序／流程、操作配图和给您阅读的 PDF 教程。PDF 已在项目的 assets/reading 文件夹内；稍后询问的是是否把 PDF 另存到方便阅读的位置，不是是否下载程序。请从本目录重新读取 Skill 和核心正文，再开始带做。')
+                    message='已下载并校验最新项目完整包，包含供 AI 执行的程序／流程、操作配图和给您阅读的 PDF 教程。PDF 已在项目的 assets/reading 文件夹内；稍后询问的是是否把 PDF 另存到方便阅读的位置，不是是否下载程序。请从本目录读取 Skill，启动统一流程并按 reading 读取当前小节，再开始带做。')
     raise UpdateError('下载期间仓库连续更新，尚未确认最新版本，请重新执行 start；暂停带做。')
 
 def main():

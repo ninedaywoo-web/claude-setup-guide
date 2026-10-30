@@ -44,7 +44,7 @@ BROWSER_GUIDANCE = """**这套流程完成后，您可以用 Claude 桌面版，
 VPS_GUIDANCE = """VPS 就是您租用的一台远程服务器，我们把它配置成自己的魔法节点。您在网站完成购买，Codex 会接着帮您部署，再把电脑和手机连接到这条线路。这里准备的是自己的节点，平时购买的共享梯子套餐另作配置期间的联网工具。
 
 您目前是还没买 VPS、已买但没配置，还是已经有可用的自建节点？已有的可以先核对并复用；没有就跟着下面的图解准备。"""
-VPS_PURCHASE_GUIDANCE = '需要购买时，默认按 **DMIT → 搬瓦工 → AKILE** 选：先从 [DMIT 实际订购目录](https://www.dmit.io/cart.php) 核对已成功交付的洛杉矶 Premium → AS3 → LAX.AS3.Pro.TINY，参考价 10.90 美元/月；缺货就核对并推荐有成熟适配经验的搬瓦工 USCA_9 的 1 GB 档，搬瓦工也缺货再看 AKILE LAXPremium-Mini。默认分别按月付、季付、月付准备；我会在下单前列清本次实际付款总额、覆盖时长和续费金额。'
+from vps_purchase import PURCHASE_GUIDANCE as VPS_PURCHASE_GUIDANCE
 NETWORK_GUIDANCE = '电脑上的代理客户端负责连接 VPS 节点。TUN 负责接管电脑流量，全局模式让流量走选定的节点；我们会先保留旧 VPN，单独测通新节点，再切换并确认 Codex 能继续回复。'
 PHONE_GUIDANCE = '手机主要承担首次登录和订阅付款。我们先给手机配置好网络，再通过 Claude 的 iOS 内购完成订阅，之后回电脑的 Claude 桌面端或 CLI 使用。Apple 负责这笔内购订单，后续需要申请退款，也从 Apple 的入口处理。'
 CHECK_GUIDANCE = '配好后，我会带您用 [NetCoffee](https://ip.net.coffee/claude/)、[Ping0](https://ping0.cc/) 和 [Scamalytics](https://scamalytics.com/ip) 这三个网站检查网络。电脑先检查一次，手机配好后再检查一次，确认两台设备都在使用我们配置的目标线路，再继续登录和订阅。'
@@ -127,7 +127,7 @@ def customer_output(result, state, now):
         result['verification_images'] = GOOGLE_VERIFICATION_IMAGES.copy()
     if key == 'vps':
         from vps_purchase import POLICY, evaluate
-        purchase = evaluate(data.get('purchase_checks'), now, alternatives=data.get('dmit_alternatives'), choice=data.get('purchase_choice'))
+        purchase = result.get('purchase_decision') or evaluate(data.get('purchase_checks'), now, alternatives=data.get('dmit_alternatives'), choice=data.get('purchase_choice'), captures={})
         result['purchase_decision'] = purchase
         result['purchase_instruction'] = POLICY
         messages.extend([VPS_GUIDANCE, VPS_PURCHASE_GUIDANCE] if not data.get('vps_origin') else [VPS_PURCHASE_GUIDANCE])
@@ -138,7 +138,8 @@ def customer_output(result, state, now):
                                  '年付或多年预付只在用户明确要求时比较。三家都缺货则确认等待或在这三家内比较其他同线路套餐。'
                                  '已有客户选择按其要求继续；准备好 VPS 与 SSH 访问后提交本阶段观察。')
         result['next_action'] += (' 先提交 vps_origin=existing 或 purchase；本次购买先按 purchase_instruction 核对并提交 purchase_checks，'
-                                  '用返回的 purchase_decision 决定查看哪家。can_purchase=true 才给付款指引。' + POLICY)
+                                  '先 run --action vps_capture --input 页面输入.json 采集页面，观察填写 receipt_id 并逐字引用 evidence；'
+                                  '可购买还需 billing_evidence 引用周期、本次金额和续费金额。用返回的 purchase_decision 决定查看哪家。can_purchase=true 才给付款指引。')
         if facts(state, 'vps').get('vps_origin') == 'purchase':
             for observation in purchase['checked']:
                 if observation['status'] == 'available':
@@ -297,6 +298,16 @@ def customer_output(result, state, now):
     if key == 'payment_preparation' and device.get('phone') != 'android':
         if result.get('status') not in ('waiting', 'needs_support'):
             messages.append('先确认 Apple 账号和等待安排，准备好后按下面流程充值和订阅。' + GIFT_GUIDANCE)
+            if data.get('store_signed_in') is True and data.get('gift_channel') in (None, 'alipay') and data.get('gift_entry') != 'opened':
+                from workflow_teaching import guide
+                alipay = guide('gift_alipay', state, key)
+                messages.append(alipay['customer_message'])
+                result['customer_images'] = alipay['customer_images']
+            if data.get('store_signed_in') is True and data.get('gift_channel') in (None, 'alipay') and data.get('gift_entry') != 'opened':
+                result['next_action'] = ('需要买礼品卡，首推支付宝：直接展示 gift_alipay 的完整小程序链接、备忘录步骤和原图，省去搜索入口。'
+                    '看到支付宝内购买页后提交 gift_entry=opened，继续原教程的美区、金额、购买和兑换步骤。沿用支付宝渠道。')
+            result['gift_help_instruction'] = ('需要买礼品卡时首推支付宝，直接展示备忘录小程序跳转链接和原图；省去搜索入口。客户选择后记录 gift_channel=alipay；说找不到时记录 gift_entry=missing，'
+                '直接给备忘录小程序跳转路径。其他购买渠道由客户明确选择。')
     if key == 'payment_preparation' and device.get('phone') == 'android':
         messages.append(ANDROID_PAYMENT)
     if key == 'subscription' and data.get('order_confirmed') is True and data.get('pro_visible') is True and data.get('purchase_restricted') is not True:

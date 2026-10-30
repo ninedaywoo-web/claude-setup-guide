@@ -81,6 +81,15 @@ class WorkflowTests(unittest.TestCase):
                 'data': data if data is not None else self.data(view['stage'])}
 
     def advance(self):
+        if self.flow.next()['stage'] == 'computer_network':
+            # Stage-transition fixtures supply successful execution results;
+            # separate receipt tests exercise missing and failed probes.
+            good = lambda *a, **k: SimpleNamespace(returncode=0, stdout=json.dumps(
+                {'status': 'passed', 'exit_matches': True, 'https_204': True}))
+            self.flow.run('probe_proxy', runner=good)
+            self.flow.run('probe_system', runner=good)
+            if self.flow.next()['stage'] != 'computer_network':
+                return self.flow.next()
         return self.flow.submit(self.payload())
 
     def reach(self, target):
@@ -184,6 +193,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertNotIn('tun_enabled', self.flow.next()['missing'])
         data = self.data('computer_network'); del data['tun_enabled']
         self.flow.submit(self.payload(data))
+        self.advance()
         self.assertEqual(self.flow.next()['stage'], 'browser')
 
     def test_duplicate_submission_idempotent_and_stale_ticket_rejected(self):
@@ -428,7 +438,7 @@ class WorkflowTests(unittest.TestCase):
             with self.subTest(scope=scope):
                 self.flow.state = deepcopy(baseline)
                 self.flow.invalidate(scope, 'configuration changed without editing network JSON')
-                self.reach('computer_network'); self.advance()
+                self.reach('computer_network'); self.flow.submit(self.payload())
                 self.assertEqual(self.flow.next()['stage'], 'computer_network')
                 self.assertEqual(self.flow.next()['missing'], ['probe_proxy', 'probe_system'])
                 self.flow.run('probe_proxy', runner=good)

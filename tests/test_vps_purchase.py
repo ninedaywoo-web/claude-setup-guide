@@ -118,7 +118,20 @@ class PurchaseEvidenceTests(unittest.TestCase):
 class PurchaseWorkflowTests(unittest.TestCase):
     setUp = fixtures.WorkflowTests.setUp
     data = fixtures.WorkflowTests.data
-    payload = fixtures.WorkflowTests.payload
+    def payload(self, data=None):
+        # These tests isolate purchasing policy. Capture integration is exercised
+        # with actual saved page files in test_capture_receipts.py.
+        if data:
+            items = list(data.get('purchase_checks', {}).items())
+            items += [('dmit', x) for x in data.get('dmit_alternatives', [])]
+            for vendor, item in items:
+                key = 'fixture-' + vendor + '-' + item['plan']
+                billing = ('Quarterly' if item.get('cycle') == 'quarterly' else 'Monthly') + ' ' + str(item.get('amount', 10.90)) + ' ' + item.get('currency', 'USD')
+                item.update(receipt_id=key, billing_evidence=billing)
+                self.flow.state['receipts'].append({'id': key, 'action': 'vps_capture', 'success': True,
+                    'result': {'vendor': vendor, 'url': item['url'], 'checked_at': item['checked_at'],
+                               'page': item['page'], 'text': item['evidence'] + '\n' + billing}})
+        return fixtures.WorkflowTests.payload(self, data)
     advance = fixtures.WorkflowTests.advance
     reach = fixtures.WorkflowTests.reach
 

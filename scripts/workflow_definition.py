@@ -77,6 +77,7 @@ INVALIDATES = {
 OBJECT_FIELDS = {'browser': 'profile_ref', 'payment_preparation': 'apple_account_ref', 'phone_proxy': 'apple_account_ref'}
 
 ACTIONS = {
+    'vps_capture': ('vps', ['vps_capture.py']),
     'cleanup_audit': ('cleanup', ['cleanup.py', '--audit']),
     'cleanup_apply': ('cleanup', ['cleanup.py']),
     'cleanup_restore': ('cleanup', ['cleanup.py']),
@@ -105,7 +106,9 @@ OPTIONAL_FIELDS = {
                'purchase_channel': ('chuhai91', 'gmailbuy'), 'materials_explained': True, 'materials_images_shown': 'google_images'},
     'devices': {'pdf_save_choice': ('yes', 'no', 'unanswered'), 'pdf_saved_path': 'text'},
     'phone_proxy': {**APPLE_OPTIONAL, 'client_available': True},
-    'payment_preparation': {**APPLE_OPTIONAL, 'route_accepted': True},
+    'payment_preparation': {**APPLE_OPTIONAL, 'route_accepted': True,
+                            'gift_channel': ('alipay', 'apple_official', 'already_funded'),
+                            'gift_entry': ('missing', 'opened')},
     'browser': {'score_review': ('rechecked', 'continue'), 'score_review_note': 'text'},
     'phone_network': {'score_review': ('rechecked', 'continue'), 'score_review_note': 'text'},
     'subscription': {'purchase_restricted': False, 'support_case': 'text', 'support_retry_at': 'date'},

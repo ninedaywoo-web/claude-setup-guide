@@ -1,5 +1,11 @@
 # 更新记录
 
+## 1.0.61 · 2026-11-23
+
+- 新增启动前上下文自检与前置空白对话提醒（`README.md`、`SKILL.md`、`references/12-latest-start.md`）：全新空白对话静默放行；检测到旧对话已有无关任务上下文时立即暂停，请客户新建空白对话再粘贴原指令（客户明确回复「继续当前对话」则忽略旧话题起步）。
+- 补齐极简全局红线（`SKILL.md`、`workflow_messages.py`）：每轮推进以 `workflow.py` 为准，禁止口头“已记录”跳过控制层；进入 `login` 阶段前严禁打开或点击登录 Claude 桌面版、创建账户或代发测试消息，严禁在普通浏览器（非 AdsPower）登录新 Google 账号或执行 Claude 授权。
+- 收紧 `cleanup` 阶段代码校验（`workflow.py`、`workflow_definition.py`）：`outcome=cleaned` 默认绑定本阶段 `cleanup_audit` 或 `cleanup_apply` 执行回执（仅浏览器或仅手机封禁时使用 `cleanup_mode=browser_only/phone_only`），并拒绝仅“退出登录（Log out）”冒充清理。
+
 ## 1.0.60 · 2026-11-19
 
 - Google 账号准备只问能否登录 Google／Gmail。从未用过 Claude 的自有 Gmail 可以复用；客户只谈到 Claude 账号时，继续确认 Gmail。

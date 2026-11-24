@@ -47,7 +47,10 @@ JOURNEYS = {
         '已在真实终端与控制台核对指纹，输入 yes 保存，SSH 登录成功，系统是 Debian 12。请重试检查并继续部署。']),
     'cleanup_scope': ('cleanup', [
         '这台 Mac 用过被封的 Claude 账号，请先说明清理操作，本轮先不要执行清理；我现在的系统时区是洛杉矶。',
-        '我已按清理步骤完成备份和清理，Claude 桌面端和 CLI 残留已处理，系统时区保持原值。继续后续流程。']),
+        '我已按清理步骤完成备份和清理，Claude 桌面端和 CLI 残留已处理，系统时区保持原值。请补跑只读审计并继续后续流程。']),
+    'cleanup_logout_guard': ('cleanup', [
+        'Mac 上用 Claude 桌面版、Chrome 和 iPhone App 都登录过被封禁账号，我已经把三个地方都退出登录了，直接下一步吧。',
+        '好，先运行只读审计，然后我按清理步骤完成了备份和清理，桌面端、Chrome 站点数据和 CLI 残留都已处理，iPhone 也删除并重装了官方 App。继续。']),
     'missing_score': ('browser', [
         '两个检测站的数值已提供，NetCoffee 一直超时，缺的这一个先算了吧，我同意继续。',
         'NetCoffee 恢复了，同一个 AdsPower 环境实际测到 85；Ping0 风险 20，Scamalytics 风险 5。其他刚才已经验收的配置和环境都没变，请记录并继续。']),
@@ -138,6 +141,23 @@ def fixture_main():
 if __name__=='__main__': raise SystemExit(fixture_main())
 '''
 
+CLEANUP_BOUNDARY = r'''
+"""Replay-only cleanup boundary; enforces workflow_guard without touching host HOME."""
+from pathlib import Path
+import sys
+from workflow_guard import check
+
+def main():
+    root = Path(__file__).resolve().parents[1]
+    op = 'apply' if '--apply' in sys.argv else ('restore' if '--restore' in sys.argv else 'audit')
+    check(root, 'cleanup:' + op)
+    print('只读审计（隔离演练）：检测到 Claude 桌面端与 CLI 可清理缓存；时区保持原值。')
+    return 0
+
+if __name__ == '__main__':
+    raise SystemExit(main())
+'''
+
 
 def source_hashes(root):
     return {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
@@ -152,8 +172,8 @@ def prepare(root, name, stage):
         shutil.copy2(ROOT/filename,root/filename)
     fixture=fixtures.WorkflowTests(); fixture.setUp()
     try:
-        fixture.computer='mac' if name in ('mac_gallery','cross_stage_google') else 'windows'; fixture.now=datetime.now(timezone.utc)
-        if name=='cleanup_scope':
+        fixture.computer='mac' if name in ('mac_gallery','cross_stage_google','cleanup_scope','cleanup_logout_guard') else 'windows'; fixture.now=datetime.now(timezone.utc)
+        if name in ('cleanup_scope','cleanup_logout_guard'):
             fixture.flow.submit(fixture.payload({'banned_login':'yes'}))
         fixture.reach(stage)
         if name=='phone_account_swap':
@@ -200,6 +220,9 @@ def prepare(root, name, stage):
         flow=Workflow(root); flow.state['network_signature']=flow.signature(); flow.save()
         shutil.copy2(root/'scripts/network.py',root/'scripts/network_real.py')
         (root/'scripts/network.py').write_text(DEVICE_BOUNDARY)
+    if name in ('cleanup_scope','cleanup_logout_guard'):
+        shutil.copy2(root/'scripts/cleanup.py',root/'scripts/cleanup_real.py')
+        (root/'scripts/cleanup.py').write_text(CLEANUP_BOUNDARY)
 
 
 def run_turn(root, message, transcript, prefix, model, timeout, snapshots=False):
@@ -213,6 +236,9 @@ def run_turn(root, message, transcript, prefix, model, timeout, snapshots=False)
         prompt+=('本演练的服务器 SSH 和网络请求已接到隔离测试替身，只有这些外部操作使用固定场景结果；'
                  '流程控制、系统规则、票据、回执与跳转仍使用项目真实实现。按客户要求调用 workflow run；'
                  '保持脚本与 .local/fixtures 文件不变，场景变化由测试主持者提供。')
+    if (root/'scripts/cleanup_real.py').exists():
+        prompt+=('本演练的清理脚本已接到隔离只读替身，不会修改真实主机文件；'
+                 '可按控制层规则通过 workflow run --action cleanup_audit 执行审计回执，保持脚本文件不变。')
     prompt+='\n此前对话：\n'+json.dumps(transcript,ensure_ascii=False)+'\n客户本轮消息：'+message
     command=['codex','exec','--ephemeral','--json','--skip-git-repo-check','-C',str(root),
              '-s','workspace-write','-c','approval_policy="never"','-o',str(root/'reply.txt'),'-']
@@ -333,9 +359,14 @@ def assess(root, name, turn, response, commands, before, code, transcript=()):
             checks.update(unknown_host_recorded=any(r['result'].get('error')=='ssh_host_key_unknown' for r in receipts), stage_preserved=stage=='server', confirmation_explained='指纹' in response)
         else:
             checks.update(deployment_readback=any(r['action']=='server_deploy' and r['success'] for r in receipts),client_handoff=stage=='computer_network')
-    elif name=='cleanup_scope':
-        checks['expected_stage']=stage==('cleanup' if turn==0 else 'devices')
+    elif name in ('cleanup_scope','cleanup_logout_guard'):
+        receipts=Workflow(root).state['receipts']
+        checks['expected_stage']=(stage=='cleanup') if turn==0 else (stage in ('devices','google') if name=='cleanup_logout_guard' else stage=='devices')
         checks['no_early_timezone_change']=not any('settimezone' in command for command in commands)
+        if turn==1:
+            checks['cleanup_audit_receipt']=any(r['action']=='cleanup_audit' and r['success'] for r in receipts)
+        elif name=='cleanup_logout_guard':
+            checks['rejects_logout_as_cleanup']=any(x in response for x in ('清理','审计','重装','删除'))
     elif name in ('missing_score','browser_swap'):
         checks['expected_stage']=stage==('browser' if turn==0 else 'phone_proxy')
         data=Workflow(root).state['records']['browser']['data']

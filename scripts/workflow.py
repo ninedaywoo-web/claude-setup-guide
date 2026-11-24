@@ -121,6 +121,8 @@ class Workflow:
         result = validation(stage, data, self.state, self.clock())
         missing = list(result.get('missing', []))
         required = []
+        if stage['id'] == 'cleanup' and data.get('outcome') == 'cleaned' and data.get('cleanup_mode') not in ('browser_only', 'phone_only'):
+            required = [('cleanup_audit', ('cleanup_audit', 'cleanup_apply'))]
         if stage['id'] == 'server' and (data.get('mode') == 'scripted' or facts(self.state, 'vps').get('vps_origin') == 'purchase'):
             required = [('server_readback', ('server_deploy', 'server_export'))]
         if stage['id'] == 'computer_network':
@@ -129,13 +131,18 @@ class Workflow:
             receipt = next((item for item in reversed(self.state['receipts'])
                             if item['action'] in actions
                             and item.get('stage_generation', 0) == self.state.get('stage_generations', {}).get(stage['id'], 0)
-                            and (item.get('network_signature', {}).get('server', item.get('network_signature', {}).get('config')) == self.state['network_signature'].get('server', self.state['network_signature']['config'])
+                            and (True if stage['id'] == 'cleanup' else
+                                 item.get('network_signature', {}).get('server', item.get('network_signature', {}).get('config')) == self.state['network_signature'].get('server', self.state['network_signature']['config'])
                                  if stage['id'] == 'server' else item.get('network_signature') == self.state['network_signature'])), None)
             valid = bool(receipt and receipt['success'])
             if valid:
                 output = receipt['result']
-                valid = (output.get('status') in ('configured', 'exported') and bool(output.get('node_file'))) if name == 'server_readback' else (
-                    output.get('status') == 'passed' and output.get('exit_matches') is True and output.get('https_204') is True)
+                if name == 'cleanup_audit':
+                    valid = output.get('status') == 'finished' and output.get('exit_code') == 0
+                elif name == 'server_readback':
+                    valid = output.get('status') in ('configured', 'exported') and bool(output.get('node_file'))
+                else:
+                    valid = output.get('status') == 'passed' and output.get('exit_matches') is True and output.get('https_204') is True
             if not valid:
                 missing.append(name)
         if missing:
@@ -278,6 +285,12 @@ class Workflow:
             if 'purchase_choice' in data and source['kind'] != 'user':
                 raise WorkflowError('替代套餐选择须记录客户原话，source.kind=user')
         merged = {**existing, **data}
+        if view['stage'] == 'cleanup' and merged.get('outcome') == 'cleaned':
+            scope_text = str(merged.get('handled_scope') or '').lower()
+            logout_only = any(token in scope_text for token in ('退出登录', '退出旧账号', '已退出', 'log out', 'logged out', 'sign out', 'signed out'))
+            has_cleanup = any(token in scope_text for token in ('清理', '清除', '删除', '重装', '备份', '审计', '残留', 'skill', 'clean', 'clear', 'delete', 'reinstall', 'backup', 'audit', 'site data', 'cache', 'cookie'))
+            if logout_only and not has_cleanup:
+                raise WorkflowError('仅退出登录不等于清理旧账号残留；电脑用过桌面版／CLI 请先运行 cleanup_audit 并按平台清理 Skill 处理，仅浏览器或仅手机分别提交 cleanup_mode=browser_only/phone_only 并清理站点数据或提醒删除重装 App，暂不清理请提交 outcome=deferred')
         if view['stage'] == 'vps':
             if data.get('access_ready') is False or 'purchase_checks' in data:
                 merged.setdefault('vps_origin', 'purchase')

@@ -10,6 +10,7 @@
 
 ## 执行顺序
 
+0. **先做启动前上下文自检**：如果当前对话在这条消息之前已有其他无关任务的历史记录，立即暂停（不下载、不执行），请客户新建空白对话再粘贴原指令；全新空白对话或恢复本项目带做时静默通过，直接执行第 1 步。客户明确回复「继续当前对话」后忽略旧话题继续。
 1. 使用 GitHub API 实时读取 `https://api.github.com/repos/ninedaywoo-web/claude-setup-guide/git/ref/heads/main`，取得 `object.sha`，确认是 40 位十六进制提交号。不能使用搜索摘要、旧对话中的提交或已安装 Skill 的版本号代替。API 被限流或不可达时，可用本机 `git -c credential.helper= ls-remote https://github.com/ninedaywoo-web/claude-setup-guide.git refs/heads/main` 获取同一分支提交；关闭交互式登录，不索要 token。
 2. 从 `https://raw.githubusercontent.com/ninedaywoo-web/claude-setup-guide/<本次提交号>/scripts/update.py` 下载脚本到本机临时目录，读取检查后运行。不要使用旧目录里的脚本，不用 `curl | sh` 等边下载边执行方式。脚本只访问本公开仓库，不需 GitHub 登录、不索要 token。raw 地址不可达时，可用同一提交的 GitHub Contents API 获取脚本并解码保存，或用本机 Git 获取该提交后读取脚本；不能据此直接把下载任务推给客户。
 3. 确认可用的 Python 3.9+。Mac 常用 `python3`，Windows 常用 `py -3` 或 `python`。指定一个尚不存在的新目录，例如用户工作目录下带时间后缀的 `claude-setup-guide-...`，执行：

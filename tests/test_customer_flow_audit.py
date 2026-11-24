@@ -18,7 +18,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
     def test_browser_cleanup_then_computer_first_still_prepares_phone_and_google(self):
         self.flow.submit(self.payload({'banned_login': 'yes'}))
         self.assertIn('Google 账号准备 → VPS', self.flow.next()['next_action'])
-        self.flow.submit(self.payload({'outcome': 'cleaned',
+        self.flow.submit(self.payload({'outcome': 'cleaned', 'cleanup_mode': 'browser_only',
             'handled_scope': 'Customer confirmed Claude site data cleared in Chrome and Firefox'}))
         self.assertEqual(self.flow.next()['stage'], 'devices')
         self.flow.submit(self.payload({'computer': 'windows'}))
@@ -55,6 +55,8 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
                 try:
                     case.computer, case.phone = computer, phone
                     case.flow.submit(case.payload({'banned_login': 'yes'}))
+                    if outcome == 'cleaned':
+                        case.flow.run('cleanup_audit', runner=lambda *a, **k: SimpleNamespace(returncode=0))
                     case.flow.submit(case.payload({'outcome': outcome, 'handled_scope': 'Actual cleanup scope recorded'}))
                     case.reach('browser')
                     self.assertIn('phone_proxy → timezone → phone_network', case.flow.next()['next_action'])
@@ -83,7 +85,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.reach('browser')
         self.flow.invalidate('cleanup', 'Recheck actual browser login residue')
         self.assertEqual(self.flow.next()['stage'], 'cleanup')
-        self.flow.submit(self.payload({'outcome': 'cleaned', 'handled_scope': 'Selected browser site data'}))
+        self.flow.submit(self.payload({'outcome': 'cleaned', 'cleanup_mode': 'browser_only', 'handled_scope': 'Selected browser site data'}))
         self.flow = Workflow(self.root, lambda: self.now)
         self.assertEqual(self.flow.next()['stage'], 'browser')
         self.advance()
@@ -170,6 +172,8 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
                             case.computer, case.phone = computer, phone
                             case.flow.submit(case.payload({'banned_login': ban}))
                             if outcome:
+                                if outcome == 'cleaned':
+                                    case.flow.run('cleanup_audit', runner=lambda *a, **k: SimpleNamespace(returncode=0))
                                 case.flow.submit(case.payload({'outcome': outcome, 'handled_scope': 'Isolated actual scope'}))
                             self.assertEqual(case.flow.next()['stage'], 'devices')
                             case.reach('google')

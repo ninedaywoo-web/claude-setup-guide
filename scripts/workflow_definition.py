@@ -101,6 +101,7 @@ APPLE_OPTIONAL = {'account_origin': APPLE_ORIGINS, 'apple_account_ref': 'text', 
                   'wait_choice': ('wait', 'continue'), 'apple_reminder_shown': True,
                   'purchase_restricted': False, 'support_case': 'text', 'support_retry_at': 'date'}
 OPTIONAL_FIELDS = {
+    'cleanup': {'cleanup_mode': ('platform_skill', 'browser_only', 'phone_only')},
     'vps': {'vps_origin': ('existing', 'purchase'), 'purchase_checks': 'mapping',
             'dmit_alternatives': 'list', 'purchase_choice': 'text'},
     'google': {'account_origin': ('self_used', 'purchased'),

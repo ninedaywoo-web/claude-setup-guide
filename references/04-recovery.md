@@ -14,7 +14,7 @@ Mac 客户直接展示 [Mac 端清理 Skill](15-mac-cleanup.md)，Windows 客户
 
 对客户使用“Mac 端清理 Skill”“Windows 端清理 Skill”。两端都先只读审计，具体操作与验证范围见对应入口。
 
-先确认实际使用的是 Claude Code、Claude Desktop 还是浏览器。只使用浏览器时，按指定浏览器配置档检查站点登录状态，不清空全部浏览器资料，也不清理未使用过的 CLI。Mac 的钥匙串路径不能套到 Windows；Windows Credential Manager 不自动删除。
+先确认实际使用的是 Claude Code、Claude Desktop 还是浏览器。**仅退出登录（Log out）不等于清理旧账号残留**：Mac/Windows 用过桌面版或 CLI 时须先运行 `workflow.py run --action cleanup_audit` 并按平台清理 Skill 处理；只使用浏览器时，按指定浏览器配置档检查并清理站点数据，不清空全部浏览器资料，也不清理未使用过的 CLI。Mac 的钥匙串路径不能套到 Windows；Windows Credential Manager 不自动删除。仅当客户主动要求申诉解封时才进入本章申诉部分。
 
 沿用客户已确认的清理范围，展示实际清单、备份后，由客户在终端做一次最终确认。身份／账号状态单独选择；时区与网络按对应章节处理。结果记录具体已处理项目和备份位置。
 

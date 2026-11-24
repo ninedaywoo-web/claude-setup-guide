@@ -129,7 +129,7 @@ python3 scripts/workflow.py run --action browser_scores --input .local/network/o
 
 服务端部署／导出会读回验证，成功回执自动完成服务端阶段。使用了网络脚本的 `probe` 配置时，电脑网络阶段会同时核对当前网络代次和阶段检查批次的两种探针成功回执；更换电脑或重置检查会更新批次，旧回执仅保留为历史。手填通过字段不能覆盖失败回执。代理探针只填它实际测得的项目，TUN、旧 VPN 交接和 Codex 回复仍在设备上观察。下载 Karing 仅完成下载，后续安装和设置继续当前阶段。失败保留当前阶段与错误，按对应修复章节连续排查。
 
-清理阶段可用 `cleanup_audit`／`cleanup_apply`；审计不会完成清理阶段。执行清理时仍由客户在终端完成现有脚本的范围选择和最终确认，控制层不代填确认。Windows 可通过 `--input` 提供 `{ "scope": ["cache", "account", "credentials", "desktop"] }` 中实际选定的范围，Mac 在原交互清单中选择。Windows 恢复使用 `cleanup_restore`，输入文件提供 `backup_directory`，按现有恢复校验和本人确认执行。实际结束后提交所选范围与结果。`cleanup_apply` 在 Mac 调用原交互流程，在 Windows 使用现有 `--apply` 流程。
+清理阶段可用 `cleanup_audit`／`cleanup_apply`；审计不会完成清理阶段。仅退出登录（Log out）不等于清理旧账号残留；电脑涉及桌面版或 CLI 封禁残留且提交 `outcome=cleaned` 时，须关联本阶段 `cleanup_audit` 或 `cleanup_apply` 的成功回执；仅浏览器或仅手机涉及封禁残留时，完成站点数据清理或提醒 iPhone 删除重装 App 后提交 `cleanup_mode=browser_only` 或 `phone_only`。执行清理时仍由客户在终端完成现有脚本的范围选择和最终确认，控制层不代填确认。Windows 可通过 `--input` 提供 `{ "scope": ["cache", "account", "credentials", "desktop"] }` 中实际选定的范围，Mac 在原交互清单中选择。Windows 恢复使用 `cleanup_restore`，输入文件提供 `backup_directory`，按现有恢复校验和本人确认执行。实际结束后提交所选范围与结果。`cleanup_apply` 在 Mac 调用原交互流程，在 Windows 使用现有 `--apply` 流程。
 
 统一状态存在时，网络部署／检测、Karing 下载、平台清理入口会验证控制层本次执行许可。直接调用这些入口会提示先运行 `workflow.py next`。`network.py status`、`invalidate` 保留诊断用途；失效状态会被控制层同步识别。旧 `login_readiness.py` 在统一流程启用后返回当前流程结果。
 

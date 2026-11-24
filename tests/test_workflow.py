@@ -84,6 +84,9 @@ class WorkflowTests(unittest.TestCase):
                 'source': source, 'data': data}
 
     def advance(self):
+        if self.flow.next()['stage'] == 'cleanup':
+            ok = lambda *a, **k: SimpleNamespace(returncode=0)
+            self.flow.run('cleanup_audit', runner=ok)
         if self.flow.next()['stage'] == 'computer_network':
             # Stage-transition fixtures supply successful execution results;
             # separate receipt tests exercise missing and failed probes.
@@ -407,6 +410,54 @@ class WorkflowTests(unittest.TestCase):
         self.assertFalse(calls[0][1]['capture_output'])
         self.assertNotIn('input', calls[0][1])
         self.assertEqual(self.flow.next()['stage'], 'cleanup')
+
+    def test_cleanup_cleaned_requires_audit_receipt_and_rejects_logout_only(self):
+        self.flow.submit(self.payload({'banned_login': 'yes'}))
+        with self.assertRaisesRegex(WorkflowError, '仅退出登录不等于清理旧账号残留'):
+            self.flow.submit(self.payload({'outcome': 'cleaned', 'handled_scope': 'Mac 桌面版、Chrome 和 iPhone 都已退出登录'}))
+        # Without cleanup_audit/cleanup_apply receipt, desktop cleanup cannot advance.
+        view = self.flow.submit(self.payload({'outcome': 'cleaned', 'handled_scope': 'Mac 桌面端缓存与残留已按清理步骤处理'}))
+        self.assertEqual(view['stage'], 'cleanup')
+        self.assertEqual(view['missing'], ['cleanup_audit'])
+        # Failed audit does not satisfy the receipt requirement.
+        fail = lambda *a, **k: SimpleNamespace(returncode=1)
+        self.flow.run('cleanup_audit', runner=fail)
+        self.assertEqual(self.flow.next()['stage'], 'cleanup')
+        self.assertEqual(self.flow.next()['missing'], ['cleanup_audit'])
+        # Successful audit receipt satisfies the requirement and advances.
+        ok = lambda *a, **k: SimpleNamespace(returncode=0)
+        self.flow.run('cleanup_audit', runner=ok)
+        self.assertEqual(self.flow.next()['stage'], 'devices')
+        # Invalidating cleanup requires a fresh audit receipt in the new generation.
+        self.flow.invalidate('cleanup', 'recheck local cleanup residue')
+        view = self.flow.submit(self.payload({'outcome': 'cleaned', 'handled_scope': 'Re-verified Mac desktop cleanup'}))
+        self.assertEqual(view['stage'], 'cleanup')
+        self.assertEqual(view['missing'], ['cleanup_audit'])
+        self.flow.run('cleanup_audit', runner=ok)
+        self.assertEqual(self.flow.next()['stage'], 'devices')
+
+    def test_cleanup_browser_only_and_phone_only_do_not_require_desktop_audit(self):
+        for mode, scope in (('browser_only', 'Cleaned Chrome Claude site data'),
+                            ('phone_only', 'Reminded customer to delete and reinstall iPhone Claude App')):
+            with self.subTest(mode=mode):
+                case = WorkflowTests(); case.setUp()
+                try:
+                    case.flow.submit(case.payload({'banned_login': 'yes'}))
+                    view = case.flow.submit(case.payload({'outcome': 'cleaned', 'cleanup_mode': mode, 'handled_scope': scope}))
+                    self.assertEqual(view['stage'], 'devices')
+                finally:
+                    case.doCleanups()
+
+    def test_context_self_check_and_pre_login_redline_are_published(self):
+        repo = Path(__file__).resolve().parents[1]
+        for rel, needle in (('README.md', '新建一个空白对话'),
+                            ('SKILL.md', '启动前上下文自检'),
+                            ('SKILL.md', '到达 `login` 阶段前，严禁打开或点击登录 Claude 桌面版'),
+                            ('references/12-latest-start.md', '启动前上下文自检')):
+            self.assertIn(needle, (repo / rel).read_text(encoding='utf-8'))
+        view = self.flow.next()
+        self.assertIn('禁止口头“已记录”跳过控制层', view['task_scope_instruction'])
+        self.assertIn('严禁打开或点击登录 Claude 桌面版', view['task_scope_instruction'])
 
     def test_windows_restore_batch_uses_existing_confirmation_flow(self):
         self.flow.submit(self.payload({'banned_login': 'yes'}))

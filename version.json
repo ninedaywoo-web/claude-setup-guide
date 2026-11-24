@@ -1,10 +1,10 @@
 {
-  "version": "1.0.60",
-  "published_at": "2026-11-19",
+  "version": "1.0.61",
+  "published_at": "2026-11-23",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "账号准备只问 Google／Gmail 能否登录，明确确认缺号后进入购买分支",
-    "Google 账号状态与出海91选购、账号资料和 2FA 图解联动，兼容已保存的进度"
+    "新增启动前上下文自检与前置空白对话提醒，避免旧对话上下文干扰配置顺序",
+    "补齐未到 login 阶段禁登桌面版与普通浏览器红线，cleanup 阶段绑定 cleanup_audit 回执并拒绝仅退出登录冒充清理"
   ]
 }

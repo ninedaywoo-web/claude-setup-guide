@@ -40,7 +40,7 @@ Windows 本机 HTTP 代理测通，但开启 TUN 后反复连接 VPS、测速卡
 
 补充教程只修改用户指定部分。新增前置指引时，后续既有教学、配图、红框箭头及顺序原样保留；PDF 优先追加或合并原页，核对原页文字与渲染一致。原配图未在当前仓库找到时，先查交付源文件和历史记录，再继续编辑。
 
-发布修改时同步 version.json 与 CHANGELOG.md，运行 python3 scripts/manifest.py，再运行 python3 -m unittest discover -s tests。更新只改课程和脚本；.local/ 是使用者的数据，不提交、不覆盖。
+发布修改时同步 version.json 与 CHANGELOG.md，运行 python3 scripts/manifest.py，再运行 python3 -m unittest discover -s tests。更新只改课程和脚本；.local/ 是使用者的数据，不提交、不覆盖。**以后每次改动并推送到 `origin/main` 后，默认同步更新麦多点商城（`/Users/zhuwenhao/Projects/digital-shop` 及线上 ECS）的 `claude-setup` 发布版本元数据（`releases` / `sync_state` 与交付文档）。**
 
 确定性执行层见 references/14-scripted-execution.md；平台清理入口见 references/15-mac-cleanup.md 与 references/16-windows-cleanup.md。运行状态与凭据仅存 .local/。来源与许可保留 licenses/，客户界面只显示平台清理 Skill 名称。
 

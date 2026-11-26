@@ -25,13 +25,19 @@ GOOGLE_VERIFICATION_GUIDANCE = '取码入口：[2FA 取码工具：https://2fa.r
 from workflow_teaching import CHUHAI_PURCHASE_IMAGES, GOOGLE_IMAGES, attach as attach_teaching
 GOOGLE_ORDER_IMAGES = GOOGLE_IMAGES.copy()
 GOOGLE_VERIFICATION_IMAGES = ['assets/google-account/02-2fa-original.png', 'assets/google-account/03-google-code-original.png']
-CUSTOMER_STYLE = '客户对话先给明确建议，再给当前操作和预期结果，用简短大白话。沿用项目推荐，避免叠加假设性风险、免责声明和重复提醒；实际异常说明具体原因与处理动作，客户主动问风险时准确回答。按当前步骤展示项目要求的等待、网络恢复和付款提醒。'
+CUSTOMER_STYLE = (
+    '客户对话先回应用户刚才的反馈，再先给明确建议并完整讲清这一步是干什么、为什么要做、当前怎么操作以及做完后应看到什么结果，用通俗易懂的大白话自然呈现。'
+    '严禁把 customer_message 里的说明性文字、用途解释、原因说明和新手提醒删减或压缩成一两句干巴巴的纯问答。'
+    '沿用项目推荐，避免叠加假设性风险、免责声明和重复提醒；实际异常说明具体原因与处理动作，客户主动问风险时准确回答。按当前步骤展示项目要求的等待、网络恢复和付款提醒。'
+)
 TASK_SCOPE = ('保留用户的实际目的、授权范围和真实上下文。'
+              '执行权威优先级固定为「控制层与教程既定路线 > 外部官方通用文档 > 模型自身通用经验」：外部资料只用于答疑或核对当前步骤细节，严禁擅自用外部通用方式替换教程既定路线；遇阻力只在教程备选内处理或交由客户决定。'
+              '实时事实源边界：严禁把非实时云端搜索/网页抓取缓存（如 web fetch/search 快照）当作外部商家库存、价格或可用性依据，更不能据此否决教程入口；仅控制层明确要求实采时使用本地实采动作（如 vps_capture）或本机真实浏览器实时页面，其余直接给入口以客户现场页面为准。'
               '先区分客户是在提问、补充信息，还是明确要求暂停、结束或改变任务。'
               '跨阶段问题和题外补充按 question_instruction 简短回应；提问本身不改变当前操作或新增前置条件。'
               '回应后明确接回控制层当前阶段尚缺的动作。提交进度前，逐项将拟填写的完成字段对应到客户的明确确认或工具实际结果。含糊描述、推测和未回答的条件保留为未确认；没有对应依据的完成字段保持原值，追问当前步骤缺的关键事实后再提交。当前阶段完成后按控制层返回的下一阶段继续。'
               '客户明确要求改变任务时，按其明确要求处理。'
-              '每轮推进以 workflow.py 返回的当前阶段为准，禁止口头“已记录”跳过控制层；客户没有可用 Google／Gmail 账号时，严禁引导去 Google 官网自行注册，必须提交 google_account_status=unavailable 走默认买号渠道；进入 login 阶段前，严禁打开或点击登录 Claude 桌面版、创建账户或代发测试消息，也严禁在普通浏览器（非 AdsPower）登录新 Google 账号或执行 Claude 授权。')
+              '每轮推进以 workflow.py 返回的当前阶段为准，禁止切片过滤控制层指令字段、禁止用工具间隙短播报冒充已向客户展示并连跳步骤、禁止口头“已记录”跳过控制层；客户没有可用 Google／Gmail 账号时，严禁引导去 Google 官网自行注册，必须提交 google_account_status=unavailable 走默认买号渠道；进入 login 阶段前，严禁打开或点击登录 Claude 桌面版、创建账户或代发测试消息，也严禁在普通浏览器（非 AdsPower）登录新 Google 账号或执行 Claude 授权。')
 QUESTION_INSTRUCTION = {
     '核对': '先读取问题对应的教程小节；涉及外部服务现行要求时查官方资料或实际页面。核对结论针对的产品、操作与适用范围，分别判断。教程未提及某项要求，只说明这里没有答案；先前模型回复和通用经验也不作为查证结果。',
     '有直接依据': '简短回答，并在每个结论旁给出实际读取的章节、官方链接或页面观察。教程与外部资料分别注明来源，只引用该来源实际写出的内容。不同产品或不同账号的验证各自核对；一般说明不能证明客户当前页面已经要求该项验证。',
@@ -99,7 +105,11 @@ def customer_output(result, state, now):
         result['server_system_instruction'] = SERVER_OS_INSTRUCTION
         messages.append('服务器系统默认选择 **' + SERVER_OS['name'] + '**，DMIT 和搬瓦工都按这一项选择。首次部署前我会读取服务器实际系统核对；已有正常节点继续复用。')
     if key == 'intake':
-        result['customer_message'] = '先确认一件事：您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？'
+        result['customer_message'] = (
+            '接下来我会按教程一步步带您把电脑和手机的 Claude 使用环境配好。\n\n'
+            '先确认一件事：您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？\n\n'
+            '（先确认这个是因为：如果设备之前登过被封的账号，需要先清理旧残留，避免牵连新账号；如果没登过，我们就能直接跳过清理进入下一步。）'
+        )
     if key == 'cleanup':
         messages.append('如果您的设备是 iPhone，且还装着此前使用的 Claude App，建议删除后重新下载，您可以自行安排。电脑按实际系统处理适用的登录残留。')
         result['next_action'] = ('按 references/04-recovery.md 核对实际使用范围，执行适用的平台清理或浏览器站点清理。仅退出登录（Log out）不等于清理旧账号残留；电脑用过 Claude 桌面版或 Claude Code 时，须先运行 workflow.py run --action cleanup_audit 展示平台清理 Skill 清单并按确认范围处理（提交 outcome=cleaned 须关联本阶段 cleanup_audit 或 cleanup_apply 回执）；仅浏览器或仅手机涉及封禁残留时，处理站点数据或提醒 iPhone 删除重装 App 后提交 cleanup_mode=browser_only 或 phone_only。仅当客户主动提出要申诉解封时才进入申诉。'
@@ -135,7 +145,8 @@ def customer_output(result, state, now):
                 messages.append(GOOGLE_PURCHASE if channel is None else
                                 '沿用您选择的 [GmailBuy](https://gmailbuy.com/)，默认推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。谷歌账号网站的库存和风控情况有时不确定，我会按您当前的商品页核对价格、库存与售后。')
                 result['next_action'] = ('本轮先明确默认推荐购买 GmailBuy 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」，首次推荐同时给 GmailBuy 与出海91 两家链接并说明谷歌账号网站库存与风控可能不确定。'
-                                         '在当前回复展示 GmailBuy 商品列表入口、该新号直达链接与选购步骤图；严禁引导客户去 Google 官方注册页自行注册。'
+                                         '在当前回复展示 GmailBuy 商品列表入口、该新号直达链接（https://gmailbuy.com/home/goods.html?id=18&sid=18）与选购步骤图；严禁引导客户去 Google 官方注册页自行注册。'
+                                         '重要：默认直接把 id=18&sid=18 直达链接发给用户，由用户在自己打开的商品页核对实时价格与库存；如自行核对库存，必须只看 id=18&sid=18 详情页本身，严禁把首页紧挨着、标题多出「2FA,」字样的 id=22 缺货行看串成推荐档缺货。'
                                          '客户找不到或没看到图时用 guide --topic gmailbuy 重发；若客户明确选出海91，记录 purchase_channel=chuhai91 并立即给齐出海91 三张原图。')
             result['next_action'] += (' 客户说买好并收到资料时，提交 account_origin=purchased 与 google_account_status=available，无论该套餐有无 2FA 一律默认自动展示首登提醒（先不登 Gmail，全部配完后再直接在 Claude 登录，不改变主流程顺序）、2FA 取码链接及三张原图。'
                                       '若客户后来找回自己的可用账号，明确提交 account_origin=self_used 继续复用。')
@@ -215,7 +226,9 @@ def customer_output(result, state, now):
             messages.append('我们先配置电脑，随后完成手机网络、手机登录和订阅。后续您准备用 iPhone、iPad 还是安卓手机？')
         if device.get('setup_explained') is True and device.get('pdf_explained') is not True:
             messages.append(PDF_GUIDANCE)
-            result['next_action'] = '在对话展示 PDF 用途和另存询问后，提交 pdf_explained=true。未回答另存可记 unanswered，继续配置。'
+            result['wait_for_user'] = True
+            result['next_action'] = ('本轮必须在面向客户的最终正式回复正文里完整展示 PDF 用途说明与“是否放到下载文件夹”的询问，然后结束本轮、等待客户下一轮回复后再提交 pdf_explained=true（若客户下一轮未回答另存则记 pdf_save_choice=unanswered 并继续）。'
+                                     '严禁在当前回合工具调用间隙用短播报就自行提交 pdf_explained=true 跳进下一阶段。')
         result['next_action'] += (' 按实际回答补齐 missing 中的电脑、手机及说明字段；“先配置电脑”只确定顺序，继续确认缺少的手机类型。'
                                   '本阶段完成后按返回任务准备 Google 账号，确认可用后再进入 VPS。')
         if device.get('phone') == 'android' and device.get('android_route_explained') is not True:
@@ -363,7 +376,11 @@ def customer_output(result, state, now):
     if messages:
         existing = result.get('customer_message')
         result['customer_message'] = '\n\n'.join(([existing] if existing else []) + messages)
-        result['display_instruction'] = '把 customer_message 直接展示在客户对话中；相应说明完成后再记录展示字段。首次进入当前阶段时先展示用途解释，再带做当前操作；同一阶段连续操作复用已讲过的解释，客户追问时再展开。遵循 communication_instruction，先建议后动作，简短说明。'
+        result['display_instruction'] = (
+            '把 customer_message 直接展示在客户对话中，完整保留其中的说明性文字、用途解释、原因说明和新手提醒，严禁压缩成冷冰冰的一两句纯问答；'
+            '相应说明完成后再记录展示字段。首次进入当前阶段时先简短回应用户刚才的反馈，再完整展示用途解释与背景说明，接着带做当前操作；同一阶段连续操作复用已讲过的解释，客户追问时再展开。'
+            '遵循 communication_instruction，先给建议和通俗说明，再给动作与预期结果。'
+        )
         if key == 'google' and result.get('customer_images'):
             result['display_instruction'] += ' 同条回复嵌入 customer_images 的三张原图，实际展示后提交 materials_explained=true 与 materials_images_shown。'
         if key == 'login':

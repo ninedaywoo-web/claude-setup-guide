@@ -1,5 +1,11 @@
 # 更新记录
 
+## 1.0.64 · 2026-11-26
+
+- 修复 Codex 场景下回复过度精简成纯问答的问题（`AGENTS.md`、`SKILL.md`、`scripts/workflow_messages.py`、`scripts/workflow_view.py`）：移除诱导删减的「通常两三句话／简短说明」表述，明确要求先回应客户上一句，再把 `customer_message` 中的说明性文字、用途解释、原因与提醒完整呈现到最终正文，并禁止用脚本切片过滤掉 `display_instruction`、`next_action` 等控制层字段。
+- 修复 `devices` 阶段工具间隙连续自交 `setup_explained`、`pdf_explained` 吞掉说明并跳步的问题（`scripts/workflow.py`、`scripts/workflow_messages.py`、`scripts/workflow_view.py`）：明确禁止把工具调用间隙的短播报当作已向客户展示，`PDF_GUIDANCE` 分支返回 `wait_for_user=true` 并要求在正文展示完另存询问后结束本轮、等客户回复再提交 `pdf_explained=true`。
+- 确立两条全局底层原则（`AGENTS.md`、`SKILL.md`、`scripts/workflow_messages.py`、`references/08-google-account.md`）：① 权威层级固定为「控制层与教程既定路线 > 外部官方通用文档 > 模型自身通用经验」，外部资料仅作答疑或细节核对，严禁擅自用通用替代方式推翻教程路线；② 实时事实源边界，严禁把非实时云端搜索/网页抓取缓存当作外部商家库存或价格依据，控制层明确要求实采时走 `vps_capture` 或本机真实浏览器，其余环节直接给入口以客户现场页面为准。同步更新 `references/05-ai-walkthrough.md` 的 Google 默认推荐口径并注明 GmailBuy `id=18` 防看串提示。
+
 ## 1.0.63 · 2026-11-26
 
 - 买完 Google 账号的防踩坑提醒中，明确讲清“不要自己先去登录 Gmail／Google 邮箱”的原因（谷歌风控不确定，第一次登录往往最不容易触发风控，把宝贵的第一次登录留给后面的 Claude 登录），同时再次强调主流程顺序绝不提前登录。

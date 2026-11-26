@@ -889,6 +889,23 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertEqual(v['reference'],'references/07-apple-purchase-support.md')
         self.assertEqual(v['resume_at'],(self.now+timedelta(hours=72)).isoformat())
 
+    def test_codex_global_authority_fact_source_and_devices_turn_boundary(self):
+        from workflow_view import compact
+        intake = self.flow.next()
+        self.assertIn('控制层与教程既定路线 > 外部官方通用文档 > 模型自身通用经验', intake['task_scope_instruction'])
+        self.assertIn('非实时云端搜索/网页抓取缓存', intake['task_scope_instruction'])
+        self.assertIn('避免牵连新账号', intake['customer_message'])
+        compact_intake = compact(intake)
+        self.assertIn('禁止压缩成纯问答', compact_intake['display_instruction'])
+        self.assertIn('禁止切片丢弃控制字段', compact_intake['display_instruction'])
+        self.assertIn('禁止工具间隙播报代替正文', compact_intake['display_instruction'])
+        self.reach('devices')
+        pdf_view = self.flow.submit(self.payload({'computer': 'mac', 'phone': 'iphone', 'setup_explained': True}))
+        self.assertEqual(pdf_view['stage'], 'devices')
+        self.assertIs(pdf_view.get('wait_for_user'), True)
+        self.assertIn('等待客户下一轮回复后再提交 pdf_explained=true', pdf_view['next_action'])
+        self.assertIn('严禁在当前回合工具调用间隙', pdf_view['next_action'])
+
 
 # Keep inherited baseline tests in their original module; this file adds only new cases.
 for name in list(fixtures.WorkflowTests.__dict__):

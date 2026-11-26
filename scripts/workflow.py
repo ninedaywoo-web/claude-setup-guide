@@ -208,8 +208,10 @@ class Workflow:
             result['purchase_decision'] = self.purchase_decision(facts(self.state, 'vps'))
         if stage['id'] == 'devices' and facts(self.state, 'devices').get('setup_explained') is not True:
             result['customer_message'] = DEVICE_GUIDANCE
-            result['next_action'] = ('确认电脑和手机类型后，在对话中展示 customer_message 的设备搭配说明；'
-                                     '展示后提交 setup_explained=true，再继续阅读版介绍和账号准备。')
+            result['next_action'] = ('先在面向客户的正式正文回复里完整展示 customer_message 的设备搭配说明，再请客户确认电脑与手机类型；'
+                                     '若本轮刚展示设备说明并向客户提问，等待客户回复设备类型后连同 computer、phone 一起提交 setup_explained=true；'
+                                     '若此前遗漏展示、现在已知道设备类型，则在正式回复里把完整设备说明展示给客户后提交 setup_explained=true，再进入阅读版介绍。'
+                                     '严禁把工具调用间隙的短进度播报当作已展示，也不得同轮连续跳过设备说明与 PDF 另存询问。')
         if stage['id'] == 'payment_preparation' and facts(self.state, 'devices').get('phone') != 'android':
             result['conditional_fields'] = {'account_type=new': {'first_used_at': 'timestamp'}}
             result['account_history'] = self.state.get('apple_accounts', {})

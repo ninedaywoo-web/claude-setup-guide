@@ -5,42 +5,25 @@ PDF_GUIDANCE = """**项目已经下载好了**，接下来 Codex 会按项目流
 
 **建议把 PDF 单独保存一份。需要我帮您放到“下载”文件夹吗？**文件已在项目里，无需重新下载。"""
 GOOGLE_QUESTION = '您有一个现在能正常登录的 Google／Gmail 账号吗？'
-GOOGLE_PURCHASE = """您目前没有可用的 Google 账号。国内环境直接去官网注册常容易卡在扫码或手机号验证过不去，因此本教程**默认推荐购买 GmailBuy 的全新美国谷歌账号**，两个网站都可以选：
+GOOGLE_PURCHASE = """您目前没有可用的 Google 账号。**优先购买美区 Google 老号**，首选出海91。两个网站都可以选：
 
-- 首选 [GmailBuy](https://gmailbuy.com/)：推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。
-- 备选 [出海91](https://chuhai91.cc/)：也有谷歌精品老号等套餐可选（选这家时我会立刻给您完整三步图）。
+- 首选 [出海91](https://chuhai91.cc/)：按我们的选购经验，价格相对贵一点，账号也相对稳一点。
+- [GmailBuy](https://gmailbuy.com/)：价格相对便宜一点，按我们的选购经验，被封的可能性也大一点。
 
-**选购提示：**谷歌账号网站的库存有时候会变动（不确定），谷歌账号的风控情况也会不确定，下单前请核对当前页面的实际价格、库存和售后说明，看您个人选择。下面是 GmailBuy 选购与查单示意图。买到的 Google 账号用于后续登录 Claude；**买完后先不要去登录 Gmail 或 Google 邮箱**（因为谷歌风控不确定，而账号的第一次登录往往最不容易触发风控，我们要把这宝贵的“第一次登录”留给后面的 Claude 登录），先把资料保存好，等全部网络配完后再去 Claude 首次登录。"""
-GOOGLE_MATERIALS_GUIDANCE = """**⚠️ 买完 Google 账号后，务必先记住这条防踩坑提醒（现在先不要登录任何地方）：**
-- **不要自己先去登录 Gmail、Google 网页或其他任何地方**，把商家给的账号资料保存好就行。
-- **为什么？**因为谷歌账号的风控情况不确定，而新拿到手的账号**第一次登录往往不需要过风控验证、最容易一次登进去**；如果提前在 Gmail 或别的地方把“第一次登录”用掉了，后面再登 Claude 就更容易弹风控。所以我们把宝贵的“第一次登录”专门留给后面的 Claude 登录。
-- **现在还不是登录的时候**——我们还是严格按主流程先把 **VPS、电脑网络、AdsPower 和手机网络全部配置并验收完成**，等全部配好后，**第一次登录这个 Google 账号时直接在手机 Claude App 里登录即可**。
-
-**顺便先把 2FA 验证码是什么、怎么用直接教给您（不管这次买的新号有没有带 2FA、后面会不会弹，先看懂留着备用）：**
-- **什么是 2FA 验证码？**简单说就是“两步验证动态数字密码”（类似银行动态口令，每 30 秒自动刷新一组 6 位数字）。商家订单里标注的 **“2FA 密钥”**（一串字母和数字）相当于生成动态密码的“种子”，登录 Google 时万一弹出“身份验证器验证码／两步验证”，就需要用它算出当前 6 位数字填进去才能过验证。
-- **先保存哪些资料？**把订单里的 Google 邮箱、登录密码、恢复邮箱／辅助邮箱全部存好；如果订单里还带有商家标注的「2FA 密钥」，也一并存好。
-- **两种取码方式怎么选？**
-  - **教程推荐方式（快捷网页取码）：**直接用 **[2FA 取码工具：https://2fa.run/](https://2fa.run/)**，这是我们教程里推荐的验证器使用方式，无需额外装软件。等后面全部网络配置验收完成、在手机 Claude 用 Google 登录时，万一 Google 弹出身份验证器验证码，照下面三张原图把 2FA 密钥贴进网站算出当前 6 位验证码，再填回手机登录页面即可。
-  - **本机离线方式（后面有条件再配）：**如果您偏好本机离线工具，也可以后面有条件时再把这串 2FA 密钥导入手机本机的身份验证器（如 Google Authenticator 或 iPhone 自带「密码」App）生成同样的 6 位动态验证码。当前先看懂下面三张原图备用就行。
-
-**请先确认看懂了上面的首登防踩坑提醒和 2FA 备用图解，回复「知道了」或「下一步」，我们就正式进入 VPS 节点准备。**"""
+看您个人选择。下面是出海91完整三步图。如果您选这家，就从注册出海91购物网站账号开始，QQ 邮箱也可以。买到的 Google 账号用于后续登录 Claude。"""
+GOOGLE_MATERIALS_GUIDANCE = '收到账号资料后，先找到 Google 邮箱、登录密码，以及商家标注的“2FA 密钥”。2FA 密钥是一串用来生成登录验证码的字母和数字。取码网址是 [2FA 取码工具：https://2fa.run/](https://2fa.run/)。等手机网络配置完成、Google 登录页面要求身份验证器验证码时，再按图用密钥生成验证码，并填回手机登录页面。'
 GOOGLE_LOGIN_GUIDANCE = '手机网络已经验收完成，接下来在手机上使用准备好的 Google 账号登录 Claude。按当前页面输入账号和密码；Google 要求身份验证器验证码时，再按下面的取码步骤操作。'
 GOOGLE_VERIFICATION_GUIDANCE = '取码入口：[2FA 取码工具：https://2fa.run/](https://2fa.run/)。使用商家提供的 2FA 密钥时，在已配置好的 AdsPower 中打开网站，将密钥填入上方“JS实现”区域，点击“点击获取验证码”，再把当前验证码填回手机 Google 页面。使用自己的 Google 账号时，也可以从自己已绑定的身份验证器取得验证码；其他验证方式按当前页面完成。'
 from workflow_teaching import CHUHAI_PURCHASE_IMAGES, GOOGLE_IMAGES, attach as attach_teaching
 GOOGLE_ORDER_IMAGES = GOOGLE_IMAGES.copy()
 GOOGLE_VERIFICATION_IMAGES = ['assets/google-account/02-2fa-original.png', 'assets/google-account/03-google-code-original.png']
-CUSTOMER_STYLE = (
-    '客户对话先回应用户刚才的反馈，再先给明确建议并完整讲清这一步是干什么、为什么要做、当前怎么操作以及做完后应看到什么结果，用通俗易懂的大白话自然呈现。'
-    '严禁把 customer_message 里的说明性文字、用途解释、原因说明和新手提醒删减或压缩成一两句干巴巴的纯问答。'
-    '沿用项目推荐，避免叠加假设性风险、免责声明和重复提醒；实际异常说明具体原因与处理动作，客户主动问风险时准确回答。按当前步骤展示项目要求的等待、网络恢复和付款提醒。'
-)
+CUSTOMER_STYLE = '客户对话先给明确建议，再给当前操作和预期结果，用简短大白话。沿用项目推荐，避免叠加假设性风险、免责声明和重复提醒；实际异常说明具体原因与处理动作，客户主动问风险时准确回答。按当前步骤展示项目要求的等待、网络恢复和付款提醒。'
 TASK_SCOPE = ('保留用户的实际目的、授权范围和真实上下文。'
-              '外部商品页除控制层明确要求实采（如 vps_capture）外，直接提供教程入口由客户现场核对，不以非实时搜索缓存判断库存。'
               '先区分客户是在提问、补充信息，还是明确要求暂停、结束或改变任务。'
               '跨阶段问题和题外补充按 question_instruction 简短回应；提问本身不改变当前操作或新增前置条件。'
               '回应后明确接回控制层当前阶段尚缺的动作。提交进度前，逐项将拟填写的完成字段对应到客户的明确确认或工具实际结果。含糊描述、推测和未回答的条件保留为未确认；没有对应依据的完成字段保持原值，追问当前步骤缺的关键事实后再提交。当前阶段完成后按控制层返回的下一阶段继续。'
               '客户明确要求改变任务时，按其明确要求处理。'
-              '每轮推进以 workflow.py 返回的当前阶段为准，完整读取控制层指令字段，不用工具间隙短播报冒充已向客户展示并连跳步骤，禁止口头“已记录”跳过控制层；进入 login 阶段前，严禁打开或点击登录 Claude 桌面版、创建账户或代发测试消息，也严禁在普通浏览器（非 AdsPower）登录新 Google 账号或执行 Claude 授权。')
+              '每轮推进以 workflow.py 返回的当前阶段为准，禁止口头“已记录”跳过控制层；进入 login 阶段前，严禁打开或点击登录 Claude 桌面版、创建账户或代发测试消息，也严禁在普通浏览器（非 AdsPower）登录新 Google 账号或执行 Claude 授权。')
 QUESTION_INSTRUCTION = {
     '核对': '先读取问题对应的教程小节；涉及外部服务现行要求时查官方资料或实际页面。核对结论针对的产品、操作与适用范围，分别判断。教程未提及某项要求，只说明这里没有答案；先前模型回复和通用经验也不作为查证结果。',
     '有直接依据': '简短回答，并在每个结论旁给出实际读取的章节、官方链接或页面观察。教程与外部资料分别注明来源，只引用该来源实际写出的内容。不同产品或不同账号的验证各自核对；一般说明不能证明客户当前页面已经要求该项验证。',
@@ -108,11 +91,7 @@ def customer_output(result, state, now):
         result['server_system_instruction'] = SERVER_OS_INSTRUCTION
         messages.append('服务器系统默认选择 **' + SERVER_OS['name'] + '**，DMIT 和搬瓦工都按这一项选择。首次部署前我会读取服务器实际系统核对；已有正常节点继续复用。')
     if key == 'intake':
-        result['customer_message'] = (
-            '先确认一件事：您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？\n\n'
-            '（如果没有登过，就可以直接跳过旧残留清理进入下一步。）'
-        )
-        result['next_action'] = '只确认准备使用的电脑或手机之前有没有登录过被 Claude 封禁的账号（回复有／没有／不确定即可）；先不提前追问具体设备或登录方式，有封禁记录进入 cleanup 阶段再核对。'
+        result['customer_message'] = '先确认一件事：您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？'
     if key == 'cleanup':
         messages.append('如果您的设备是 iPhone，且还装着此前使用的 Claude App，建议删除后重新下载，您可以自行安排。电脑按实际系统处理适用的登录残留。')
         result['next_action'] = ('按 references/04-recovery.md 核对实际使用范围，执行适用的平台清理或浏览器站点清理。仅退出登录（Log out）不等于清理旧账号残留；电脑用过 Claude 桌面版或 Claude Code 时，须先运行 workflow.py run --action cleanup_audit 展示平台清理 Skill 清单并按确认范围处理（提交 outcome=cleaned 须关联本阶段 cleanup_audit 或 cleanup_apply 回执）；仅浏览器或仅手机涉及封禁残留时，处理站点数据或提醒 iPhone 删除重装 App 后提交 cleanup_mode=browser_only 或 phone_only。仅当客户主动提出要申诉解封时才进入申诉。'
@@ -132,27 +111,21 @@ def customer_output(result, state, now):
         elif status == 'available':
             messages.append(GOOGLE_MATERIALS_GUIDANCE)
             result['customer_images'] = GOOGLE_ORDER_IMAGES.copy()
-            result['wait_for_user'] = True
-            result['next_action'] = ('无论这次买到的 Google 账号有没有附带 2FA 密钥、后续是否会弹 2FA，都必须在本轮面向客户的最终正式回复正文里完整讲清以下三点并把 customer_images 三张原图转为项目绝对路径全部嵌入最终正文，不等客户主动发问：'
-                                     '① 首登防踩坑提醒及原因——明确告知不要自己先登 Gmail、Google 网页或其他地方，并把原因直接讲给客户（谷歌风控不确定，新号第一次登录往往不需要过风控验证、最容易一次登进去，所以要把宝贵的第一次登录留给后面的 Claude 登录），严禁省掉原因；'
-                                     '② 大白话解释什么是 2FA 验证码（两步验证动态 6 位数字密码、每 30 秒刷新，订单里的「2FA 密钥」是生成它的种子），明确说明 [2FA 取码工具：https://2fa.run/](https://2fa.run/) 是我们教程推荐的快捷验证器使用方式，同时也说明手机本机身份验证器导入密钥后面有条件再配即可，并嵌入三张原图；'
-                                     '③ 严禁修改或跳过主流程顺序：现在先把账号资料存好，绝对不要提前带客户登录 Google 或 Claude，等 VPS、电脑网络、AdsPower 和手机网络全部配完验收后再在手机 Claude App 首次登录。'
-                                     '重要停顿边界（wait_for_user=true）：本轮把完整文字说明与三张原图写进最终正式正文并请客户回复「知道了／下一步」后，立即结束本轮！严禁在当前回合工具调用间隙用中间播报贴图后立刻提交 materials_explained=true 跳进 vps（否则三张原图会被客户端折叠隐藏）。待客户下一轮回复后，再提交 materials_explained=true 和 materials_images_shown 进入 vps 阶段。')
+            result['next_action'] = ('在当前回复直接展示 customer_message 中的 2FA 取码链接，并将 customer_images 转为当前项目的绝对路径嵌入聊天。'
+                                     '解释邮箱、密码及商家标注的密钥用途，实际嵌入三张原图后提交 materials_explained=true 和 materials_images_shown（本次展示的三张图片路径），按返回任务继续；这一步由 Codex 展示完成，无需客户额外确认。')
         elif status == 'unavailable':
-            if channel == 'chuhai91':
-                messages.append('沿用您选择的 [出海91](https://chuhai91.cc/)，按下面三步图购买美区 Google 账号（谷歌账号网站库存与风控可能不确定，按当前页面价格和库存核对）。先注册或登录出海91 购物网站账号（QQ 邮箱也可以），再接到已完成的位置。')
-                result['purchase_images'] = CHUHAI_PURCHASE_IMAGES.copy()
-                result['next_action'] = ('本轮沿用出海91，将 customer_message 里的出海91注册、分类和选购三张原图直接嵌入同一条回复，指出现在从哪一步开始。'
-                                         '客户索要购买步骤、找不到图或没看懂时，运行 guide --topic chuhai_purchase，把三张原图和入口链接重新给齐。'
-                                         '注册的是出海91购物网站账号，本流程不引导注册 Google 账号。客户问买哪个时，按实际页面定位分类并核对美区、价格与库存。')
+            if channel == 'gmailbuy':
+                messages.append('沿用您选择的 [GmailBuy](https://gmailbuy.com/)，优先购买美区 Google 老号。我会按您当前的商品页核对美区、老号、价格和库存。')
+                result['next_action'] = '在当前回复展示 GmailBuy 商品列表入口与选购步骤图；根据实际页面讲当前操作，客户说找不到或没看到图时用 guide --topic gmailbuy 重发。'
             else:
                 messages.append(GOOGLE_PURCHASE if channel is None else
-                                '沿用您选择的 [GmailBuy](https://gmailbuy.com/)，默认推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。谷歌账号网站的库存和风控情况有时不确定，我会按您当前的商品页核对价格、库存与售后。')
-                result['next_action'] = ('本轮先明确默认推荐购买 GmailBuy 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」，首次推荐同时给 GmailBuy 与出海91 两家链接并说明谷歌账号网站库存与风控可能不确定，同时客观说明因国内环境官网注册易卡扫码／手机号验证，本流程优先按上述渠道准备账号。'
-                                         '在当前回复展示 GmailBuy 商品列表入口、该新号直达链接（https://gmailbuy.com/home/goods.html?id=18&sid=18）与选购步骤图。'
-                                         '直接把 id=18&sid=18 直达链接发给用户，由用户在自己打开的实时页面核对价格与库存（不以非实时搜索缓存判断缺货，也不要和首页紧挨着、标题多出「2FA,」字样的 id=22 混淆）。'
-                                         '客户找不到或没看到图时用 guide --topic gmailbuy 重发；若客户明确选出海91，记录 purchase_channel=chuhai91 并立即给齐出海91 三张原图。')
-            result['next_action'] += (' 客户说买好并收到资料时，提交 account_origin=purchased 与 google_account_status=available，无论该套餐有无 2FA 一律默认自动展示首登提醒（先不登 Gmail，全部配完后再直接在 Claude 登录，不改变主流程顺序）、2FA 取码链接及三张原图。'
+                                '沿用您选择的出海91，继续购买美区 Google 老号。先注册或登录出海91网站账号，再从下面的三步图接到已完成的位置。')
+                result['purchase_images'] = CHUHAI_PURCHASE_IMAGES.copy()
+                result['next_action'] = ('本轮先明确推荐购买美区 Google 老号；首次推荐同时给两家链接，首选出海91。'
+                                         '将 customer_message 里的出海91注册、分类和选购三张原图直接嵌入同一条回复，指出现在从哪一步开始。'
+                                         '客户索要购买步骤、找不到图或没看懂时，运行 guide --topic chuhai_purchase，把三张原图和入口链接重新给齐。'
+                                         '注册的是出海91购物网站账号，本流程不引导注册 Google 账号。客户明确选择网站后记录 purchase_channel，已完成的步骤直接沿用。客户问买哪个时，按实际页面定位老号分类并核对美区、价格与库存。')
+            result['next_action'] += (' 客户说买好并收到资料时，提交 account_origin=purchased 与 google_account_status=available，直接展示资料、取码和回填三张图及取码链接。'
                                       '若客户后来找回自己的可用账号，明确提交 account_origin=self_used 继续复用。')
             messages.append(GOOGLE_TIMING)
         else:
@@ -163,7 +136,7 @@ def customer_output(result, state, now):
                 '简短的“有／没有”必须明确是在回答 Google／Gmail 的提问。'
                 '确认自己的 Google／Gmail 能登录时提交 account_origin=self_used 与 google_account_status=available，直接接到 VPS；从未使用 Claude 也可复用。'
                 '客户已明确说这个号关联的 Claude 账号被封禁时，只问「您还有另一个能正常登录的 Google／Gmail 账号吗？」'
-                '只有客户明确确认没有可用 Google 账号，才用 source.kind=user、source.reference=客户原话提交 google_account_status=unavailable，随后按返回内容给出默认购买建议、入口链接与选购图解。'
+                '只有客户明确确认没有可用 Google 账号，才用 source.kind=user、source.reference=客户原话提交 google_account_status=unavailable，随后按返回内容给出购买建议与图解。'
                 + GOOGLE_TIMING)
     if key == 'login':
         messages.extend([GOOGLE_LOGIN_GUIDANCE, GOOGLE_VERIFICATION_GUIDANCE])
@@ -230,9 +203,7 @@ def customer_output(result, state, now):
             messages.append('我们先配置电脑，随后完成手机网络、手机登录和订阅。后续您准备用 iPhone、iPad 还是安卓手机？')
         if device.get('setup_explained') is True and device.get('pdf_explained') is not True:
             messages.append(PDF_GUIDANCE)
-            result['wait_for_user'] = True
-            result['next_action'] = ('本轮必须在面向客户的最终正式回复正文里完整展示 PDF 用途说明与“是否放到下载文件夹”的询问，然后结束本轮、等待客户下一轮回复后再提交 pdf_explained=true（若客户下一轮未回答另存则记 pdf_save_choice=unanswered 并继续）。'
-                                     '严禁在当前回合工具调用间隙用短播报就自行提交 pdf_explained=true 跳进下一阶段。')
+            result['next_action'] = '在对话展示 PDF 用途和另存询问后，提交 pdf_explained=true。未回答另存可记 unanswered，继续配置。'
         result['next_action'] += (' 按实际回答补齐 missing 中的电脑、手机及说明字段；“先配置电脑”只确定顺序，继续确认缺少的手机类型。'
                                   '本阶段完成后按返回任务准备 Google 账号，确认可用后再进入 VPS。')
         if device.get('phone') == 'android' and device.get('android_route_explained') is not True:
@@ -380,13 +351,9 @@ def customer_output(result, state, now):
     if messages:
         existing = result.get('customer_message')
         result['customer_message'] = '\n\n'.join(([existing] if existing else []) + messages)
-        result['display_instruction'] = (
-            '把 customer_message 直接展示在客户对话中，完整保留其中的说明性文字、用途解释、原因说明和新手提醒，严禁压缩成冷冰冰的一两句纯问答；'
-            '相应说明完成后再记录展示字段。首次进入当前阶段时先简短回应用户刚才的反馈，再完整展示用途解释与背景说明，接着带做当前操作；同一阶段连续操作复用已讲过的解释，客户追问时再展开。'
-            '遵循 communication_instruction，先给建议和通俗说明，再给动作与预期结果。'
-        )
+        result['display_instruction'] = '把 customer_message 直接展示在客户对话中；相应说明完成后再记录展示字段。首次进入当前阶段时先展示用途解释，再带做当前操作；同一阶段连续操作复用已讲过的解释，客户追问时再展开。遵循 communication_instruction，先建议后动作，简短说明。'
         if key == 'google' and result.get('customer_images'):
-            result['display_instruction'] += ' 在本轮最终正式正文完整展示首登防踩坑原因、2FA 两种方式说明（主推 https://2fa.run/，手机本机验证器导入后面有条件再配）并嵌入 customer_images 的三张原图，然后结束本轮等待客户回复后再提交 materials_explained=true 与 materials_images_shown（不在同轮后台提交）。'
+            result['display_instruction'] += ' 同条回复嵌入 customer_images 的三张原图，实际展示后提交 materials_explained=true 与 materials_images_shown。'
         if key == 'login':
             result['display_instruction'] += ' 当前已进入登录阶段。Google 页面要求身份验证器验证码时，直接展示取码链接，并把 verification_images 转为项目绝对路径嵌入聊天；按实际验证方式继续。'
         if APPLE_PAYMENT_RECHECK in messages:

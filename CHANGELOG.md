@@ -1,5 +1,9 @@
 # 更新记录
 
+## 1.0.67 · 2026-11-26
+
+- 整体回退并恢复至 `v1.0.61`（`d59882a`）稳定基线：所有入口说明、教程正文、控制层脚本、配图与测试用例均恢复为 `v1.0.61` 原状；使用递增版本号 `1.0.67` 发布，保留完整 Git 历史并确保已拉取 `1.0.62–1.0.66` 的环境可正常检测到基线恢复更新。
+
 ## 1.0.66 · 2026-11-26
 
 - 修复 `google` 阶段买完账号后三张 2FA 原图与首登防踩坑提醒被 Codex 折叠收进中间步骤的问题（`scripts/workflow_messages.py`、`AGENTS.md`、`SKILL.md`、`references/08-google-account.md`、`references/17-workflow-controller.md`）：该分支新增 `wait_for_user=true`，要求在面向客户的最终正式正文里完整展示首登原因、2FA 说明与三张原图后结束本轮，待客户回复「知道了／下一步」后再提交 `materials_explained=true` 进入 VPS，禁止同轮后台提交跳过展示。

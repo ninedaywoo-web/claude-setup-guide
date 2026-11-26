@@ -47,12 +47,8 @@ def compact(result):
     if lesson:
         result['current_guide'] = {k: lesson[k] for k in ('topic', 'step', 'total_steps', 'reference')}
     result.pop('teaching_next_action', None)
-    result['display_instruction'] = (
-        '首次进入阶段时，先简短回应用户刚才的回复，再完整展示 customer_message 的说明性文字、用途解释、原因说明、使用信息和提醒，用通俗大白话讲给新手听，不要压成一两句纯问答；'
-        '返回 wait_for_user=true 或含待客户确认的提问时，在最终正式正文里展示并结束本轮等待客户回复后再提交（不用工具调用间隙的短播报替代正文）。'
-        '先给明确建议，标明操作设备，配原图、1～3 个动作与完成标志；同一阶段后续轮次已讲内容按需复用。'
-        '首次进入阶段将 customer_message 中全部图解按顺序展示齐全，配中文说明与当前起点；商家、账号来源或支付渠道首次确定或改变时，同阶段也要补齐本次 customer_images 中尚未展示的新分支图，包括该分支的后续操作预览；之前已完整展示的图可以复用。teaching_step 只定位当前操作，不缩减首次图集。用户说不会或图没显示时用 guide 重讲，图没显示时同条附返回的 image_links 或 PDF。明确索要其他商家图可只读预览，保留当前选择，随后接回当前阶段。'
-    )
+    result['display_instruction'] = ('首次进入阶段，完整展示 customer_message 的说明、使用信息和提醒；先给明确建议，标明操作设备，配原图、1～3 个动作与完成标志；已讲内容按需复用。'
+        '首次进入阶段将 customer_message 中全部图解按顺序展示齐全，配中文说明与当前起点；商家、账号来源或支付渠道首次确定或改变时，同阶段也要补齐本次 customer_images 中尚未展示的新分支图，包括该分支的后续操作预览；之前已完整展示的图可以复用。teaching_step 只定位当前操作，不缩减首次图集。用户说不会或图没显示时用 guide 重讲，图没显示时同条附返回的 image_links 或 PDF。明确索要其他商家图可只读预览，保留当前选择，随后接回当前阶段。')
     if result.get('stage') == 'browser':
         result['display_instruction'] += ('本阶段说明须包含 Claude 桌面版、Claude Code 可用，AdsPower 的登录授权用途，'
             '以及桌面端权限方面的担忧和已交付用户正常使用的反馈；按 customer_message 原有表述给到客户。')

@@ -1,5 +1,10 @@
 # 更新记录
 
+## 1.0.66 · 2026-11-26
+
+- 修复 `google` 阶段买完账号后三张 2FA 原图与首登防踩坑提醒被 Codex 折叠收进中间步骤的问题（`scripts/workflow_messages.py`、`AGENTS.md`、`SKILL.md`、`references/08-google-account.md`、`references/17-workflow-controller.md`）：该分支新增 `wait_for_user=true`，要求在面向客户的最终正式正文里完整展示首登原因、2FA 说明与三张原图后结束本轮，待客户回复「知道了／下一步」后再提交 `materials_explained=true` 进入 VPS，禁止同轮后台提交跳过展示。
+- 在 2FA 说明中并列写明两种取码方式：明确 `[2FA 取码工具：https://2fa.run/](https://2fa.run/)` 是本教程推荐的快捷验证器使用方式，同时说明手机本机身份验证器离线导入密钥后面有条件再配即可。
+
 ## 1.0.65 · 2026-11-26
 
 - 做减法精简 `AGENTS.md`、`SKILL.md`、`scripts/workflow_messages.py`、`scripts/workflow_view.py` 及相关章节文案：移除强硬对抗式“全局执行底线／严禁官方注册”措辞，避免诱发模型防御性覆盖；完整保留已验证生效的新手说明呈现、`devices` 阶段 `wait_for_user=true` 停顿与“以客户现场实时页面为准”规则。

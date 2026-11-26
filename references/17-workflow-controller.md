@@ -44,7 +44,7 @@ VPS 阶段按既定商家与默认机房推进，不询问使用国家／地区�
 
 `google_account_status=unavailable` 时同条回复展示两家购号链接，默认推荐 GmailBuy 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」并说明谷歌账号网站库存和风控可能不确定。客户选择后记录 `purchase_channel=gmailbuy` 或 `chuhai91`；首推或已选 GmailBuy 时直接给该站首页、该新号直达链接与选购图，按实际页面继续。选择出海91 时，直接嵌入 `customer_message` 中注册、分类和选号三张原图，给出注册页和分类页链接并标明当前操作。客户问购买办法或没看到图时，调用 `guide --topic gmailbuy` 或 `chuhai_purchase` 重发整组。明确索要另一家图时可用 guide 预览，沿用当前渠道。
 
-收到购买资料时提交 `account_origin=purchased`、`google_account_status=available`。程序仍返回 `google`，在 `customer_message` 直接提供首登防踩坑提醒（先不要登录 Gmail／Google 邮箱，等全部配完网络后第一次登录直接在 Claude 登录；**当前绝不提前登录**）和 https://2fa.run/，`customer_images` 给出原账号资料、取码与回填三张图。**无论本次买到的套餐是否带 2FA、后续会不会弹 2FA，都必须在同条回复自动展示全部说明、链接和三张原图（不等客户问）**，实际展示后提交 `materials_explained=true` 与 `materials_images_shown` 接续下一阶段 `vps`。这是展示完成记录，无需用户再确认。未买到账号时展示标记不代替账号准备完成。
+收到购买资料时提交 `account_origin=purchased`、`google_account_status=available`。程序仍返回 `google`（含 `wait_for_user=true`），在 `customer_message` 直接提供首登防踩坑提醒及原因、2FA 科普与两种取码方式说明（主推 https://2fa.run/，手机本机导入密钥后面有条件再配），`customer_images` 给出原账号资料、取码与回填三张图。**无论本次买到的套餐是否带 2FA、后续会不会弹 2FA，都必须在本轮最终正式正文自动展示全部说明、链接和三张原图（不等客户问）**，展示完毕后结束本轮、等客户回复「知道了／下一步」后再提交 `materials_explained=true` 与 `materials_images_shown` 接续下一阶段 `vps`（不在同轮后台提交，避免三张原图被客户端折叠）。未买到账号时展示标记不代替账号准备完成。
 
 已有可用账号提交 `account_origin=self_used`、`google_account_status=available` 直接复用。为接续现有输入，“没有账号”变为“已备妥”时默认走购买资料说明；用户后来找回自己的可用账号时，明确使用 `self_used`。旧进度保留已有 Google 账号结果和选购渠道。
 

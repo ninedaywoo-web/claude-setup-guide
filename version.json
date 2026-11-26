@@ -1,10 +1,10 @@
 {
-  "version": "1.0.65",
+  "version": "1.0.66",
   "published_at": "2026-11-26",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "精简并柔化 AGENTS.md、SKILL.md 与控制层措辞，移除强硬对抗口吻，保留完整新手说明、devices 阶段 PDF 停顿与不以非实时缓存判库存规则",
-    "收紧 intake 开场只问封禁经历，不提前展开设备或登录方式追问；Google 购号以国内官网易卡扫码验证的客观原因自然推荐 GmailBuy 新号与出海91，保留首登原因与 2FA 科普"
+    "修复 Google 买完账号后同轮后台提交 materials_explained 导致三张 2FA 原图和首登提醒被 Codex 折叠隐藏的问题（新增 wait_for_user=true，独立停一轮在最终正文完整展示后再进 VPS）",
+    "在 2FA 科普中并列说明两种取码方式：明确 https://2fa.run/ 为教程推荐的快捷验证器使用方式，手机本机身份验证器导入密钥后面有条件再配"
   ]
 }

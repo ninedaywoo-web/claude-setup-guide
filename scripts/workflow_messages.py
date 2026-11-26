@@ -19,7 +19,11 @@ GOOGLE_MATERIALS_GUIDANCE = """**⚠️ 买完 Google 账号后，务必先记�
 **顺便先把 2FA 验证码是什么、怎么用直接教给您（不管这次买的新号有没有带 2FA、后面会不会弹，先看懂留着备用）：**
 - **什么是 2FA 验证码？**简单说就是“两步验证动态数字密码”（类似银行动态口令，每 30 秒自动刷新一组 6 位数字）。商家订单里标注的 **“2FA 密钥”**（一串字母和数字）相当于生成动态密码的“种子”，登录 Google 时万一弹出“身份验证器验证码／两步验证”，就需要用它算出当前 6 位数字填进去才能过验证。
 - **先保存哪些资料？**把订单里的 Google 邮箱、登录密码、恢复邮箱／辅助邮箱全部存好；如果订单里还带有商家标注的「2FA 密钥」，也一并存好。
-- **万一弹 2FA 怎么取码？**取码网址是 [2FA 取码工具：https://2fa.run/](https://2fa.run/)。等后面全部网络配置验收完成、在手机 Claude 用 Google 登录时，万一 Google 弹出身份验证器验证码，就照下面三张原图把 2FA 密钥贴进网站算出当前 6 位验证码，再填回手机登录页面即可。"""
+- **两种取码方式怎么选？**
+  - **教程推荐方式（快捷网页取码）：**直接用 **[2FA 取码工具：https://2fa.run/](https://2fa.run/)**，这是我们教程里推荐的验证器使用方式，无需额外装软件。等后面全部网络配置验收完成、在手机 Claude 用 Google 登录时，万一 Google 弹出身份验证器验证码，照下面三张原图把 2FA 密钥贴进网站算出当前 6 位验证码，再填回手机登录页面即可。
+  - **本机离线方式（后面有条件再配）：**如果您偏好本机离线工具，也可以后面有条件时再把这串 2FA 密钥导入手机本机的身份验证器（如 Google Authenticator 或 iPhone 自带「密码」App）生成同样的 6 位动态验证码。当前先看懂下面三张原图备用就行。
+
+**请先确认看懂了上面的首登防踩坑提醒和 2FA 备用图解，回复「知道了」或「下一步」，我们就正式进入 VPS 节点准备。**"""
 GOOGLE_LOGIN_GUIDANCE = '手机网络已经验收完成，接下来在手机上使用准备好的 Google 账号登录 Claude。按当前页面输入账号和密码；Google 要求身份验证器验证码时，再按下面的取码步骤操作。'
 GOOGLE_VERIFICATION_GUIDANCE = '取码入口：[2FA 取码工具：https://2fa.run/](https://2fa.run/)。使用商家提供的 2FA 密钥时，在已配置好的 AdsPower 中打开网站，将密钥填入上方“JS实现”区域，点击“点击获取验证码”，再把当前验证码填回手机 Google 页面。使用自己的 Google 账号时，也可以从自己已绑定的身份验证器取得验证码；其他验证方式按当前页面完成。'
 from workflow_teaching import CHUHAI_PURCHASE_IMAGES, GOOGLE_IMAGES, attach as attach_teaching
@@ -128,11 +132,12 @@ def customer_output(result, state, now):
         elif status == 'available':
             messages.append(GOOGLE_MATERIALS_GUIDANCE)
             result['customer_images'] = GOOGLE_ORDER_IMAGES.copy()
-            result['next_action'] = ('无论这次买到的 Google 账号有没有附带 2FA 密钥、后续是否会弹 2FA，都必须在当前回复默认自动完整讲清以下三点并把 customer_images 三张原图转为项目绝对路径全部嵌入聊天，不等客户主动发问：'
+            result['wait_for_user'] = True
+            result['next_action'] = ('无论这次买到的 Google 账号有没有附带 2FA 密钥、后续是否会弹 2FA，都必须在本轮面向客户的最终正式回复正文里完整讲清以下三点并把 customer_images 三张原图转为项目绝对路径全部嵌入最终正文，不等客户主动发问：'
                                      '① 首登防踩坑提醒及原因——明确告知不要自己先登 Gmail、Google 网页或其他地方，并把原因直接讲给客户（谷歌风控不确定，新号第一次登录往往不需要过风控验证、最容易一次登进去，所以要把宝贵的第一次登录留给后面的 Claude 登录），严禁省掉原因；'
-                                     '② 大白话解释什么是 2FA 验证码（两步验证动态 6 位数字密码、每 30 秒刷新，订单里的「2FA 密钥」是生成它的种子，万一 Google 弹验证器验证码就用它取码），并直接给出 https://2fa.run/ 和三张原图；'
+                                     '② 大白话解释什么是 2FA 验证码（两步验证动态 6 位数字密码、每 30 秒刷新，订单里的「2FA 密钥」是生成它的种子），明确说明 [2FA 取码工具：https://2fa.run/](https://2fa.run/) 是我们教程推荐的快捷验证器使用方式，同时也说明手机本机身份验证器导入密钥后面有条件再配即可，并嵌入三张原图；'
                                      '③ 严禁修改或跳过主流程顺序：现在先把账号资料存好，绝对不要提前带客户登录 Google 或 Claude，等 VPS、电脑网络、AdsPower 和手机网络全部配完验收后再在手机 Claude App 首次登录。'
-                                     '实际嵌入三张原图后立即提交 materials_explained=true 和 materials_images_shown（本次展示的三张图片路径），按控制层返回的下一阶段（vps）继续推进；这一步由 Codex 展示完成，无需客户额外确认。')
+                                     '重要停顿边界（wait_for_user=true）：本轮把完整文字说明与三张原图写进最终正式正文并请客户回复「知道了／下一步」后，立即结束本轮！严禁在当前回合工具调用间隙用中间播报贴图后立刻提交 materials_explained=true 跳进 vps（否则三张原图会被客户端折叠隐藏）。待客户下一轮回复后，再提交 materials_explained=true 和 materials_images_shown 进入 vps 阶段。')
         elif status == 'unavailable':
             if channel == 'chuhai91':
                 messages.append('沿用您选择的 [出海91](https://chuhai91.cc/)，按下面三步图购买美区 Google 账号（谷歌账号网站库存与风控可能不确定，按当前页面价格和库存核对）。先注册或登录出海91 购物网站账号（QQ 邮箱也可以），再接到已完成的位置。')
@@ -381,7 +386,7 @@ def customer_output(result, state, now):
             '遵循 communication_instruction，先给建议和通俗说明，再给动作与预期结果。'
         )
         if key == 'google' and result.get('customer_images'):
-            result['display_instruction'] += ' 同条回复嵌入 customer_images 的三张原图，实际展示后提交 materials_explained=true 与 materials_images_shown。'
+            result['display_instruction'] += ' 在本轮最终正式正文完整展示首登防踩坑原因、2FA 两种方式说明（主推 https://2fa.run/，手机本机验证器导入后面有条件再配）并嵌入 customer_images 的三张原图，然后结束本轮等待客户回复后再提交 materials_explained=true 与 materials_images_shown（不在同轮后台提交）。'
         if key == 'login':
             result['display_instruction'] += ' 当前已进入登录阶段。Google 页面要求身份验证器验证码时，直接展示取码链接，并把 verification_images 转为项目绝对路径嵌入聊天；按实际验证方式继续。'
         if APPLE_PAYMENT_RECHECK in messages:

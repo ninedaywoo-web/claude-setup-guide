@@ -3,7 +3,7 @@
     ".gitattributes": "547f59603028195ff9f8a87d04c4651551e8bd0d68f075257dfd549cd846b25b",
     ".gitignore": "29d98e57738b3097cf43d3f351df9be6766d48a0b522393e1b5437a9587988f0",
     "AGENTS.md": "51b22aab0bdd8a565a8b87b4c47f9550589c03dfbbe36f4ae6d3f763d135725b",
-    "CHANGELOG.md": "40a17c7dcadfda21b35c9e5ca8f4d8f47a1aa2c0c91a812c3a07c0249b36e825",
+    "CHANGELOG.md": "5d347365b28a0cd7976a3eb6c60caae34ead251c4e981a34381cafc1f6cc2aa8",
     "README.md": "e91bf77b3fbb2e90c9eaca5f12f940a76ccfd6dd26fe3138a61f0efc17f91cda",
     "SKILL.md": "df1a994285349ab6e3ae5669f3ab237dafe944c6c965cb1e24337f85d9175253",
     "agents/openai.yaml": "77f7b07e49ad3a01d1cd9f61e5ef30867346474bb53a4af6b77a84ad6cf22014",
@@ -106,7 +106,7 @@
     "references/05-ai-walkthrough.md": "fdeff9b67242ffaa109e8f2a7f152b0ecae94531c55761a9536bf4fe9f040796",
     "references/06-before-login.md": "02b05c0c690b04a8b1e09428da51087bd01f1a3aa7d85bf77c4d0b0df08ff09a",
     "references/07-apple-purchase-support.md": "9a2c2d73a0fd4037ff14e0f528bc8356413e024e41f0649ff25c632f1bd2571e",
-    "references/08-google-account.md": "3cc8f280ce52cd12cc20d6435c7a7353f711655a5c650c1a09bcc33ae45a3772",
+    "references/08-google-account.md": "cc3fe27ea1238779d27531391f7c54ccc58ff080ff654598a4920c65cbdb50f6",
     "references/09-vps-purchase.md": "59c750f3de64d9a66f74558c3dd1d6e48a299f2f2cd87ad7b3f6676702bcef23",
     "references/10-windows.md": "d9723fe03fcf5ac12502fb16456194ec61dd0969cf4e5fd80c85d77f703755ef",
     "references/11-android-web-pay.md": "c4361710e7afea9719a7cb28a709100a624ec3d641fabddd653dc5aa0ff206ed",
@@ -133,14 +133,14 @@
     "scripts/workflow.py": "7783e8956bae22c9898cdc07fa2f087cd6fe23763e66973f0620ed73d48e387f",
     "scripts/workflow_definition.py": "e34c518cbaf1b62f95a09358f7ed738dc5206580d1602ec1cbae2fedee3bcb23",
     "scripts/workflow_guard.py": "045d1e68962fc74adb9a9a6b9ba1aeec98b1fed0de9b26ed9926f5b55314784e",
-    "scripts/workflow_messages.py": "aed1deb0164c6c28d39ba75723757ff65c7431a75a2d95c9caca24f9cc9fc7fb",
+    "scripts/workflow_messages.py": "e27a510e3c8777febfc13d0d383e14567669805c6f22b694603b0d130c8487f7",
     "scripts/workflow_teaching.py": "20bb0be0b2482e289a932f1292d99d8bfee16866389057360841d3e3d1366342",
     "scripts/workflow_view.py": "9a13141e2dfdddc1c2f6043a45c2a022f8752962660d5b8c1a5a66934426619b",
-    "tests/model_replay.py": "37f9899db546354489e8da5c3487e2e4b64f3004fb20eb44bc789398b9e5b937",
+    "tests/model_replay.py": "33bd85cab9c193f4da40bfb4f3f75f0f8def7d1e6343c548a8da76c3ba997fd9",
     "tests/panel_contract_smoke.py": "bb7059e35488f569ec67a1720280cfff3718de5eabb5595ca98fefe5ccbcfb96",
     "tests/test_adversarial_flow.py": "42f93a62652fc23bb9f0e7dfd131ead4c3ea3a820641086a4f088c2a8c5d9d8a",
     "tests/test_capture_receipts.py": "f760c0b7248cd470bbaa51a39786fa88de2b02a8f0f080a3e95d92474b8179b6",
-    "tests/test_customer_flow_audit.py": "964a6ef0b6f68586698ea29517763df8d6ffd55a3f7a06e90091cca5795d9b7d",
+    "tests/test_customer_flow_audit.py": "5239d719eb09c4cfeee510656c7a848ddf98ede276956604d6d122d59dbe1dff",
     "tests/test_delivery_versions.py": "5028a8c0ce0cb308c40497ed9c22267f12576fe96b057376b59c48d2d124eb46",
     "tests/test_download.py": "3cebad299c30613768d84373da77e2f69964f1a2e8418eec1c252889ceff573a",
     "tests/test_login_readiness.py": "cf1e5fa0c1222887b37574f21759c2de113793525fc6b7e985770d6dc80e6267",
@@ -155,6 +155,6 @@
     "tests/test_workflow.py": "7cebc9eefd6f2b7624ca2c3a21b000780cfac770fee50e989f2865f4f7b6aa7b",
     "tests/test_workflow_teaching.py": "f39eb5c85c1a1de303676755c2f4360a8f5c965ad64f8dcaba52869867602079",
     "tests/test_workflow_updates.py": "70b4d98904e32f6de176874d8267f89d8f59ba4e6e6d3475641bfc206ca62b4f",
-    "version.json": "35eb6ac1a0c3acaf207576ea1654151864ed8ca5873d0919a821e08cb97459cc"
+    "version.json": "a796170592e2a37d179edb7041a02cf5117632a21016c1bc1291bdf3ed071bb5"
   }
 }

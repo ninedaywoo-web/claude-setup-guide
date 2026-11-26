@@ -10,14 +10,16 @@ GOOGLE_PURCHASE = """您目前没有可用的 Google 账号。本流程不引导
 - 首选 [GmailBuy](https://gmailbuy.com/)：推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。
 - 备选 [出海91](https://chuhai91.cc/)：也有谷歌精品老号等套餐可选（选这家时我会立刻给您完整三步图）。
 
-**选购提示：**谷歌账号网站的库存有时候会变动（不确定），谷歌账号的风控情况也会不确定，下单前请核对当前页面的实际价格、库存和售后说明，看您个人选择。下面是 GmailBuy 选购与查单示意图。买到的 Google 账号用于后续登录 Claude；**买完后先不要去登录 Gmail 或 Google 邮箱**，等我们把后面的服务器和网络全部配完后，第一次登录直接去 Claude 登录即可。"""
-GOOGLE_MATERIALS_GUIDANCE = """**买完 Google 账号后，先记住这条防踩坑提醒（现在先不要登录）：**
-- **不要自己先去登录 Gmail、Google 网页或其他地方**，先把商家给的账号资料保存好就行。
+**选购提示：**谷歌账号网站的库存有时候会变动（不确定），谷歌账号的风控情况也会不确定，下单前请核对当前页面的实际价格、库存和售后说明，看您个人选择。下面是 GmailBuy 选购与查单示意图。买到的 Google 账号用于后续登录 Claude；**买完后先不要去登录 Gmail 或 Google 邮箱**（因为谷歌风控不确定，而账号的第一次登录往往最不容易触发风控，我们要把这宝贵的“第一次登录”留给后面的 Claude 登录），先把资料保存好，等全部网络配完后再去 Claude 首次登录。"""
+GOOGLE_MATERIALS_GUIDANCE = """**⚠️ 买完 Google 账号后，务必先记住这条防踩坑提醒（现在先不要登录任何地方）：**
+- **不要自己先去登录 Gmail、Google 网页或其他任何地方**，把商家给的账号资料保存好就行。
+- **为什么？**因为谷歌账号的风控情况不确定，而新拿到手的账号**第一次登录往往不需要过风控验证、最容易一次登进去**；如果提前在 Gmail 或别的地方把“第一次登录”用掉了，后面再登 Claude 就更容易弹风控。所以我们把宝贵的“第一次登录”专门留给后面的 Claude 登录。
 - **现在还不是登录的时候**——我们还是严格按主流程先把 **VPS、电脑网络、AdsPower 和手机网络全部配置并验收完成**，等全部配好后，**第一次登录这个 Google 账号时直接在手机 Claude App 里登录即可**。
 
-**顺便提前教您看懂账号资料和 2FA 验证码（不管这次买的新号有没有带 2FA、以后会不会弹 2FA，都先留着备用）：**
-- 先保存好订单里的 Google 邮箱、登录密码，以及恢复邮箱／辅助邮箱；如果订单里还带有商家标注的“2FA 密钥”（一串用来生成登录验证码的字母和数字），取码网址是 [2FA 取码工具：https://2fa.run/](https://2fa.run/)。
-- 等后面手机网络配置验收完成、在 Claude 里用 Google 登录时，万一 Google 要求身份验证器验证码，再按下面三张原图把 2FA 密钥填进去取码并回填到手机登录页面。"""
+**顺便先把 2FA 验证码是什么、怎么用直接教给您（不管这次买的新号有没有带 2FA、后面会不会弹，先看懂留着备用）：**
+- **什么是 2FA 验证码？**简单说就是“两步验证动态数字密码”（类似银行动态口令，每 30 秒自动刷新一组 6 位数字）。商家订单里标注的 **“2FA 密钥”**（一串字母和数字）相当于生成动态密码的“种子”，登录 Google 时万一弹出“身份验证器验证码／两步验证”，就需要用它算出当前 6 位数字填进去才能过验证。
+- **先保存哪些资料？**把订单里的 Google 邮箱、登录密码、恢复邮箱／辅助邮箱全部存好；如果订单里还带有商家标注的「2FA 密钥」，也一并存好。
+- **万一弹 2FA 怎么取码？**取码网址是 [2FA 取码工具：https://2fa.run/](https://2fa.run/)。等后面全部网络配置验收完成、在手机 Claude 用 Google 登录时，万一 Google 弹出身份验证器验证码，就照下面三张原图把 2FA 密钥贴进网站算出当前 6 位验证码，再填回手机登录页面即可。"""
 GOOGLE_LOGIN_GUIDANCE = '手机网络已经验收完成，接下来在手机上使用准备好的 Google 账号登录 Claude。按当前页面输入账号和密码；Google 要求身份验证器验证码时，再按下面的取码步骤操作。'
 GOOGLE_VERIFICATION_GUIDANCE = '取码入口：[2FA 取码工具：https://2fa.run/](https://2fa.run/)。使用商家提供的 2FA 密钥时，在已配置好的 AdsPower 中打开网站，将密钥填入上方“JS实现”区域，点击“点击获取验证码”，再把当前验证码填回手机 Google 页面。使用自己的 Google 账号时，也可以从自己已绑定的身份验证器取得验证码；其他验证方式按当前页面完成。'
 from workflow_teaching import CHUHAI_PURCHASE_IMAGES, GOOGLE_IMAGES, attach as attach_teaching
@@ -117,8 +119,10 @@ def customer_output(result, state, now):
         elif status == 'available':
             messages.append(GOOGLE_MATERIALS_GUIDANCE)
             result['customer_images'] = GOOGLE_ORDER_IMAGES.copy()
-            result['next_action'] = ('无论这次买到的 Google 账号有没有附带 2FA 密钥、后续是否会弹 2FA，都必须在当前回复默认自动展示 customer_message 中的首登防踩坑提醒和 2FA 取码链接，并将 customer_images 三张原图转为项目绝对路径全部嵌入聊天，不等客户主动发问。'
-                                     '严禁修改或跳过主流程顺序：首登提醒只是告知客户买完后不要先登 Gmail，等全部配完网络后再去 Claude 登录，现在绝对不要带客户登录 Google 或 Claude。'
+            result['next_action'] = ('无论这次买到的 Google 账号有没有附带 2FA 密钥、后续是否会弹 2FA，都必须在当前回复默认自动完整讲清以下三点并把 customer_images 三张原图转为项目绝对路径全部嵌入聊天，不等客户主动发问：'
+                                     '① 首登防踩坑提醒及原因——明确告知不要自己先登 Gmail、Google 网页或其他地方，并把原因直接讲给客户（谷歌风控不确定，新号第一次登录往往不需要过风控验证、最容易一次登进去，所以要把宝贵的第一次登录留给后面的 Claude 登录），严禁省掉原因；'
+                                     '② 大白话解释什么是 2FA 验证码（两步验证动态 6 位数字密码、每 30 秒刷新，订单里的「2FA 密钥」是生成它的种子，万一 Google 弹验证器验证码就用它取码），并直接给出 https://2fa.run/ 和三张原图；'
+                                     '③ 严禁修改或跳过主流程顺序：现在先把账号资料存好，绝对不要提前带客户登录 Google 或 Claude，等 VPS、电脑网络、AdsPower 和手机网络全部配完验收后再在手机 Claude App 首次登录。'
                                      '实际嵌入三张原图后立即提交 materials_explained=true 和 materials_images_shown（本次展示的三张图片路径），按控制层返回的下一阶段（vps）继续推进；这一步由 Codex 展示完成，无需客户额外确认。')
         elif status == 'unavailable':
             if channel == 'chuhai91':

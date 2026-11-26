@@ -1,10 +1,10 @@
 {
-  "version": "1.0.62",
+  "version": "1.0.63",
   "published_at": "2026-11-26",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "Google 账号默认推荐改至 GmailBuy 全新美国谷歌新号套餐，严禁引导客户去官网自行注册 Google，并补充库存与风控不确定说明",
-    "买完 Google 账号后默认自动展示首登防踩坑提醒（先不登 Gmail，全部网络配完后再直接在 Claude 登录，绝不改变主流程）及 2FA 三张图解"
+    "补充买完 Google 账号先不要登录 Gmail 的风控原因说明（把最不易触发风控的第一次登录留给 Claude），主流程顺序不变",
+    "用大白话补充解释 2FA 动态验证码的概念与用途，买完后默认自动弹出 2FA 说明、取码链接与三张原图"
   ]
 }

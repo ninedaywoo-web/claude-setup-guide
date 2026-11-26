@@ -407,6 +407,8 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         bought_view = self.flow.submit(self.payload({'google_account_status': 'available'}))
         self.assertEqual(bought_view['stage'], 'google')
         self.assertIn('不要自己先去登录 Gmail', bought_view['customer_message'])
+        self.assertIn('第一次登录往往不需要过风控', bought_view['customer_message'])
+        self.assertIn('什么是 2FA 验证码', bought_view['customer_message'])
         self.assertIn('不管这次买的新号有没有带 2FA', bought_view['customer_message'])
         self.assertIn('严禁修改或跳过主流程顺序', bought_view['next_action'])
         self.assertEqual(bought_view['customer_images'], GOOGLE_IMAGES)

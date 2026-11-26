@@ -224,15 +224,13 @@ class TeachingTests(unittest.TestCase):
     def test_no_google_account_shows_default_seller_gallery_before_choice(self):
         c=self.case;c.reach('google')
         view=c.flow.submit(c.payload({'google_account_status':'unavailable'}))
-        self.assertTrue(all(p in view['customer_images'] for p in ('assets/chuhai91/01-register.png',
-                           'assets/chuhai91/02-google-aged-category.png','assets/chuhai91/03-us-ip-product.png')))
+        self.assertEqual(view['customer_images'], ['assets/step-guides/gmailbuy-shop.png'])
         self.assertNotIn('purchase_channel',view['observed'])
-        self.assertIn('https://gmailbuy.com',view['customer_message'])
-        self.assertIn('https://chuhai91.cc/auth/register',view['customer_message'])
-        self.assertIn('https://chuhai91.cc/categories/premium-aged-google-accounts',view['customer_message'])
+        self.assertIn('https://gmailbuy.com/home/goods.html?id=18&sid=18',view['customer_message'])
+        self.assertIn('https://chuhai91.cc/',view['customer_message'])
         self.assertNotIn('先单独确认',view['next_action'])
-        self.assertEqual(view['default_teaching']['topic'],'chuhai_purchase')
-        repeated=c.flow.guide('chuhai_purchase')
+        self.assertEqual(view['default_teaching']['topic'],'gmailbuy')
+        repeated=c.flow.guide('gmailbuy')
         self.assertEqual(repeated['customer_images'],view['customer_images'])
         self.assertTrue(repeated['progress_unchanged'])
 

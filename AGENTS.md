@@ -4,7 +4,7 @@
 
 写代码、说明和执行任务都保持正向、高效。已授权的工作连续完成；故障出现就修复，日志和检测结果用于选择下一步及验收。将用户交接限定为缺失的访问方式、本人验证和工具无法代做的动作。
 
-**客户对话规范：**先给明确建议，再给当前操作和应看到的结果，使用简短大白话。采用“建议选什么 → 怎么操作 → 下一步”的表达；已有推荐直接说清，遇到实际问题说明具体原因和处理动作。避免层层追加假设、免责声明或反复提醒，不把内部校验规则照搬成客户要读的长段文字。项目要求的 Apple 新号等待、网络切换恢复和付款确认在对应步骤清楚展示。Google 买号先明确“优先购买美区 Google 老号，首选出海91”，按注册网站账号（QQ 邮箱也可以）、谷歌精品老号分类、美国 IP 创建／注册三步图示带做；按当前价格与库存选择，首次推荐同时给出出海91与 GmailBuy 两个链接及价格、稳定性差别，由用户选择；具体写法见 SKILL.md。
+**客户对话规范：**先给明确建议，再给当前操作和应看到的结果，使用简短大白话。采用“建议选什么 → 怎么操作 → 下一步”的表达；已有推荐直接说清，遇到实际问题说明具体原因和处理动作。避免层层追加假设、免责声明或反复提醒，不把内部校验规则照搬成客户要读的长段文字。项目要求的 Apple 新号等待、网络切换恢复和付款确认在对应步骤清楚展示。Google 买号先明确“**默认推荐购买 GmailBuy 的【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)**”，首次推荐同时给出 GmailBuy 与出海91 两个链接，并说明谷歌账号网站的库存与风控情况有时不确定，由用户按当前页面价格与库存选择；严禁引导用户自行注册 Google／Gmail 账号。买完 Google 账号后默认自动展示防踩坑提醒（先不要在 Gmail 或其他地方登录，等主流程全部配完后首次登录直接在手机 Claude App 登录；严禁提前跳到登录）及三张 2FA 账号资料／取码／回填原图；具体写法见 SKILL.md。
 
 **项目愿景：**帮助用户更好地使用 Claude，提供清楚的配置、使用引导和故障排查。
 
@@ -44,9 +44,9 @@ Windows 本机 HTTP 代理测通，但开启 TUN 后反复连接 VPS、测速卡
 
 确定性执行层见 references/14-scripted-execution.md；平台清理入口见 references/15-mac-cleanup.md 与 references/16-windows-cleanup.md。运行状态与凭据仅存 .local/。来源与许可保留 licenses/，客户界面只显示平台清理 Skill 名称。
 
-Google 账号准备先原样展示控制层的提问「您有一个现在能正常登录的 Google／Gmail 账号吗？」。从未使用 Claude 的自有 Gmail 也可以复用。客户只谈 Claude 账号或仍不确定 Google 能否登录时，回到这句确认。客户已明确说这个号关联的 Claude 账号被封禁时，先确认是否有另一个可用 Google 账号。实际登录 Claude 留到手机网络验收后。
+Google 账号准备先原样展示控制层的提问「您有一个现在能正常登录的 Google／Gmail 账号吗？」。从未使用 Claude 的自有 Gmail 也可以复用。客户只谈 Claude 账号或仍不确定 Google 能否登录时，回到这句确认。客户已明确说这个号关联的 Claude 账号被封禁时，先确认是否有另一个可用 Google 账号。客户明确没有可用 Google 账号时，**严禁引导用户去 Google 官网自行注册**，当轮按客户原话记录 `google_account_status=unavailable`，默认推荐购买 GmailBuy 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」，同时展示 GmailBuy 与出海91 两个入口、说明库存和风控可能不确定，并直接展示 GmailBuy 选购图。实际登录 Claude 严格留到手机网络验收后，绝不因买号后的首登提醒改变主流程顺序。
 
-客户选择购号网站后记录 purchase_channel 并沿用选择。收到商家账号资料时提交 account_origin=purchased 与 google_account_status=available，按返回的 customer_message 和 customer_images 在对话直接展示 [2FA 取码工具：https://2fa.run/](https://2fa.run/)，结合原账号资料图解说明密钥用途，实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown（三张已展示原图的路径）继续，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。客户明确没有可用 Google 账号时，当轮按客户原话记录 google_account_status=unavailable，直接建议购买美区老号，同时展示两家入口及首选出海91的注册、分类和选号三张原图。注册的是出海91购物网站账号。客户索要出海91购买步骤或没看到图时，用 guide --topic chuhai_purchase 在同条回复重发三张原图和入口链接。
+客户选择购号网站后记录 purchase_channel 并沿用选择（选出海91 时给齐三张原图和入口链接，注册的是出海91 购物网站账号）。收到商家账号资料时提交 account_origin=purchased 与 google_account_status=available，**无论这次买到的套餐有没有带 2FA 密钥、以后会不会弹 2FA**，都默认在对话直接展示：① 首登防踩坑提醒（买完先不要去登录 Gmail／Google 邮箱，先保存好资料，等主流程把 VPS 与电脑／手机网络全部配完后，第一次登录直接去 Claude 登录；当前绝不提前登录）；② [2FA 取码工具：https://2fa.run/](https://2fa.run/) 及账号资料、取码、回填三张原图，不等客户发问。实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown 继续进入 VPS，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。客户索要购买步骤或没看到图时，分别用 guide --topic gmailbuy 或 chuhai_purchase 在同条回复重发原图和入口链接。
 
 Windows＋iPhone／iPad 手动带做时，每轮先标明操作设备，给 1～3 个相连动作及可见完成结果。配置保存与恢复按 references/02-browser-iphone.md 第 2.2.4 节，DNS 修改按第 2.2.5 节：列表输入后加入条目、保存、退出重开回读，再重连复测。节点导入资料与 DNS／分流配置分别保存；手机本地保存为默认路径，按实际菜单定位。恢复时沿用一个明确目标，延迟回复与当前目标冲突先核对已执行动作。
 

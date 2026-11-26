@@ -1,5 +1,11 @@
 # 更新记录
 
+## 1.0.62 · 2026-11-26
+
+- 严禁引导客户去 Google 官方注册页自行注册 Google／Gmail 账号：在 `SKILL.md` 硬红线、`workflow_messages.py`（含 `google` 阶段初始分支与全局 `TASK_SCOPE`）同步封死，缺号时必须提交 `google_account_status=unavailable` 走购买渠道。
+- Google 购号默认推荐改为 **GmailBuy** 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」（`https://gmailbuy.com/home/goods.html?id=18&sid=18`），同步更新 `assets/step-guides/gmailbuy-shop.png` 示意图，保留出海91 作为备选渠道，并明确提示谷歌账号网站的库存和风控情况有时不确定。
+- 买完 Google 账号后无论套餐是否附带 2FA、后续会不会弹 2FA，一律默认自动弹出首登防踩坑提醒（不要先去登录 Gmail／Google 邮箱，先保存资料；主流程顺序绝对不变，等 VPS、电脑与手机网络全部配完后，首次登录直接去 Claude 登录）以及 `https://2fa.run/` 与三张账号资料／取码／回填原图，随后立即进入 `vps` 阶段。
+
 ## 1.0.61 · 2026-11-23
 
 - 新增启动前上下文自检与前置空白对话提醒（`README.md`、`SKILL.md`、`references/12-latest-start.md`）：全新空白对话静默放行；检测到旧对话已有无关任务上下文时立即暂停，请客户新建空白对话再粘贴原指令（客户明确回复「继续当前对话」则忽略旧话题起步）。

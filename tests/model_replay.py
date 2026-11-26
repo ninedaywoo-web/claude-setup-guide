@@ -63,9 +63,12 @@ JOURNEYS = {
         'Google 密码已经从自己保存的密码里找到了，账号能正常使用，恢复邮箱也能收信，没有被 Claude 封过。我还没买 VPS，下一步呢？',
         'VPS 还没买。我再问一下，后面 iPhone 订阅是不是用 Apple ID？我电脑还装了 ChatGPT 和 Photoshop，这些要卸载吗？',
         '我看到有人说明年这个套餐要涨到 129 美元，还说购买之前必须先买域名。这些是真的吗？我还在注册页面。']),
+    'google_gmailbuy': ('google', [
+        '没有能正常登录的谷歌账号。',
+        '好，我已经在 GmailBuy 买好那个全新美国谷歌新号了，收到了邮箱密码和辅助邮箱，好像没给 2FA。下一步怎么弄？']),
     'google': ('google', [
         '没有能正常登录的谷歌账号。',
-        '就按你推荐的出海91买。把购买程序发我一下，刚才没看到图。是先注册谷歌吗？',
+        '我想选出海91买。把购买程序发我一下，刚才没看到图。是先注册谷歌吗？',
         '出海91网站已经注册并登录好了，下一步买哪个？',
         '买好了，账号资料也收到了，看不懂。',
         '刚才那个验证码还是不会弄，图没显示，你再教我一下。',
@@ -275,6 +278,19 @@ def assess(root, name, turn, response, commands, before, code, transcript=()):
                       no_early_login=stage in ('google','vps'))
         if name=='bought' or name=='google' and turn==3:
             checks['account_materials_picture']=picture('/google-account/01-order-original.png')
+    elif name=='google_gmailbuy':
+        if turn==0:
+            checks['stage_preserved']=stage=='google'
+            checks['two_sellers']='https://gmailbuy.com/' in response and 'https://chuhai91.cc/' in response
+            checks['gmailbuy_new_account']='全新美国谷歌账号' in response and 'id=18&sid=18' in response
+            checks['no_google_signup']='accounts.google.com' not in response
+            checks['stock_and_risk_notice']=('库存' in response and '风控' in response)
+            checks['gmailbuy_picture']=picture('/step-guides/gmailbuy-shop.png')
+        else:
+            checks['auto_2fa_link']='https://2fa.run/' in response
+            checks['auto_2fa_gallery']=all(picture('/google-account/'+p+'-original.png') for p in ('01-order','02-2fa','03-google-code'))
+            checks['dont_login_gmail_first']=('Gmail' in response or '谷歌邮箱' in response) and ('不要' in response or '先不' in response)
+            checks['main_flow_to_vps']=stage=='vps' and 'VPS' in response
     elif name=='google':
         if turn==5:
             checks['vps_handoff']=stage=='vps' and 'VPS' in response
@@ -282,13 +298,13 @@ def assess(root, name, turn, response, commands, before, code, transcript=()):
             checks['stage_preserved']=stage=='google'
         if turn==0:
             checks['two_sellers']='https://chuhai91.cc/' in response and 'https://gmailbuy.com/' in response
-            checks['us_aged_account']=all(word in response for word in ('购买','美区','老号'))
-        if turn in (0,1):
+            checks['gmailbuy_default']='全新美国谷歌账号' in response and 'accounts.google.com' not in response
+            checks['gmailbuy_picture']=picture('/step-guides/gmailbuy-shop.png')
+        if turn==1:
             checks['complete_purchase_gallery']=all(picture('/chuhai91/'+p) for p in
                 ('01-register.png','02-google-aged-category.png','03-us-ip-product.png'))
             checks['direct_register_link']='https://chuhai91.cc/auth/register' in response
             checks['seller_registration']=re.search(r'注册[^。！\n]{0,20}出海91|出海91[^。！\n]{0,24}注册',response) is not None
-        if turn==1:
             checks['new_purchase_preview']=all(picture('/google-account/'+p+'-original.png') for p in
                 ('01-order','02-2fa','03-google-code'))
         if turn==2:

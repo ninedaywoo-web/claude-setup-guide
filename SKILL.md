@@ -44,7 +44,7 @@ VPS 选型直接按默认商家、洛杉矶机房与目标套餐推进，不询�
 
 **先读 `references/17-workflow-controller.md`。从开场到手机订阅完成，当前阶段和下一步都由 `scripts/workflow.py` 返回。**其他章节提供当前动作的具体方法，章节排列和旧进度中的“下一步”不单独决定跳转。
 
-**硬红线：**每轮推进以 `workflow.py` 返回的当前阶段为准，禁止口头“已记录”跳过控制层。在 `workflow.py` 到达 `login` 阶段前，严禁打开或点击登录 Claude 桌面版、严禁创建账户或代发测试消息、严禁在普通浏览器（非 AdsPower）登录新 Google 账号或执行 Claude 授权。
+**硬红线：**每轮推进以 `workflow.py` 返回的当前阶段为准，禁止口头“已记录”跳过控制层。客户没有可用 Google／Gmail 账号时，**严禁跳转或引导客户去 Google 官方注册页自行注册**，必须当轮提交 `google_account_status=unavailable` 按程序返回的购买渠道推进。在 `workflow.py` 到达 `login` 阶段前，严禁打开或点击登录 Claude 桌面版、严禁创建账户或代发测试消息、严禁在普通浏览器（非 AdsPower）登录新 Google 账号或执行 Claude 授权。
 
 ```bash
 python3 scripts/workflow.py init
@@ -69,7 +69,7 @@ python3 scripts/workflow.py next
 ### 客户对话怎么说
 
 - 先给建议，再说当前动作和预期结果。用大白话，通常两三句话；需要解释的术语在第一次用到时解释。
-- 已有的路线和选购建议直接告诉客户。Google 买号先说“**优先购买美区 Google 老号，首选出海91**”，按 `references/08-google-account.md` 三步图示带做：本人邮箱注册网站账号（QQ 邮箱也可以）、进入「Google 谷歌账户 → 谷歌精品老号」、优先选择美国 IP 创建／注册的老号。按当前价格与库存选择，购买后接同章账号资料与 2FA；首次推荐就在同一条回复展示出海91与 GmailBuy 两个可点击链接，按作者选购经验说明出海91相对贵、相对稳，GmailBuy相对便宜、被封可能性大一点，由用户选择。
+- 已有的路线和选购建议直接告诉客户。Google 买号先说“**默认推荐购买 GmailBuy 的【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)**”，首次推荐就在同一条回复展示 [GmailBuy](https://gmailbuy.com/)（含该新号直达链接 `https://gmailbuy.com/home/goods.html?id=18&sid=18`）与 [出海91](https://chuhai91.cc/) 两个可点击链接，并说明谷歌账号网站的库存和风控情况有时都不确定，由用户按当前页面价格与库存选择；严禁引导客户去 Google 官网自行注册。按 `references/08-google-account.md` 展示 GmailBuy 选购图（若客户选出海91 则按出海91 三步图带做，注册的是出海91 网站账号）。买完 Google 账号后，默认自动告知“先不要在 Gmail 或其他地方登录，等后面全部配完后首次登录直接在手机 Claude App 登录（当前不提前登录）”，并无论是否带 2FA 一律主动展示账号资料与 2FA 取码／回填三张原图。
 - 用户问“买哪个”时，直接指出当前页面符合条件的选项。能看到页面就自行查看；缺少商品信息时，只请用户补充商品名称或当前商品页截图。
 - 用具体事实推进：有实际异常就简短说明原因和处理动作。不要在正常操作后叠加“可能曾在别处被封”“不能保证安全”等假设性段落，也不把推荐改写成一串免责说明。商品介绍用于帮助选择，不围绕其中一个描述反复展开风险推测。客户主动问风险时，准确回答所问的问题。
 - 提醒放在需要它的步骤：Apple 新号约两天等待、切换网络的恢复方法、付款确认等照常明确展示；账号密码和两步验证在本人输入环节说明。已讲过且情况未变的内容复用，不在选商品、点分类、看截图的每一轮重复。
@@ -110,8 +110,8 @@ Windows 本机 HTTP 代理测通，但开启 TUN 后反复连接 VPS、测速卡
 
 PDF 位于 `assets/reading/`，给客户阅读；AI 按 Markdown 和控制层执行。开场说明与保存选择按阅读版章节完成，已有选择复用。找 PDF 内容时实际核对篇目和页码。进度和凭据只保存在 `.local/`，不提交到仓库。
 
-Google 账号准备先原样展示控制层的提问「您有一个现在能正常登录的 Google／Gmail 账号吗？」。从未使用 Claude 的自有 Gmail 也可以复用。客户只谈 Claude 账号或仍不确定 Google 能否登录时，回到这句确认。客户已明确说这个号关联的 Claude 账号被封禁时，先确认是否有另一个可用 Google 账号。实际登录 Claude 留到手机网络验收后。
+Google 账号准备先原样展示控制层的提问「您有一个现在能正常登录的 Google／Gmail 账号吗？」。从未使用 Claude 的自有 Gmail 也可以复用。客户只谈 Claude 账号或仍不确定 Google 能否登录时，回到这句确认。客户已明确说这个号关联的 Claude 账号被封禁时，先确认是否有另一个可用 Google 账号。客户明确没有可用 Google 账号时，**严禁引导用户自行注册 Google／Gmail 账号**，当轮按客户原话记录 `google_account_status=unavailable`，默认推荐购买 GmailBuy 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」，同时展示 GmailBuy 与出海91 两个入口、说明库存与风控的不确定性，并直接展示 GmailBuy 选购图。实际登录 Claude 严格留到手机网络验收后，绝不因买号后的首登提醒改变主流程顺序。
 
-客户选择购号网站后记录 purchase_channel 并沿用选择。收到商家账号资料时提交 account_origin=purchased 与 google_account_status=available，按返回的 customer_message 和 customer_images 在对话直接展示 [2FA 取码工具：https://2fa.run/](https://2fa.run/)，结合原账号资料图解说明密钥用途，实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown（三张已展示原图的路径）继续，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。客户明确没有可用 Google 账号时，当轮按客户原话记录 google_account_status=unavailable，直接建议购买美区老号，同时展示两家入口及首选出海91的注册、分类和选号三张原图。注册的是出海91购物网站账号。客户索要出海91购买步骤或没看到图时，用 guide --topic chuhai_purchase 在同条回复重发三张原图和入口链接。
+客户选择购号网站后记录 purchase_channel 并沿用选择（选出海91 时展示出海91 注册、分类和选号三张原图，注册的是出海91 购物网站账号）。收到商家账号资料时提交 account_origin=purchased 与 google_account_status=available，**无论买到的账号是否附带 2FA 密钥、后续会不会弹 2FA**，都默认按返回的 customer_message 和 customer_images 在对话直接展示：① 首登防踩坑提醒（买完先不要去登录 Gmail 或 Google 邮箱，保存好资料，等主流程把 VPS 和电脑／手机网络全部配置验收完成后，第一次登录直接去 Claude 登录；当前不要提前登录）；② [2FA 取码工具：https://2fa.run/](https://2fa.run/) 及账号资料、取码、回填三张原图，不等客户发问。实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown（三张已展示原图的路径）继续进入 VPS，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。客户索要购买步骤或没看到图时，用 guide --topic gmailbuy 或 chuhai_purchase 在同条回复重发原图和入口链接。
 
 **默认出图：**首次进入阶段，在聊天中按顺序展示该阶段适用的全部原图，配中文说明和当前起点。商家或渠道确定后立即给齐该分支整套图；设备、商家和渠道按实际选择匹配。图片全部提前展示，实际操作与验收仍按原阶段推进。用户说不会、找不到、没看懂或图片未显示时，立即重讲对应图。`guide --topic <主题ID>` 默认返回整组，`--step <图片序号>` 用于后续定位重讲；教学位置不缩减首次阶段图集。完整用法见 references/17-workflow-controller.md 的「默认出图与重复求助」。

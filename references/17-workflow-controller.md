@@ -27,7 +27,7 @@ VPS 阶段按既定商家与默认机房推进，不询问使用国家／地区�
 
 | 进入阶段 | 当场解释 |
 | --- | --- |
-| google | 先问有没有能正常登录的 Google／Gmail 账号；客户明确没有可用 Google 账号时，同时展示出海91与 GmailBuy 的链接及选购差别，推荐美区 Google 老号。记住选择；收到购买资料后展示 2FA 链接和原资料图，再继续。已有账号复用；安卓只解释适用的 Google 登录用途。 |
+| google | 先问有没有能正常登录的 Google／Gmail 账号；客户明确没有可用 Google 账号时，严禁引导自行注册 Google，同时展示 GmailBuy 与出海91 链接，默认推荐 GmailBuy 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」并说明库存与风控不确定。记住选择；收到购买资料后无论有无 2FA 一律自动展示首登提醒（先不登 Gmail，全部配完后再直接在 Claude 登录，不改变主流程顺序）、2FA 链接和原资料三张图，再继续进 VPS。已有账号复用；安卓只解释适用的 Google 登录用途。 |
 | vps | VPS 是租来的远程服务器，用来搭建自己的节点；客户购买，Codex 部署。按 [库存核对](18-vps-stock.md) 从 DMIT cart.php 核对 AS3 Premium TINY，参考价 10.90 美元/月，缺货首推搬瓦工。新购买提交 purchase_checks，依据 purchase_decision 继续；其他 DMIT 选项独立验证、说明未交付实践后由客户选择。默认月付／季付，确认实际扣款金额与覆盖时长。家宽问题按网络篇解释搭配与最终出口。 |
 | computer_network | 客户端连接节点，TUN 接管流量，全局走选定节点；保留旧 VPN 测通后再切换。 |
 | browser | 区分 Claude 桌面版、Claude Code 与 AdsPower；电脑浏览器中的 Claude 登录、邮件链接和授权使用 AdsPower，桌面版与 CLI 可正常使用。展示桌面版权限风险说法与已交付用户正常使用反馈，并给出三站链接。 |
@@ -40,11 +40,11 @@ VPS 阶段按既定商家与默认机房推进，不询问使用国家／地区�
 
 ## Google 购号、资料图解与登录衔接
 
-开场使用 `customer_message` 中的 Google／Gmail 原句。客户只谈 Claude 账号或尚未确认 Google 账号能否登录时，保留进度并确认 Google。只有客户明确没有可用 Google 账号时，才记录 `google_account_status=unavailable`，来源用 `source.kind=user` 和客户原话。实际登录 Claude 留到手机网络验收后。
+开场使用 `customer_message` 中的 Google／Gmail 原句。客户只谈 Claude 账号或尚未确认 Google 账号能否登录时，保留进度并确认 Google。只有客户明确没有可用 Google 账号时，才记录 `google_account_status=unavailable`，来源用 `source.kind=user` 和客户原话；**严禁引导客户去 Google 官方注册页自行注册**。实际登录 Claude 严格留到手机网络验收后，绝不改变主流程顺序。
 
-`google_account_status=unavailable` 时同条回复展示两家购号链接和价格、稳定性差别。客户选择后记录 `purchase_channel=chuhai91` 或 `gmailbuy`；首推或已选出海91时，直接嵌入 `customer_message` 中注册、分类和选号三张原图，给出注册页和分类页链接并标明当前操作。客户问购买办法或没看到图时，调用 `guide --topic chuhai_purchase` 重发整组。选择 GmailBuy 后直接给该站入口和选购图，按实际页面继续。明确索要另一家图时可用 guide 预览，沿用当前渠道。
+`google_account_status=unavailable` 时同条回复展示两家购号链接，默认推荐 GmailBuy 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」并说明谷歌账号网站库存和风控可能不确定。客户选择后记录 `purchase_channel=gmailbuy` 或 `chuhai91`；首推或已选 GmailBuy 时直接给该站首页、该新号直达链接与选购图，按实际页面继续。选择出海91 时，直接嵌入 `customer_message` 中注册、分类和选号三张原图，给出注册页和分类页链接并标明当前操作。客户问购买办法或没看到图时，调用 `guide --topic gmailbuy` 或 `chuhai_purchase` 重发整组。明确索要另一家图时可用 guide 预览，沿用当前渠道。
 
-收到购买资料时提交 `account_origin=purchased`、`google_account_status=available`。程序仍返回 `google`，在 `customer_message` 直接提供 https://2fa.run/，`customer_images` 给出原账号资料、取码与回填三张图。Codex 在同条回复展示说明、链接和图片后，提交 `materials_explained=true` 与 `materials_images_shown` 接续下一阶段。这是展示完成记录，无需用户再确认。未买到账号时展示标记不代替账号准备完成。
+收到购买资料时提交 `account_origin=purchased`、`google_account_status=available`。程序仍返回 `google`，在 `customer_message` 直接提供首登防踩坑提醒（先不要登录 Gmail／Google 邮箱，等全部配完网络后第一次登录直接在 Claude 登录；**当前绝不提前登录**）和 https://2fa.run/，`customer_images` 给出原账号资料、取码与回填三张图。**无论本次买到的套餐是否带 2FA、后续会不会弹 2FA，都必须在同条回复自动展示全部说明、链接和三张原图（不等客户问）**，实际展示后提交 `materials_explained=true` 与 `materials_images_shown` 接续下一阶段 `vps`。这是展示完成记录，无需用户再确认。未买到账号时展示标记不代替账号准备完成。
 
 已有可用账号提交 `account_origin=self_used`、`google_account_status=available` 直接复用。为接续现有输入，“没有账号”变为“已备妥”时默认走购买资料说明；用户后来找回自己的可用账号时，明确使用 `self_used`。旧进度保留已有 Google 账号结果和选购渠道。
 

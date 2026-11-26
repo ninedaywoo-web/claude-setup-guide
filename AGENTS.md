@@ -2,9 +2,9 @@
 
 新购 VPS 系统统一按 `scripts/network_server.py` 的 `SERVER_OS` 规则，当前为 Debian 12。购买时明确选择，首次脚本部署读取服务器实际系统核对；商家缺少选项时先说明并确认处理方式，已有正常节点复用。具体操作见 references/01-network.md「选系统」。
 
-写代码、说明和执行任务都保持正向、高效。已授权的工作连续完成；故障出现就修复，日志和检测结果用于选择下一步及验收。将用户交接限定为缺失的访问方式、本人验证和工具无法代做的动作。
+写代码、说明和执行任务都保持正向、精准、高效：直接写清楚应该怎么做、为什么这么做与目标结果，优先使用正向指令。已授权的工作连续完成；故障出现就修复，日志和检测结果用于选择下一步及验收。将用户交接限定为缺失的访问方式、本人验证和工具无法代做的动作。
 
-**客户对话规范：**先给明确建议，再给当前操作和应看到的结果，使用简短大白话。采用“建议选什么 → 怎么操作 → 下一步”的表达；已有推荐直接说清，遇到实际问题说明具体原因和处理动作。避免层层追加假设、免责声明或反复提醒，不把内部校验规则照搬成客户要读的长段文字。项目要求的 Apple 新号等待、网络切换恢复和付款确认在对应步骤清楚展示。Google 买号先明确“优先购买美区 Google 老号，首选出海91”，按注册网站账号（QQ 邮箱也可以）、谷歌精品老号分类、美国 IP 创建／注册三步图示带做；按当前价格与库存选择，首次推荐同时给出出海91与 GmailBuy 两个链接及价格、稳定性差别，由用户选择；具体写法见 SKILL.md。
+**客户对话规范：**先给明确建议，再给当前操作和应看到的结果，使用清晰大白话。采用“建议选什么 → 怎么操作 → 下一步”的表达；已有推荐直接说清，遇到实际问题说明具体原因和处理动作。项目要求的 Apple 新号等待、网络切换恢复和付款确认在对应步骤清楚展示。Google 买号先明确“默认推荐购买 GmailBuy 的【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)”（`https://gmailbuy.com/home/goods.html?id=18&sid=18`），首次推荐同时给出 GmailBuy 与出海91两个链接、说明网站库存与风控可能不确定，并随控制层打开或附上本地离线图文页 `assets/google-account/guide.html`（含两段式购买与 2FA 备用图解）；具体写法见 SKILL.md。
 
 **项目愿景：**帮助用户更好地使用 Claude，提供清楚的配置、使用引导和故障排查。
 
@@ -46,7 +46,7 @@ Windows 本机 HTTP 代理测通，但开启 TUN 后反复连接 VPS、测速卡
 
 Google 账号准备先原样展示控制层的提问「您有一个现在能正常登录的 Google／Gmail 账号吗？」。从未使用 Claude 的自有 Gmail 也可以复用。客户只谈 Claude 账号或仍不确定 Google 能否登录时，回到这句确认。客户已明确说这个号关联的 Claude 账号被封禁时，先确认是否有另一个可用 Google 账号。实际登录 Claude 留到手机网络验收后。
 
-客户选择购号网站后记录 purchase_channel 并沿用选择。收到商家账号资料时提交 account_origin=purchased 与 google_account_status=available，按返回的 customer_message 和 customer_images 在对话直接展示 [2FA 取码工具：https://2fa.run/](https://2fa.run/)，结合原账号资料图解说明密钥用途，实际展示三张原图后由 Codex 提交 materials_explained=true 与 materials_images_shown（三张已展示原图的路径）继续，无需客户额外确认；自有账号记录 account_origin=self_used 直接复用。登录出现两步验证时再次展示链接与原取码、回填图解。客户明确没有可用 Google 账号时，当轮按客户原话记录 google_account_status=unavailable，直接建议购买美区老号，同时展示两家入口及首选出海91的注册、分类和选号三张原图。注册的是出海91购物网站账号。客户索要出海91购买步骤或没看到图时，用 guide --topic chuhai_purchase 在同条回复重发三张原图和入口链接。
+客户明确没有可用 Google 账号时，当轮按客户原话记录 `google_account_status=unavailable`：程序会自动尝试在默认浏览器打开固定离线图文页 `assets/google-account/guide.html` 并返回可点击本地路径（需要重开时可运行 `workflow.py run --action open_google_guide`）；对话中同步展示默认推荐的 GmailBuy 新号（`id=18&sid=18`）、备选出海91、选购图与本地图文页路径，由客户按现场页面价格与库存选择。客户选择出海91时记录 `purchase_channel=chuhai91` 并展示三步图（注册的是出海91购物网站账号）。收到商家账号资料时提交 `account_origin=purchased` 与 `google_account_status=available`，在对话直接展示首登时机原因、2FA 大白话科普、推荐取码工具 [2FA 取码工具：https://2fa.run/](https://2fa.run/)（手机本机验证器导入密钥后面有条件再配）及三张原图，实际展示后提交 `materials_explained=true` 与 `materials_images_shown` 继续进入 VPS；自有账号记录 `account_origin=self_used` 直接复用。登录出现两步验证时再次展示取码链接与原取码、回填图解。客户索要购买步骤或没看到图时，用 `guide --topic gmailbuy` 或 `chuhai_purchase` 重发原图，或运行 `open_google_guide` 重新打开本地图文页。
 
 Windows＋iPhone／iPad 手动带做时，每轮先标明操作设备，给 1～3 个相连动作及可见完成结果。配置保存与恢复按 references/02-browser-iphone.md 第 2.2.4 节，DNS 修改按第 2.2.5 节：列表输入后加入条目、保存、退出重开回读，再重连复测。节点导入资料与 DNS／分流配置分别保存；手机本地保存为默认路径，按实际菜单定位。恢复时沿用一个明确目标，延迟回复与当前目标冲突先核对已执行动作。
 

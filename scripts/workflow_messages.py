@@ -5,13 +5,15 @@ PDF_GUIDANCE = """**项目已经下载好了**，接下来 Codex 会按项目流
 
 **建议把 PDF 单独保存一份。需要我帮您放到“下载”文件夹吗？**文件已在项目里，无需重新下载。"""
 GOOGLE_QUESTION = '您有一个现在能正常登录的 Google／Gmail 账号吗？'
-GOOGLE_PURCHASE = """您目前没有可用的 Google 账号。**优先购买美区 Google 老号**，首选出海91。两个网站都可以选：
+GOOGLE_PURCHASE = """您目前没有可用的 Google 账号，**默认推荐购买 GmailBuy 的全新美国谷歌账号**，两个网站都可以选：
 
-- 首选 [出海91](https://chuhai91.cc/)：按我们的选购经验，价格相对贵一点，账号也相对稳一点。
-- [GmailBuy](https://gmailbuy.com/)：价格相对便宜一点，按我们的选购经验，被封的可能性也大一点。
+- 首选 [GmailBuy](https://gmailbuy.com/)：推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。
+- 备选 [出海91](https://chuhai91.cc/)：也有谷歌精品老号等套餐可选（选这家时我会立刻给您完整三步图）。
 
-看您个人选择。下面是出海91完整三步图。如果您选这家，就从注册出海91购物网站账号开始，QQ 邮箱也可以。买到的 Google 账号用于后续登录 Claude。"""
-GOOGLE_MATERIALS_GUIDANCE = '收到账号资料后，先找到 Google 邮箱、登录密码，以及商家标注的“2FA 密钥”。2FA 密钥是一串用来生成登录验证码的字母和数字。取码网址是 [2FA 取码工具：https://2fa.run/](https://2fa.run/)。等手机网络配置完成、Google 登录页面要求身份验证器验证码时，再按图用密钥生成验证码，并填回手机登录页面。'
+**选购提示：**谷歌账号网站的库存有时候会变动，谷歌账号的风控情况也会不确定，下单前以您现场打开页面的实际价格、库存和售后说明为准。买到的 Google 账号用于后续登录 Claude；**买完先保存资料，把宝贵的“第一次登录”留给后面全部网络配置验收完后的手机 Claude App**（因为谷歌风控不确定，新号第一次登录往往最顺畅、最容易直接登进去）。"""
+GOOGLE_MATERIALS_GUIDANCE = """**买完 Google 账号后，先把这两件事看懂（资料先保存好，当前继续下一步准备 VPS）：**
+- **首登时机与原因：**先保存商家给的 Google 邮箱、登录密码、恢复邮箱及 2FA 密钥（如有），把新号的“第一次登录”留给后面 VPS、电脑网络、AdsPower 和手机网络全部配置验收完成后的**手机 Claude App**——因为谷歌账号的风控情况不确定，新号第一次登录往往最顺畅、最容易一次登进去。
+- **什么是 2FA 验证码及怎么用：**2FA 验证码就是“两步验证动态数字密码”（每 30 秒刷新一组 6 位数字），订单里标注的「2FA 密钥」是生成它的种子。后续在手机 Claude 登录 Google 时，如果弹出身份验证器验证码，推荐使用我们的快捷取码入口 **[2FA 取码工具：https://2fa.run/](https://2fa.run/)** 照下面三张原图算出当前 6 位数字填回即可；如果您更偏好手机本机身份验证器导入密钥，后面有条件时再配也可以。"""
 GOOGLE_LOGIN_GUIDANCE = '手机网络已经验收完成，接下来在手机上使用准备好的 Google 账号登录 Claude。按当前页面输入账号和密码；Google 要求身份验证器验证码时，再按下面的取码步骤操作。'
 GOOGLE_VERIFICATION_GUIDANCE = '取码入口：[2FA 取码工具：https://2fa.run/](https://2fa.run/)。使用商家提供的 2FA 密钥时，在已配置好的 AdsPower 中打开网站，将密钥填入上方“JS实现”区域，点击“点击获取验证码”，再把当前验证码填回手机 Google 页面。使用自己的 Google 账号时，也可以从自己已绑定的身份验证器取得验证码；其他验证方式按当前页面完成。'
 from workflow_teaching import CHUHAI_PURCHASE_IMAGES, GOOGLE_IMAGES, attach as attach_teaching
@@ -110,22 +112,27 @@ def customer_output(result, state, now):
             result['next_action'] = '结合已有对话确认账号来源，提交 account_origin=self_used 或 purchased；购买账号继续展示资料与取码图解。'
         elif status == 'available':
             messages.append(GOOGLE_MATERIALS_GUIDANCE)
+            if result.get('guide_page'):
+                messages.append('本地离线图文页也完整保留了首登说明和三张 2FA 原图：' + result['guide_page']['markdown_link'])
             result['customer_images'] = GOOGLE_ORDER_IMAGES.copy()
-            result['next_action'] = ('在当前回复直接展示 customer_message 中的 2FA 取码链接，并将 customer_images 转为当前项目的绝对路径嵌入聊天。'
-                                     '解释邮箱、密码及商家标注的密钥用途，实际嵌入三张原图后提交 materials_explained=true 和 materials_images_shown（本次展示的三张图片路径），按返回任务继续；这一步由 Codex 展示完成，无需客户额外确认。')
+            result['next_action'] = ('在当前回复直接展示 customer_message 中的首登原因说明、2FA 科普与推荐取码入口 https://2fa.run/（手机本机验证器导入密钥后面有条件再配），并将 customer_images 转为当前项目的绝对路径嵌入聊天。'
+                                     '实际嵌入三张原图后提交 materials_explained=true 和 materials_images_shown（本次展示的三张图片路径），按返回任务继续进入 vps；这一步由 Codex 展示完成，无需客户额外确认。')
         elif status == 'unavailable':
-            if channel == 'gmailbuy':
-                messages.append('沿用您选择的 [GmailBuy](https://gmailbuy.com/)，优先购买美区 Google 老号。我会按您当前的商品页核对美区、老号、价格和库存。')
-                result['next_action'] = '在当前回复展示 GmailBuy 商品列表入口与选购步骤图；根据实际页面讲当前操作，客户说找不到或没看到图时用 guide --topic gmailbuy 重发。'
+            guide_link = result.get('guide_page', {}).get('markdown_link', '')
+            if channel == 'chuhai91':
+                messages.append('沿用您选择的 [出海91](https://chuhai91.cc/)，按下面三步图购买美区 Google 账号（谷歌账号网站库存与风控可能不确定，按当前页面价格和库存核对）。先注册或登录出海91 购物网站账号（QQ 邮箱也可以），再接到已完成的位置。')
+                result['purchase_images'] = CHUHAI_PURCHASE_IMAGES.copy()
+                result['next_action'] = ('本轮沿用出海91，将 customer_message 里的出海91注册、分类和选购三张原图直接嵌入同一条回复，指出现在从哪一步开始，并附本地图文引导页链接。'
+                                         '客户索要购买步骤、找不到图或没看懂时，运行 guide --topic chuhai_purchase 重发整组图，或运行 open_google_guide 重新打开本地图文页。'
+                                         '注册的是出海91购物网站账号，后续按实际页面核对美区、价格与库存。')
             else:
                 messages.append(GOOGLE_PURCHASE if channel is None else
-                                '沿用您选择的出海91，继续购买美区 Google 老号。先注册或登录出海91网站账号，再从下面的三步图接到已完成的位置。')
-                result['purchase_images'] = CHUHAI_PURCHASE_IMAGES.copy()
-                result['next_action'] = ('本轮先明确推荐购买美区 Google 老号；首次推荐同时给两家链接，首选出海91。'
-                                         '将 customer_message 里的出海91注册、分类和选购三张原图直接嵌入同一条回复，指出现在从哪一步开始。'
-                                         '客户索要购买步骤、找不到图或没看懂时，运行 guide --topic chuhai_purchase，把三张原图和入口链接重新给齐。'
-                                         '注册的是出海91购物网站账号，本流程不引导注册 Google 账号。客户明确选择网站后记录 purchase_channel，已完成的步骤直接沿用。客户问买哪个时，按实际页面定位老号分类并核对美区、价格与库存。')
-            result['next_action'] += (' 客户说买好并收到资料时，提交 account_origin=purchased 与 google_account_status=available，直接展示资料、取码和回填三张图及取码链接。'
+                                '沿用您选择的 [GmailBuy](https://gmailbuy.com/)，默认推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。谷歌账号网站的库存与风控有时不确定，按您现场打开页面的价格、库存与售后核对即可。')
+                result['next_action'] = ('本轮直接展示程序返回的购买指引、默认推荐的 GmailBuy 新号直达链接（https://gmailbuy.com/home/goods.html?id=18&sid=18）、备选出海91链接、GmailBuy 选购图，以及本地图文引导页链接（程序已自动尝试打开 guide.html；客户需要重开时可运行 workflow.py run --action open_google_guide）。'
+                                         '以客户现场打开的商品页实时价格与库存为准；客户找不到图时用 guide --topic gmailbuy 重发；若客户明确选择出海91，记录 purchase_channel=chuhai91 并展示出海91三张原图。')
+            if guide_link:
+                messages.append('已为您准备固定版离线图文页（包含购买入口、首登说明与 2FA 三张原图），如果浏览器未自动弹出，可直接点击打开：' + guide_link)
+            result['next_action'] += (' 客户说买好并收到资料时，提交 account_origin=purchased 与 google_account_status=available，直接展示首登原因、2FA 科普、取码链接和三张原图。'
                                       '若客户后来找回自己的可用账号，明确提交 account_origin=self_used 继续复用。')
             messages.append(GOOGLE_TIMING)
         else:

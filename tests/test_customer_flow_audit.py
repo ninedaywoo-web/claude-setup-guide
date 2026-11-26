@@ -373,11 +373,13 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         for url in ('https://chuhai91.cc', 'https://gmailbuy.com/'):
             self.assertNotIn(url, view['customer_message'])
         view = self.flow.submit(self.payload({'google_account_status': 'unavailable'}))
-        for url in ('https://chuhai91.cc/', 'https://gmailbuy.com/'):
+        for url in ('https://chuhai91.cc/', 'https://gmailbuy.com/', 'https://gmailbuy.com/home/goods.html?id=18&sid=18'):
             self.assertIn(url, self.flow.next()['customer_message'])
         self.assertIn('手机网络配置完成后', view['customer_message'])
         self.assertIn('直接展示', view['display_instruction'])
-        self.assertIn('不引导注册 Google 账号', view['next_action'])
+        self.assertIn('open_google_guide', view['allowed_actions'])
+        self.assertTrue(view['guide_page']['exists'])
+        self.assertIn('guide.html', view['guide_page']['path'])
 
     def test_google_missing_account_keeps_purchase_route_on_resume(self):
         self.reach('google')
@@ -385,30 +387,74 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         view = Workflow(self.root).next()
         self.assertEqual(view['stage'], 'google')
         self.assertIn('购买', view['customer_message'])
-        self.assertIn('**优先购买美区 Google 老号**', view['customer_message'])
-        self.assertIn('首选 [出海91]', view['customer_message'])
-        self.assertIn('QQ 邮箱也可以', view['customer_message'])
-        self.assertIn('Google 谷歌账户 → 谷歌精品老号', view['customer_message'])
-        self.assertIn('美国 IP 创建／注册', view['customer_message'])
-        self.assertIn('当前价格和库存', view['customer_message'])
-        self.assertIn('价格相对贵一点', view['customer_message'])
-        self.assertIn('被封的可能性也大一点', view['customer_message'])
-        self.assertIn('看您个人选择', view['customer_message'])
-        self.assertIn('[GmailBuy](https://gmailbuy.com/)', view['customer_message'])
+        self.assertIn('**默认推荐购买 GmailBuy 的全新美国谷歌账号**', view['customer_message'])
+        self.assertIn('首选 [GmailBuy]', view['customer_message'])
+        self.assertIn('【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)', view['customer_message'])
+        self.assertIn('https://gmailbuy.com/home/goods.html?id=18&sid=18', view['customer_message'])
+        self.assertIn('库存有时候会变动', view['customer_message'])
+        self.assertIn('风控情况也会不确定', view['customer_message'])
+        self.assertIn('[出海91](https://chuhai91.cc/)', view['customer_message'])
+        self.assertIn('guide.html', view['customer_message'])
         self.assertIn('[2FA 取码工具：https://2fa.run/](https://2fa.run/)', view['account_materials_message'])
         self.assertIn('客户说买好并收到资料时', view['next_action'])
-        self.assertEqual(len(view['customer_images']), 3)
+        self.assertEqual(view['customer_images'], ['assets/step-guides/gmailbuy-shop.png'])
         for image in view['customer_images']:
             self.assertIn(image, view['customer_message'])
-        self.assertIn('先明确推荐', view['next_action'])
-        self.assertIn('按实际页面定位老号分类并核对美区', view['next_action'])
+        self.assertIn('open_google_guide', view['next_action'])
         self.assertIn('避免叠加假设性风险', view['communication_instruction'])
         self.assertNotIn('您有一个现在能正常登录的 Google／Gmail 账号吗？', view['customer_message'])
-        self.flow.submit(self.payload({'google_account_status': 'available'}))
-        if self.flow.next()['stage'] == 'google':
-            self.assertIn('materials_explained', self.flow.next()['missing'])
+        bought_view = self.flow.submit(self.payload({'google_account_status': 'available'}))
+        if bought_view['stage'] == 'google':
+            self.assertIn('materials_explained', bought_view['missing'])
+            self.assertIn('第一次登录往往最顺畅', bought_view['customer_message'])
+            self.assertIn('什么是 2FA 验证码', bought_view['customer_message'])
+            self.assertIn('https://2fa.run/', bought_view['customer_message'])
+            self.assertIn('手机本机身份验证器', bought_view['customer_message'])
             self.flow.submit(self.payload({'materials_explained': True, 'materials_images_shown': GOOGLE_IMAGES.copy()}))
         self.assertEqual(self.flow.next()['stage'], 'vps')
+
+    def test_google_unavailable_auto_opens_guide_reuses_existing_and_falls_back_on_error(self):
+        opened_urls = []
+        self.reach('google')
+        flow_ok = Workflow(self.root, lambda: self.now, auto_open_guide=True,
+                           guide_opener=lambda url: (opened_urls.append(url), True)[1])
+        self.flow = flow_ok
+        view = flow_ok.submit(self.payload({'google_account_status': 'unavailable'}))
+        self.assertEqual(len(opened_urls), 1)
+        self.assertTrue(opened_urls[0].endswith('/assets/google-account/guide.html'))
+        self.assertTrue(view['guide_page']['opened'])
+        self.assertEqual(view['guide_page']['status'], 'opened')
+        self.assertIn('guide.html', view['guide_page']['markdown_link'])
+
+        # Browser open failure still succeeds and returns a clickable local path.
+        def failing_opener(_url):
+            raise RuntimeError('browser unavailable')
+
+        with tempfile.TemporaryDirectory() as fallback_dir:
+            self.root = Path(fallback_dir)
+            self.flow = Workflow(self.root, lambda: self.now, auto_open_guide=True, guide_opener=failing_opener)
+            self.flow.init()
+            self.reach('google')
+            fallback_view = self.flow.submit(self.payload({'google_account_status': 'unavailable'}))
+            self.assertEqual(fallback_view['stage'], 'google')
+            self.assertFalse(fallback_view['guide_page']['opened'])
+            self.assertEqual(fallback_view['guide_page']['status'], 'fallback')
+            self.assertTrue(fallback_view['guide_page']['exists'])
+            self.assertIn('guide.html', fallback_view['guide_page']['path'])
+            self.assertIn('guide.html', fallback_view['customer_message'])
+            self.assertIn('open_google_guide', fallback_view['allowed_actions'])
+
+        # Existing usable Google account reuses directly and never opens the purchase guide.
+        reuse_calls = []
+        with tempfile.TemporaryDirectory() as reuse_dir:
+            self.root = Path(reuse_dir)
+            self.flow = Workflow(self.root, lambda: self.now, auto_open_guide=True,
+                                 guide_opener=lambda url: (reuse_calls.append(url), True)[1])
+            self.flow.init()
+            self.reach('google')
+            reused = self.flow.submit(self.payload({'account_origin': 'self_used', 'google_account_status': 'available'}))
+            self.assertEqual(reused['stage'], 'vps')
+            self.assertEqual(reuse_calls, [])
 
     def test_google_purchase_requires_a_google_specific_customer_observation(self):
         self.reach('google')

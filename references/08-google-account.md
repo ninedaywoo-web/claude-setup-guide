@@ -8,20 +8,22 @@
 
 如果客户只谈到 Claude 账号，沿用开场原句确认 Google 账号。如果客户已明确说某个 Google 账号关联的 Claude 账号被封禁，先确认有没有另一个可用的 Google 账号。
 
-本流程只走“已有账号复用、没有账号购买”，不引导用户注册 Google 账号。客户明确没有可用的 Google 账号时，按客户原话提交 `google_account_status=unavailable`，再同时展示两家渠道。已有可用账号记录 `account_origin=self_used`、`google_account_status=available`；购买账号收到资料时记录 `account_origin=purchased`、`google_account_status=available`，先完成下面的资料图解再继续。
+本流程默认采用“已有账号复用、没有账号购买”。客户明确没有可用的 Google 账号时，按客户原话提交 `google_account_status=unavailable`：程序会自动尝试在默认浏览器打开固定两段式离线图文页 `assets/google-account/guide.html`（上段为 GmailBuy 首推与出海91备选选购指引，下段为买完首登时机与三张 2FA 备用原图），并在返回结果中给出可点击本地路径；需要重新打开时可运行 `python3 scripts/workflow.py run --action open_google_guide`。已有可用账号记录 `account_origin=self_used`、`google_account_status=available`；购买账号收到资料时记录 `account_origin=purchased`、`google_account_status=available`，先完成下面的资料图解再继续。
 
 没有可用账号时，先明确告诉客户：
 
-> **优先购买美区 Google 老号，两个网站都可以选：**
+> **默认推荐购买 GmailBuy 的全新美国谷歌账号，两个网站都可以选：**
 >
-> - 首选[出海91](https://chuhai91.cc/)：按我们的选购经验，价格相对贵一点，账号也相对稳一点。
-> - [GmailBuy](https://gmailbuy.com/)：价格相对便宜一点，按我们的选购经验，被封的可能性也大一点。
+> - 首选 [GmailBuy](https://gmailbuy.com/)：推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。
+> - 备选 [出海91](https://chuhai91.cc/)：也有谷歌精品老号等套餐可选。
 >
-> 看您个人选择。下面是出海91的三步图。选这家时，先用自己的邮箱注册或登录出海91网站，再按图选购。
+> **选购提示：**谷歌账号网站的库存有时候会变动，谷歌账号的风控情况也会不确定，下单前以您现场打开页面的实际价格、库存和售后说明为准。下面是 GmailBuy 选购与查单示意图，本地离线图文页 `assets/google-account/guide.html` 也已备妥可随时点击打开。
 
-首次提供购买渠道时，在同一条对话里同时展示两个可点击链接及上述差别，由用户选择。默认推荐出海91；客户选择后记录 `purchase_channel=chuhai91` 或 `gmailbuy`，恢复时沿用该选择。用户选择 GmailBuy 就按其实际商品页继续挑选美区老号。已有可用 Google 账号继续复用。
+首次提供购买渠道时，在同一条对话里同时展示两个可点击链接、选购提示与本地图文页路径，由用户选择。默认推荐 GmailBuy 新号（`id=18&sid=18`）；客户选择后记录 `purchase_channel=gmailbuy` 或 `chuhai91`，恢复时沿用该选择。用户选择出海91就按出海91三步图继续。已有可用 Google 账号继续复用。
 
-选购建议按作者交付经验表达，给出选择和下一步即可。商品页的“使用痕迹”等介绍用于理解商品属性，回答仍围绕“美区＋老号”的选择与下一步操作，不延伸成层层风险推测。实际商品信息缺什么就核对什么，先展示上述两家差别；客户继续询问时针对具体问题回答。能直接查看页面时自行检查；需要用户提供信息时，只索取商品名称或当前商品页截图。付款由用户在商家页面完成。
+**买完后的首登时机说明：**买完 Google 账号后先把资料保存好，将新号的“第一次登录”留给后面 VPS、电脑网络、AdsPower 和手机网络全部配置验收完成后的**手机 Claude App**——因为谷歌账号风控不确定，新号第一次登录往往最顺畅、最容易直接登进去。主流程顺序保持不变。
+
+选购建议按作者交付经验表达，给出选择和下一步即可。商品页的“使用痕迹”等介绍用于理解商品属性，回答围绕当前推荐与实际页面选择和下一步操作展开。直接给出入口与本地图文页，以客户现场打开的实时商品页为准；需要用户提供信息时，只索取商品名称或当前商品页截图。付款由用户在商家页面完成。
 
 Google 账号用于登录 Claude；美区 Apple 账户用于 App Store 下载、礼品卡充值和订阅付款。后续电脑上的 Claude 桌面端或 CLI 沿用手机登录的同一个 Google 账号。
 
@@ -55,15 +57,15 @@ Google 账号用于登录 Claude；美区 Apple 账户用于 App Store 下载、
 
 ## GmailBuy：从商品列表到查订单
 
-选择 [GmailBuy](https://gmailbuy.com/) 后，在首页找到「谷歌邮箱批发」商品列表，按商品说明核对美国地区和注册时间。点对应行的「购买」进入详情，核对当前价格、库存和售后。详情页的「查询密码」用于查订单，由客户自行设置并保管。客户确认付款并查看订单资料后，再按下方图解辨认账号字段。页面按钮与字段以当前显示为准。
+首选或选择 [GmailBuy](https://gmailbuy.com/) 后，在首页找到「谷歌邮箱批发」商品列表，默认推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**（认准 `id=18&sid=18` 本页，区分相邻带 `2FA,` 字样的其他档位）。点对应行的「购买」进入详情，以现场页面的价格、库存和售后为准。详情页的「查询密码」用于查订单，由客户自行设置并保管。客户确认付款并保存订单资料后，把第一次登录留给后续网络配完后的手机 Claude App，并按下方图解辨认账号字段与 2FA 备用方法。页面按钮与字段以当前显示为准。
 
 ![GmailBuy 商品列表、详情和查单操作示意](../assets/step-guides/gmailbuy-shop.png)
 
-Codex 在客户选定 GmailBuy 时直接展示这张图和入口。客户找不到或看不到图时，用 `python3 scripts/workflow.py guide --topic gmailbuy` 重发。客户仅想对比另一家图解时可直接取图，继续沿用已选商家。
+Codex 在默认推荐或客户选定 GmailBuy 时直接展示这张图、直达链接与本地图文页路径。客户找不到或看不到图时，用 `python3 scripts/workflow.py guide --topic gmailbuy` 重发，或运行 `python3 scripts/workflow.py run --action open_google_guide` 重新打开本地图文页。客户仅想对比另一家图解时可直接取图，继续沿用已选商家。
 
 ## 对话里直接给出 2FA 取码链接
 
-客户说“买好了，账号资料也收到了”时，提交 `account_origin=purchased` 与 `google_account_status=available`，控制层会保留在 Google 阶段并返回资料说明和 `customer_images`。将图片转为当前项目的绝对路径嵌入聊天，按下面原图解释资料，同时在本条回复直接写出：[2FA 取码工具：https://2fa.run/](https://2fa.run/)。配一句大白话：“2FA 密钥就是生成登录验证码用的那串字母和数字；手机网络配好、登录时要求验证码，再用这个网站取码。”实际展示三张原图后由 Codex 提交 `materials_explained=true` 与 `materials_images_shown`（三张已展示图片的项目相对路径），随后按现有流程继续，无需用户额外确认。先前没有账号、后来找回自己的可用账号时，明确记录 `account_origin=self_used`，直接复用。
+客户说“买好了，账号资料也收到了”时，提交 `account_origin=purchased` 与 `google_account_status=available`，控制层会保留在 Google 阶段并返回首登时机说明、2FA 科普和 `customer_images`。将图片转为当前项目的绝对路径嵌入聊天，按下面原图解释资料，同时在回复中直接写出：**[2FA 取码工具：https://2fa.run/](https://2fa.run/)** 是我们教程推荐的验证器使用方式（2FA 验证码即每 30 秒刷新的 6 位动态数字密码，商家订单里的「2FA 密钥」是生成它的种子；手机本机身份验证器导入密钥后面有条件再配即可）。实际展示三张原图后由 Codex 提交 `materials_explained=true` 与 `materials_images_shown`（三张已展示图片的项目相对路径），随后按现有流程继续进入 VPS，无需用户额外确认。先前没有账号、后来找回自己的可用账号时，明确记录 `account_origin=self_used`，直接复用。
 
 登录中出现身份验证器验证码时，再次直接展示这个可点击链接，并展示原取码、回填图解。链接、当前操作和对应图片一起给到；PDF 是配套阅读材料，对话本身要能让用户点开并照着做。
 

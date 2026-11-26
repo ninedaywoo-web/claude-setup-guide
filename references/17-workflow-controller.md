@@ -27,7 +27,7 @@ VPS 阶段按既定商家与默认机房推进，不询问使用国家／地区�
 
 | 进入阶段 | 当场解释 |
 | --- | --- |
-| google | 先问有没有能正常登录的 Google／Gmail 账号；客户明确没有可用 Google 账号时，同时展示出海91与 GmailBuy 的链接及选购差别，推荐美区 Google 老号。记住选择；收到购买资料后展示 2FA 链接和原资料图，再继续。已有账号复用；安卓只解释适用的 Google 登录用途。 |
+| google | 先问有没有能正常登录的 Google／Gmail 账号；客户明确没有可用 Google 账号时，提交 `google_account_status=unavailable` 由程序自动尝试打开本地离线图文页 `assets/google-account/guide.html` 并返回可点击路径，同时展示 GmailBuy 推荐新号（`id=18&sid=18`）与备选出海91。记住选择；收到购买资料后展示首登原因、2FA 推荐链接和原资料图，再继续。已有账号复用；安卓只解释适用的 Google 登录用途。 |
 | vps | VPS 是租来的远程服务器，用来搭建自己的节点；客户购买，Codex 部署。按 [库存核对](18-vps-stock.md) 从 DMIT cart.php 核对 AS3 Premium TINY，参考价 10.90 美元/月，缺货首推搬瓦工。新购买提交 purchase_checks，依据 purchase_decision 继续；其他 DMIT 选项独立验证、说明未交付实践后由客户选择。默认月付／季付，确认实际扣款金额与覆盖时长。家宽问题按网络篇解释搭配与最终出口。 |
 | computer_network | 客户端连接节点，TUN 接管流量，全局走选定节点；保留旧 VPN 测通后再切换。 |
 | browser | 区分 Claude 桌面版、Claude Code 与 AdsPower；电脑浏览器中的 Claude 登录、邮件链接和授权使用 AdsPower，桌面版与 CLI 可正常使用。展示桌面版权限风险说法与已交付用户正常使用反馈，并给出三站链接。 |
@@ -42,7 +42,7 @@ VPS 阶段按既定商家与默认机房推进，不询问使用国家／地区�
 
 开场使用 `customer_message` 中的 Google／Gmail 原句。客户只谈 Claude 账号或尚未确认 Google 账号能否登录时，保留进度并确认 Google。只有客户明确没有可用 Google 账号时，才记录 `google_account_status=unavailable`，来源用 `source.kind=user` 和客户原话。实际登录 Claude 留到手机网络验收后。
 
-`google_account_status=unavailable` 时同条回复展示两家购号链接和价格、稳定性差别。客户选择后记录 `purchase_channel=chuhai91` 或 `gmailbuy`；首推或已选出海91时，直接嵌入 `customer_message` 中注册、分类和选号三张原图，给出注册页和分类页链接并标明当前操作。客户问购买办法或没看到图时，调用 `guide --topic chuhai_purchase` 重发整组。选择 GmailBuy 后直接给该站入口和选购图，按实际页面继续。明确索要另一家图时可用 guide 预览，沿用当前渠道。
+`google_account_status=unavailable` 提交成功后，程序会自动尝试在默认浏览器打开本地离线图文页 `assets/google-account/guide.html`，同时返回可点击的本地路径（需要重开时可运行 `workflow.py run --action open_google_guide`）。同条回复展示 GmailBuy 默认推荐新号（`https://gmailbuy.com/home/goods.html?id=18&sid=18`）与备选出海91链接、选购提示、选购图及本地图文页链接。客户选择后记录 `purchase_channel=gmailbuy` 或 `chuhai91`；选出海91时，直接嵌入 `customer_message` 中注册、分类和选号三张原图，给出注册页和分类页链接并标明当前操作。客户问购买办法或没看到图时，调用 `guide --topic gmailbuy` 或 `chuhai_purchase` 重发整组，或运行 `open_google_guide` 重开本地页面。明确索要另一家图时可用 guide 预览，沿用当前渠道。
 
 收到购买资料时提交 `account_origin=purchased`、`google_account_status=available`。程序仍返回 `google`，在 `customer_message` 直接提供 https://2fa.run/，`customer_images` 给出原账号资料、取码与回填三张图。Codex 在同条回复展示说明、链接和图片后，提交 `materials_explained=true` 与 `materials_images_shown` 接续下一阶段。这是展示完成记录，无需用户再确认。未买到账号时展示标记不代替账号准备完成。
 

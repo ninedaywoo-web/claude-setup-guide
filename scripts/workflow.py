@@ -13,6 +13,7 @@ import uuid
 
 from network import lock, private_file
 from network_server import Failure
+from open_google_guide import guide_info, open_google_guide
 from workflow_messages import customer_output
 from workflow_teaching import CARDS, eligible, guide as teaching_guide
 from update import workflow_output
@@ -34,11 +35,13 @@ class WorkflowError(ValueError):
 
 
 class Workflow:
-    def __init__(self, root, clock=None):
+    def __init__(self, root, clock=None, auto_open_guide=False, guide_opener=None):
         self.root = Path(root)
         self.folder = self.root / '.local/workflow'
         self.path = self.folder / 'state.json'
         self.clock = clock or (lambda: datetime.now(timezone.utc))
+        self.auto_open_guide = auto_open_guide
+        self.guide_opener = guide_opener
         self.state = read(self.path) if self.path.exists() else None
         if self.state is not None and self.state.get('schema') != 1:
             raise WorkflowError('workflow_schema_unsupported')
@@ -204,6 +207,10 @@ class Workflow:
                   'progress': progress}
         if 'score_advice' in checked:
             result['score_advice'] = checked['score_advice']
+        if stage['id'] == 'google':
+            google_data = facts(self.state, 'google')
+            if google_data.get('google_account_status') == 'unavailable' or google_data.get('account_origin') == 'purchased':
+                result['guide_page'] = {**guide_info(self.root), 'opened': False}
         if stage['id'] == 'vps':
             result['purchase_decision'] = self.purchase_decision(facts(self.state, 'vps'))
         if stage['id'] == 'devices' and facts(self.state, 'devices').get('setup_explained') is not True:
@@ -348,7 +355,11 @@ class Workflow:
         self.state['submissions'][payload['ticket']] = digest(payload)
         self.append('observed', stage=view['stage'], valid=checked['valid'])
         self.save()
-        return self.next()
+        next_view = self.next()
+        if view['stage'] == 'google' and data.get('google_account_status') == 'unavailable' and merged.get('google_account_status') == 'unavailable':
+            if self.auto_open_guide or self.guide_opener is not None:
+                next_view['guide_page'] = open_google_guide(self.root, opener=self.guide_opener)
+        return next_view
 
     def run(self, action, input_path=None, runner=None):
         view = self.next()
@@ -457,7 +468,7 @@ def main():
             print(json.dumps(Workflow(ROOT).guide(args.topic, args.step), ensure_ascii=False, indent=2))
             return 0
         with lock(ROOT / '.local/workflow'):
-            workflow = Workflow(ROOT)
+            workflow = Workflow(ROOT, auto_open_guide=os.environ.get('CLAUDE_SETUP_NO_BROWSER') != '1')
             if args.action == 'init':
                 workflow.init()
             workflow.sync()

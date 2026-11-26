@@ -46,9 +46,9 @@ CARDS = {
     **{f'chuhai_{step}': card(title, 'google', '08-google-account.md', [CHUHAI_PURCHASE_IMAGES[step]], instruction, seller='chuhai91')
        for step, (title, _, instruction) in CHUHAI_STEPS.items()},
     'gmailbuy': card('GmailBuy 选购与查单', 'google', '08-google-account.md', pics('step-guides', 'gmailbuy-shop.png'),
-                    '打开 [GmailBuy 商品列表](https://gmailbuy.com/)，找到首页「谷歌邮箱批发」商品列表（这是列表标题），按商品说明确认美国地区与注册时间。'
-                    '点对应行「购买」打开详情，核对当前价格、库存及售后。详情页的「查询密码」用于查订单，请自行设置并保存；数量按实际需求填写，付款由本人确认。'
-                    '完成后查看订单资料，再接账号字段和 2FA 图解。', seller='gmailbuy'),
+                    '打开 [GmailBuy 商品列表](https://gmailbuy.com/)，在首页「谷歌邮箱批发」列表中默认推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。'
+                    '谷歌账号网站的库存和风控情况有时不确定，点对应行「购买」打开详情，以当前页面的价格、库存及售后为准。详情页的「查询密码」用于查订单，请自行设置并保存；数量按实际需求填写，付款由本人确认。'
+                    '完成后保存订单资料，把第一次登录留给后面网络配完后的手机 Claude App，并对照账号字段和 2FA 图解备用。', seller='gmailbuy'),
     'google_materials': card('看懂账号资料和两步验证码', 'google login', '08-google-account.md', GOOGLE_IMAGES,
                             '按三张原图依次解释邮箱与密码、商家标注的 2FA 密钥、生成当前验证码及回填位置。取码链接：https://2fa.run/ 。现在可先看懂，实际登录按主流程进行。'),
     'google_2fa': card('2FA 密钥取码和回填', 'google login', '08-google-account.md', GOOGLE_IMAGES[1:],
@@ -117,7 +117,7 @@ def eligible(topic, state, *, preview=False):
         return False
     if item['phone'] == 'android' and device.get('phone') != 'android':
         return False
-    if not preview and item['seller'] and account.get('purchase_channel', 'chuhai91') != item['seller']:
+    if not preview and item['seller'] and account.get('purchase_channel', 'gmailbuy') != item['seller']:
         return False
     return True
 
@@ -204,7 +204,7 @@ def attach(result, state):
         elif stage == 'google' and data.get('account_origin') == 'purchased' and data.get('google_account_status') == 'available':
             default = 'google_materials'
         elif stage == 'google' and data.get('google_account_status') == 'unavailable':
-            default = 'gmailbuy' if data.get('purchase_channel') == 'gmailbuy' else 'chuhai_purchase'
+            default = 'chuhai_purchase' if data.get('purchase_channel') == 'chuhai91' else 'gmailbuy'
         elif stage == 'vps':
             default = next((topic for topic in gallery_topics if topic in ('vps_bandwagon', 'vps_dmit')), 'network_basics')
         elif stage == 'browser':

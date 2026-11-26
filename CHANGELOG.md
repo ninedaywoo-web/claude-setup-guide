@@ -1,5 +1,11 @@
 # 更新记录
 
+## 1.0.68 · 2026-11-26
+
+- 基于 `v1.0.61` 干净基线新增两段式固定离线图文引导页 `assets/google-account/guide.html` 及本地打开脚本 `scripts/open_google_guide.py`：客户确认没有可用 Google 账号提交 `google_account_status=unavailable` 后，程序自动尝试在默认浏览器打开 `guide.html` 并返回可点击本地路径（浏览器不可打开时仍可从路径直接进入，`workflow.py run --action open_google_guide` 保留为重新打开入口）。
+- 统一离线引导页、`scripts/workflow_messages.py`、`scripts/workflow_teaching.py`、`assets/step-guides/gmailbuy-shop.png` 及相关文档的 Google 购号口径为 **GmailBuy**「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」（`id=18&sid=18`）首推、**出海91** 备选，其余阶段与主流程顺序保持基线原状。
+- 页面下段与购买后说明完整包含：买完先保存、把第一次登录留给后续手机 Claude 的风控原因说明，什么是 2FA 验证码大白话科普，推荐取码工具 `https://2fa.run/`（并说明手机本机身份验证器导入密钥后面有条件再配）及三张高清原图。
+
 ## 1.0.67 · 2026-11-26
 
 - 整体回退并恢复至 `v1.0.61`（`d59882a`）稳定基线：所有入口说明、教程正文、控制层脚本、配图与测试用例均恢复为 `v1.0.61` 原状；使用递增版本号 `1.0.67` 发布，保留完整 Git 历史并确保已拉取 `1.0.62–1.0.66` 的环境可正常检测到基线恢复更新。

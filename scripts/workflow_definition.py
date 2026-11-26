@@ -78,6 +78,7 @@ INVALIDATES = {
 OBJECT_FIELDS = {'browser': 'profile_ref', 'payment_preparation': 'apple_account_ref', 'phone_proxy': 'apple_account_ref'}
 
 ACTIONS = {
+    'open_google_guide': ('google', ['open_google_guide.py']),
     'vps_capture': ('vps', ['vps_capture.py']),
     'cleanup_audit': ('cleanup', ['cleanup.py', '--audit']),
     'cleanup_apply': ('cleanup', ['cleanup.py']),

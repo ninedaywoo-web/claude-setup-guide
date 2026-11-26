@@ -1,5 +1,10 @@
 # 更新记录
 
+## 1.0.69 · 2026-11-26
+
+- 移除自动弹开本地网页跳转（删除 `assets/google-account/guide.html` 与 `scripts/open_google_guide.py`，`scripts/workflow.py` 与 `scripts/workflow_definition.py` 恢复至 `v1.0.61` 基线原状），回到原对话内直接带做方式。
+- 保留全链路统一的 Google 购号默认推荐：**GmailBuy**「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」（`id=18&sid=18`）首推、**出海91** 备选、`assets/step-guides/gmailbuy-shop.png` 选购图，以及买完后清晰展示首登时机原因、2FA 大白话科普、推荐取码工具 `https://2fa.run/`（附手机本机身份验证器后面有条件再配）与三张原图。
+
 ## 1.0.68 · 2026-11-26
 
 - 基于 `v1.0.61` 干净基线新增两段式固定离线图文引导页 `assets/google-account/guide.html` 及本地打开脚本 `scripts/open_google_guide.py`：客户确认没有可用 Google 账号提交 `google_account_status=unavailable` 后，程序自动尝试在默认浏览器打开 `guide.html` 并返回可点击本地路径（浏览器不可打开时仍可从路径直接进入，`workflow.py run --action open_google_guide` 保留为重新打开入口）。

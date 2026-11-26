@@ -8,7 +8,7 @@
 
 如果客户只谈到 Claude 账号，沿用开场原句确认 Google 账号。如果客户已明确说某个 Google 账号关联的 Claude 账号被封禁，先确认有没有另一个可用的 Google 账号。
 
-本流程默认采用“已有账号复用、没有账号购买”。客户明确没有可用的 Google 账号时，按客户原话提交 `google_account_status=unavailable`：程序会自动尝试在默认浏览器打开固定两段式离线图文页 `assets/google-account/guide.html`（上段为 GmailBuy 首推与出海91备选选购指引，下段为买完首登时机与三张 2FA 备用原图），并在返回结果中给出可点击本地路径；需要重新打开时可运行 `python3 scripts/workflow.py run --action open_google_guide`。已有可用账号记录 `account_origin=self_used`、`google_account_status=available`；购买账号收到资料时记录 `account_origin=purchased`、`google_account_status=available`，先完成下面的资料图解再继续。
+本流程默认采用“已有账号复用、没有账号购买”。客户明确没有可用的 Google 账号时，按客户原话提交 `google_account_status=unavailable`，并在同一条对话里展示两家渠道与选购图。已有可用账号记录 `account_origin=self_used`、`google_account_status=available`；购买账号收到资料时记录 `account_origin=purchased`、`google_account_status=available`，先完成下面的首登说明与 2FA 图解再继续。
 
 没有可用账号时，先明确告诉客户：
 
@@ -17,13 +17,13 @@
 > - 首选 [GmailBuy](https://gmailbuy.com/)：推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。
 > - 备选 [出海91](https://chuhai91.cc/)：也有谷歌精品老号等套餐可选。
 >
-> **选购提示：**谷歌账号网站的库存有时候会变动，谷歌账号的风控情况也会不确定，下单前以您现场打开页面的实际价格、库存和售后说明为准。下面是 GmailBuy 选购与查单示意图，本地离线图文页 `assets/google-account/guide.html` 也已备妥可随时点击打开。
+> **选购提示：**谷歌账号网站的库存有时候会变动，谷歌账号的风控情况也会不确定，下单前以您现场打开页面的实际价格、库存和售后说明为准。下面是 GmailBuy 选购与查单示意图。
 
-首次提供购买渠道时，在同一条对话里同时展示两个可点击链接、选购提示与本地图文页路径，由用户选择。默认推荐 GmailBuy 新号（`id=18&sid=18`）；客户选择后记录 `purchase_channel=gmailbuy` 或 `chuhai91`，恢复时沿用该选择。用户选择出海91就按出海91三步图继续。已有可用 Google 账号继续复用。
+首次提供购买渠道时，在同一条对话里同时展示两个可点击链接、选购提示与选购图，由用户选择。默认推荐 GmailBuy 新号（`id=18&sid=18`）；客户选择后记录 `purchase_channel=gmailbuy` 或 `chuhai91`，恢复时沿用该选择。用户选择出海91就按出海91三步图继续。已有可用 Google 账号继续复用。
 
 **买完后的首登时机说明：**买完 Google 账号后先把资料保存好，将新号的“第一次登录”留给后面 VPS、电脑网络、AdsPower 和手机网络全部配置验收完成后的**手机 Claude App**——因为谷歌账号风控不确定，新号第一次登录往往最顺畅、最容易直接登进去。主流程顺序保持不变。
 
-选购建议按作者交付经验表达，给出选择和下一步即可。商品页的“使用痕迹”等介绍用于理解商品属性，回答围绕当前推荐与实际页面选择和下一步操作展开。直接给出入口与本地图文页，以客户现场打开的实时商品页为准；需要用户提供信息时，只索取商品名称或当前商品页截图。付款由用户在商家页面完成。
+选购建议按作者交付经验表达，给出选择和下一步即可。商品页的“使用痕迹”等介绍用于理解商品属性，回答围绕当前推荐与实际页面选择和下一步操作展开。直接给出入口与选购图，以客户现场打开的实时商品页为准；需要用户提供信息时，只索取商品名称或当前商品页截图。付款由用户在商家页面完成。
 
 Google 账号用于登录 Claude；美区 Apple 账户用于 App Store 下载、礼品卡充值和订阅付款。后续电脑上的 Claude 桌面端或 CLI 沿用手机登录的同一个 Google 账号。
 
@@ -61,7 +61,7 @@ Google 账号用于登录 Claude；美区 Apple 账户用于 App Store 下载、
 
 ![GmailBuy 商品列表、详情和查单操作示意](../assets/step-guides/gmailbuy-shop.png)
 
-Codex 在默认推荐或客户选定 GmailBuy 时直接展示这张图、直达链接与本地图文页路径。客户找不到或看不到图时，用 `python3 scripts/workflow.py guide --topic gmailbuy` 重发，或运行 `python3 scripts/workflow.py run --action open_google_guide` 重新打开本地图文页。客户仅想对比另一家图解时可直接取图，继续沿用已选商家。
+Codex 在默认推荐或客户选定 GmailBuy 时直接展示这张图与直达链接。客户找不到或看不到图时，用 `python3 scripts/workflow.py guide --topic gmailbuy` 重发。客户仅想对比另一家图解时可直接取图，继续沿用已选商家。
 
 ## 对话里直接给出 2FA 取码链接
 

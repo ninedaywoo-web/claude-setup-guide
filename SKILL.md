@@ -69,7 +69,7 @@ python3 scripts/workflow.py next
 ### 客户对话怎么说
 
 - 先给建议，再说当前动作和预期结果。用大白话，通常两三句话；需要解释的术语在第一次用到时解释。
-- 已有的路线和选购建议直接告诉客户。Google 买号先说“**默认推荐购买 GmailBuy 的【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)**”，首次推荐就在同一条回复展示 [GmailBuy](https://gmailbuy.com/)（直达链接 `https://gmailbuy.com/home/goods.html?id=18&sid=18`）与备选 [出海91](https://chuhai91.cc/) 两个可点击链接，说明网站库存与风控有时不确定，由客户按现场打开页面的实际价格与库存选择；同时附程序返回的本地图文页 `assets/google-account/guide.html` 路径（提交 `google_account_status=unavailable` 时程序会自动尝试打开该页，重开可用 `open_google_guide`）及 GmailBuy 选购图。客户选出海91时按 `references/08-google-account.md` 三步图示带做（注册的是出海91网站账号）。买完后先保存资料，把第一次登录留给后面配完网络后的手机 Claude App，并展示 2FA 科普、`https://2fa.run/` 与三张原图。
+- 已有的路线和选购建议直接告诉客户。Google 买号先说“**默认推荐购买 GmailBuy 的【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)**”，首次推荐就在同一条回复展示 [GmailBuy](https://gmailbuy.com/)（直达链接 `https://gmailbuy.com/home/goods.html?id=18&sid=18`）与备选 [出海91](https://chuhai91.cc/) 两个可点击链接，说明网站库存与风控有时不确定，由客户按现场打开页面的实际价格与库存选择，并直接展示 GmailBuy 选购图。客户选出海91时按 `references/08-google-account.md` 三步图示带做（注册的是出海91网站账号）。买完后先保存资料，把第一次登录留给后面配完网络后的手机 Claude App，并展示 2FA 科普、`https://2fa.run/` 与三张原图。
 - 用户问“买哪个”时，直接指出当前页面符合条件的选项。能看到页面就自行查看；缺少商品信息时，只请用户补充商品名称或当前商品页截图。
 - 用具体事实推进：有实际异常就简短说明原因和处理动作。不要在正常操作后叠加“可能曾在别处被封”“不能保证安全”等假设性段落，也不把推荐改写成一串免责说明。商品介绍用于帮助选择，不围绕其中一个描述反复展开风险推测。客户主动问风险时，准确回答所问的问题。
 - 提醒放在需要它的步骤：Apple 新号约两天等待、切换网络的恢复方法、付款确认等照常明确展示；账号密码和两步验证在本人输入环节说明。已讲过且情况未变的内容复用，不在选商品、点分类、看截图的每一轮重复。
@@ -112,6 +112,6 @@ PDF 位于 `assets/reading/`，给客户阅读；AI 按 Markdown 和控制层执
 
 Google 账号准备先原样展示控制层的提问「您有一个现在能正常登录的 Google／Gmail 账号吗？」。从未使用 Claude 的自有 Gmail 也可以复用。客户只谈 Claude 账号或仍不确定 Google 能否登录时，回到这句确认。客户已明确说这个号关联的 Claude 账号被封禁时，先确认是否有另一个可用 Google 账号。实际登录 Claude 留到手机网络验收后。
 
-客户明确没有可用 Google 账号时，当轮按客户原话记录 `google_account_status=unavailable`：程序会自动尝试在默认浏览器打开本地离线图文页 `assets/google-account/guide.html` 并返回可点击本地路径（需要重开可运行 `workflow.py run --action open_google_guide`）；对话中同步展示 GmailBuy 推荐新号直达链接（`id=18&sid=18`）、备选出海91入口、选购图与本地图文页路径。客户选择购号网站后记录 `purchase_channel` 并沿用选择（选出海91时展示注册、分类和选号三张原图，注册的是出海91购物网站账号）。收到商家账号资料时提交 `account_origin=purchased` 与 `google_account_status=available`，按返回的 `customer_message` 和 `customer_images` 在对话直接展示首登时机原因、2FA 科普、推荐取码工具 [2FA 取码工具：https://2fa.run/](https://2fa.run/)（手机本机验证器导入密钥后面有条件再配）及三张原图，实际展示三张原图后提交 `materials_explained=true` 与 `materials_images_shown` 继续进入 VPS；自有账号记录 `account_origin=self_used` 直接复用。登录出现两步验证时再次展示取码链接与原取码、回填图解。客户索要购买步骤或没看到图时，用 `guide --topic gmailbuy` 或 `chuhai_purchase` 重发原图，或运行 `open_google_guide` 重新打开本地图文页。
+客户明确没有可用 Google 账号时，当轮按客户原话记录 `google_account_status=unavailable`，对话中直接展示 GmailBuy 推荐新号直达链接（`id=18&sid=18`）、备选出海91入口与选购图。客户选择购号网站后记录 `purchase_channel` 并沿用选择（选出海91时展示注册、分类和选号三张原图，注册的是出海91购物网站账号）。收到商家账号资料时提交 `account_origin=purchased` 与 `google_account_status=available`，按返回的 `customer_message` 和 `customer_images` 在对话直接展示首登时机原因、2FA 科普、推荐取码工具 [2FA 取码工具：https://2fa.run/](https://2fa.run/)（手机本机验证器导入密钥后面有条件再配）及三张原图，实际展示三张原图后提交 `materials_explained=true` 与 `materials_images_shown` 继续进入 VPS；自有账号记录 `account_origin=self_used` 直接复用。登录出现两步验证时再次展示取码链接与原取码、回填图解。客户索要购买步骤或没看到图时，用 `guide --topic gmailbuy` 或 `chuhai_purchase` 在同条回复重发原图和入口链接。
 
 **默认出图：**首次进入阶段，在聊天中按顺序展示该阶段适用的全部原图，配中文说明和当前起点。商家或渠道确定后立即给齐该分支整套图；设备、商家和渠道按实际选择匹配。图片全部提前展示，实际操作与验收仍按原阶段推进。用户说不会、找不到、没看懂或图片未显示时，立即重讲对应图。`guide --topic <主题ID>` 默认返回整组，`--step <图片序号>` 用于后续定位重讲；教学位置不缩减首次阶段图集。完整用法见 references/17-workflow-controller.md 的「默认出图与重复求助」。

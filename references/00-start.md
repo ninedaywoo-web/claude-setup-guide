@@ -56,7 +56,7 @@ Ping0 的风控值越低表示该站评估的风险越低，与前面 Claude 检
 
 ### 1.5 Google 账号与默认交付路线
 
-开始时先确认有没有自己可用的 Google 账号；没有则默认推荐 [GmailBuy](https://gmailbuy.com/) 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」（`https://gmailbuy.com/home/goods.html?id=18&sid=18`）并提供备选 [出海91](https://chuhai91.cc/)，以现场页面库存与价格为准，随包提供离线图文引导页 `assets/google-account/guide.html`。交付串和 2FA 使用方法见[Google 账号准备](08-google-account.md)。账号由用户自己保管，不发给 AI。
+开始时先确认有没有自己可用的 Google 账号；没有则默认推荐 [GmailBuy](https://gmailbuy.com/) 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」（`https://gmailbuy.com/home/goods.html?id=18&sid=18`）并提供备选 [出海91](https://chuhai91.cc/)，以现场页面库存与价格为准。交付串和 2FA 使用方法见[Google 账号准备](08-google-account.md)。账号由用户自己保管，不发给 AI。
 
 默认顺序：账号与设备准备 → VPS → Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 按平台带做 iPhone 小火箭全局代理 → 电脑／手机时区选择与定位权限设置 → 核对美区 Apple ID、等待安排与客户选择记录和余额／礼品卡 → 保持手机节点开启，下载 Claude → 使用 Google 账号登录 Claude 并订阅 Pro → 订单与手机权益确认，结束交付。手机主要用于登录和订阅，Claude Code 教学不在交付范围。
 

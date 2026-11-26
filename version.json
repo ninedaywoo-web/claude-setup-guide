@@ -1,10 +1,10 @@
 {
-  "version": "1.0.68",
+  "version": "1.0.69",
   "published_at": "2026-11-26",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "在干净基线上新增两段式固定离线引导页 assets/google-account/guide.html：提交 google_account_status=unavailable 后程序自动尝试在默认浏览器打开并返回可点击本地路径（附 open_google_guide 重开动作）",
-    "统一页面、脚本输出、默认图解与文档的 Google 购号口径为 GmailBuy 全新美国新号（id=18&sid=18）首推、出海91 备选，并在页面与回复中清晰说明首登时机原因、2FA 科普与 https://2fa.run/ 推荐取码入口"
+    "移除自动弹开本地网页跳转，恢复原对话内直接带做流程，保持主流程与其余阶段与 v1.0.61 基线一致",
+    "保留默认推荐 GmailBuy 全新美国谷歌新号（id=18&sid=18）＋备选出海91＋选购图，以及买完后清晰展示首登时机原因、2FA 大白话科普、https://2fa.run/ 推荐取码入口与三张原图"
   ]
 }

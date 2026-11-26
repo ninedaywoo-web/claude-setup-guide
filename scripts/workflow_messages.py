@@ -112,26 +112,21 @@ def customer_output(result, state, now):
             result['next_action'] = '结合已有对话确认账号来源，提交 account_origin=self_used 或 purchased；购买账号继续展示资料与取码图解。'
         elif status == 'available':
             messages.append(GOOGLE_MATERIALS_GUIDANCE)
-            if result.get('guide_page'):
-                messages.append('本地离线图文页也完整保留了首登说明和三张 2FA 原图：' + result['guide_page']['markdown_link'])
             result['customer_images'] = GOOGLE_ORDER_IMAGES.copy()
-            result['next_action'] = ('在当前回复直接展示 customer_message 中的首登原因说明、2FA 科普与推荐取码入口 https://2fa.run/（手机本机验证器导入密钥后面有条件再配），并将 customer_images 转为当前项目的绝对路径嵌入聊天。'
+            result['next_action'] = ('在当前回复直接展示 customer_message 中的首登原因说明、2FA 大白话科普与推荐取码入口 https://2fa.run/（手机本机身份验证器导入密钥后面有条件再配），并将 customer_images 三张原图转为当前项目的绝对路径嵌入聊天。'
                                      '实际嵌入三张原图后提交 materials_explained=true 和 materials_images_shown（本次展示的三张图片路径），按返回任务继续进入 vps；这一步由 Codex 展示完成，无需客户额外确认。')
         elif status == 'unavailable':
-            guide_link = result.get('guide_page', {}).get('markdown_link', '')
             if channel == 'chuhai91':
                 messages.append('沿用您选择的 [出海91](https://chuhai91.cc/)，按下面三步图购买美区 Google 账号（谷歌账号网站库存与风控可能不确定，按当前页面价格和库存核对）。先注册或登录出海91 购物网站账号（QQ 邮箱也可以），再接到已完成的位置。')
                 result['purchase_images'] = CHUHAI_PURCHASE_IMAGES.copy()
-                result['next_action'] = ('本轮沿用出海91，将 customer_message 里的出海91注册、分类和选购三张原图直接嵌入同一条回复，指出现在从哪一步开始，并附本地图文引导页链接。'
-                                         '客户索要购买步骤、找不到图或没看懂时，运行 guide --topic chuhai_purchase 重发整组图，或运行 open_google_guide 重新打开本地图文页。'
+                result['next_action'] = ('本轮沿用出海91，将 customer_message 里的出海91注册、分类和选购三张原图直接嵌入同一条回复，指出现在从哪一步开始。'
+                                         '客户索要购买步骤、找不到图或没看懂时，运行 guide --topic chuhai_purchase 重发整组图。'
                                          '注册的是出海91购物网站账号，后续按实际页面核对美区、价格与库存。')
             else:
                 messages.append(GOOGLE_PURCHASE if channel is None else
                                 '沿用您选择的 [GmailBuy](https://gmailbuy.com/)，默认推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。谷歌账号网站的库存与风控有时不确定，按您现场打开页面的价格、库存与售后核对即可。')
-                result['next_action'] = ('本轮直接展示程序返回的购买指引、默认推荐的 GmailBuy 新号直达链接（https://gmailbuy.com/home/goods.html?id=18&sid=18）、备选出海91链接、GmailBuy 选购图，以及本地图文引导页链接（程序已自动尝试打开 guide.html；客户需要重开时可运行 workflow.py run --action open_google_guide）。'
+                result['next_action'] = ('本轮直接展示默认推荐的 GmailBuy 新号直达链接（https://gmailbuy.com/home/goods.html?id=18&sid=18）、备选出海91链接与 GmailBuy 选购图。'
                                          '以客户现场打开的商品页实时价格与库存为准；客户找不到图时用 guide --topic gmailbuy 重发；若客户明确选择出海91，记录 purchase_channel=chuhai91 并展示出海91三张原图。')
-            if guide_link:
-                messages.append('已为您准备固定版离线图文页（包含购买入口、首登说明与 2FA 三张原图），如果浏览器未自动弹出，可直接点击打开：' + guide_link)
             result['next_action'] += (' 客户说买好并收到资料时，提交 account_origin=purchased 与 google_account_status=available，直接展示首登原因、2FA 科普、取码链接和三张原图。'
                                       '若客户后来找回自己的可用账号，明确提交 account_origin=self_used 继续复用。')
             messages.append(GOOGLE_TIMING)

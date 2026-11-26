@@ -8,7 +8,7 @@
 
 如果客户只谈到 Claude 账号，沿用开场原句确认 Google 账号。如果客户已明确说某个 Google 账号关联的 Claude 账号被封禁，先确认有没有另一个可用的 Google 账号。
 
-本流程只走“已有账号复用、没有账号购买”，**严禁跳转或引导用户去 Google 官网自行注册 Google／Gmail 账号**。客户明确没有可用的 Google 账号时，当轮按客户原话提交 `google_account_status=unavailable`，再同时展示两家渠道。已有可用账号记录 `account_origin=self_used`、`google_account_status=available`；购买账号收到资料时记录 `account_origin=purchased`、`google_account_status=available`，无论买到的套餐是否包含 2FA 密钥，一律先自动展示首登防踩坑提醒（先不要登 Gmail，等全部配完后再直接在 Claude 登录；绝不改变主流程顺序）和下方的账号资料与 2FA 图解，再继续进入 VPS。
+国内环境直接去官网注册常容易卡在扫码或手机号验证过不去，因此本流程默认走“已有账号复用、没有账号优先购买”。客户明确没有可用的 Google 账号时，当轮按客户原话提交 `google_account_status=unavailable`，再同时展示两家渠道。已有可用账号记录 `account_origin=self_used`、`google_account_status=available`；购买账号收到资料时记录 `account_origin=purchased`、`google_account_status=available`，无论买到的套餐是否包含 2FA 密钥，一律先自动展示首登防踩坑提醒（先不要登 Gmail，等全部配完后再直接在 Claude 登录；绝不改变主流程顺序）和下方的账号资料与 2FA 图解，再继续进入 VPS。
 
 没有可用账号时，先明确告诉客户：
 

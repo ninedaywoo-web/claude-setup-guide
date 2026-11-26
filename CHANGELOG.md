@@ -1,5 +1,11 @@
 # 更新记录
 
+## 1.0.65 · 2026-11-26
+
+- 做减法精简 `AGENTS.md`、`SKILL.md`、`scripts/workflow_messages.py`、`scripts/workflow_view.py` 及相关章节文案：移除强硬对抗式“全局执行底线／严禁官方注册”措辞，避免诱发模型防御性覆盖；完整保留已验证生效的新手说明呈现、`devices` 阶段 `wait_for_user=true` 停顿与“以客户现场实时页面为准”规则。
+- 收紧 `intake` 开场任务：仅确认电脑或手机之前有没有登录过被 Claude 封禁的账号，不提前追问具体设备或登录方式。
+- Google 购号改为以“国内环境官网注册易卡扫码或手机号验证”的客观原因自然推荐 GmailBuy 新号（`id=18&sid=18`）与备选出海91，完整保留买完后首登原因提醒与 2FA 科普自动展示。
+
 ## 1.0.64 · 2026-11-26
 
 - 修复 Codex 场景下回复过度精简成纯问答的问题（`AGENTS.md`、`SKILL.md`、`scripts/workflow_messages.py`、`scripts/workflow_view.py`）：移除诱导删减的「通常两三句话／简短说明」表述，明确要求先回应客户上一句，再把 `customer_message` 中的说明性文字、用途解释、原因与提醒完整呈现到最终正文，并禁止用脚本切片过滤掉 `display_instruction`、`next_action` 等控制层字段。

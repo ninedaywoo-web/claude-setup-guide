@@ -370,7 +370,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
         self.assertNotIn('被 Claude 封禁', view['customer_message'])
         self.assertIn('只谈到 Claude 账号', view['next_action'])
         self.assertIn('手机网络配置完成后，再使用 Google 账号登录 Claude', view['next_action'])
-        self.assertIn('严禁引导客户自行注册 Google／Gmail 账号', view['next_action'])
+        self.assertIn('默认购买建议', view['next_action'])
         for url in ('https://chuhai91.cc', 'https://gmailbuy.com/'):
             self.assertNotIn(url, view['customer_message'])
         view = self.flow.submit(self.payload({'google_account_status': 'unavailable'}))
@@ -378,7 +378,7 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
             self.assertIn(url, self.flow.next()['customer_message'])
         self.assertIn('手机网络配置完成后', view['customer_message'])
         self.assertIn('直接展示', view['display_instruction'])
-        self.assertIn('严禁引导客户去 Google 官方注册页自行注册', view['next_action'])
+        self.assertIn('id=18&sid=18', view['next_action'])
 
     def test_google_missing_account_keeps_purchase_route_on_resume(self):
         self.reach('google')
@@ -892,13 +892,11 @@ class CustomerFlowAudit(fixtures.WorkflowTests):
     def test_codex_global_authority_fact_source_and_devices_turn_boundary(self):
         from workflow_view import compact
         intake = self.flow.next()
-        self.assertIn('控制层与教程既定路线 > 外部官方通用文档 > 模型自身通用经验', intake['task_scope_instruction'])
-        self.assertIn('非实时云端搜索/网页抓取缓存', intake['task_scope_instruction'])
-        self.assertIn('避免牵连新账号', intake['customer_message'])
+        self.assertIn('不以非实时搜索缓存判断库存', intake['task_scope_instruction'])
+        self.assertIn('先不提前追问具体设备或登录方式', intake['next_action'])
         compact_intake = compact(intake)
-        self.assertIn('禁止压缩成纯问答', compact_intake['display_instruction'])
-        self.assertIn('禁止切片丢弃控制字段', compact_intake['display_instruction'])
-        self.assertIn('禁止工具间隙播报代替正文', compact_intake['display_instruction'])
+        self.assertIn('不要压成一两句纯问答', compact_intake['display_instruction'])
+        self.assertIn('wait_for_user=true', compact_intake['display_instruction'])
         self.reach('devices')
         pdf_view = self.flow.submit(self.payload({'computer': 'mac', 'phone': 'iphone', 'setup_explained': True}))
         self.assertEqual(pdf_view['stage'], 'devices')

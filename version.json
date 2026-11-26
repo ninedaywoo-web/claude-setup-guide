@@ -1,10 +1,10 @@
 {
-  "version": "1.0.64",
+  "version": "1.0.65",
   "published_at": "2026-11-26",
   "repository": "ninedaywoo-web/claude-setup-guide",
   "branch": "main",
   "summary": [
-    "修复 Codex 裁剪控制字段、压缩说明文字与工具间隙连交跳过设备/PDF 说明的问题，强制面向用户正文完整展示说明并等待 PDF 询问回复",
-    "立明全局权威层级（既定路线 > 外部官方通用文档 > 模型通用经验）与实时事实源边界（禁拿非实时网页搜索/抓取缓存判定库存或否决教程入口），同时标注 GmailBuy id=18 防看串并同步 05-ai-walkthrough.md 口径"
+    "精简并柔化 AGENTS.md、SKILL.md 与控制层措辞，移除强硬对抗口吻，保留完整新手说明、devices 阶段 PDF 停顿与不以非实时缓存判库存规则",
+    "收紧 intake 开场只问封禁经历，不提前展开设备或登录方式追问；Google 购号以国内官网易卡扫码验证的客观原因自然推荐 GmailBuy 新号与出海91，保留首登原因与 2FA 科普"
   ]
 }

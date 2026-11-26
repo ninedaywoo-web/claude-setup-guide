@@ -5,7 +5,7 @@ PDF_GUIDANCE = """**项目已经下载好了**，接下来 Codex 会按项目流
 
 **建议把 PDF 单独保存一份。需要我帮您放到“下载”文件夹吗？**文件已在项目里，无需重新下载。"""
 GOOGLE_QUESTION = '您有一个现在能正常登录的 Google／Gmail 账号吗？'
-GOOGLE_PURCHASE = """您目前没有可用的 Google 账号。本流程不引导自行注册 Google，**默认推荐购买 GmailBuy 的全新美国谷歌账号**，两个网站都可以选：
+GOOGLE_PURCHASE = """您目前没有可用的 Google 账号。国内环境直接去官网注册常容易卡在扫码或手机号验证过不去，因此本教程**默认推荐购买 GmailBuy 的全新美国谷歌账号**，两个网站都可以选：
 
 - 首选 [GmailBuy](https://gmailbuy.com/)：推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。
 - 备选 [出海91](https://chuhai91.cc/)：也有谷歌精品老号等套餐可选（选这家时我会立刻给您完整三步图）。
@@ -31,13 +31,12 @@ CUSTOMER_STYLE = (
     '沿用项目推荐，避免叠加假设性风险、免责声明和重复提醒；实际异常说明具体原因与处理动作，客户主动问风险时准确回答。按当前步骤展示项目要求的等待、网络恢复和付款提醒。'
 )
 TASK_SCOPE = ('保留用户的实际目的、授权范围和真实上下文。'
-              '执行权威优先级固定为「控制层与教程既定路线 > 外部官方通用文档 > 模型自身通用经验」：外部资料只用于答疑或核对当前步骤细节，严禁擅自用外部通用方式替换教程既定路线；遇阻力只在教程备选内处理或交由客户决定。'
-              '实时事实源边界：严禁把非实时云端搜索/网页抓取缓存（如 web fetch/search 快照）当作外部商家库存、价格或可用性依据，更不能据此否决教程入口；仅控制层明确要求实采时使用本地实采动作（如 vps_capture）或本机真实浏览器实时页面，其余直接给入口以客户现场页面为准。'
+              '外部商品页除控制层明确要求实采（如 vps_capture）外，直接提供教程入口由客户现场核对，不以非实时搜索缓存判断库存。'
               '先区分客户是在提问、补充信息，还是明确要求暂停、结束或改变任务。'
               '跨阶段问题和题外补充按 question_instruction 简短回应；提问本身不改变当前操作或新增前置条件。'
               '回应后明确接回控制层当前阶段尚缺的动作。提交进度前，逐项将拟填写的完成字段对应到客户的明确确认或工具实际结果。含糊描述、推测和未回答的条件保留为未确认；没有对应依据的完成字段保持原值，追问当前步骤缺的关键事实后再提交。当前阶段完成后按控制层返回的下一阶段继续。'
               '客户明确要求改变任务时，按其明确要求处理。'
-              '每轮推进以 workflow.py 返回的当前阶段为准，禁止切片过滤控制层指令字段、禁止用工具间隙短播报冒充已向客户展示并连跳步骤、禁止口头“已记录”跳过控制层；客户没有可用 Google／Gmail 账号时，严禁引导去 Google 官网自行注册，必须提交 google_account_status=unavailable 走默认买号渠道；进入 login 阶段前，严禁打开或点击登录 Claude 桌面版、创建账户或代发测试消息，也严禁在普通浏览器（非 AdsPower）登录新 Google 账号或执行 Claude 授权。')
+              '每轮推进以 workflow.py 返回的当前阶段为准，完整读取控制层指令字段，不用工具间隙短播报冒充已向客户展示并连跳步骤，禁止口头“已记录”跳过控制层；进入 login 阶段前，严禁打开或点击登录 Claude 桌面版、创建账户或代发测试消息，也严禁在普通浏览器（非 AdsPower）登录新 Google 账号或执行 Claude 授权。')
 QUESTION_INSTRUCTION = {
     '核对': '先读取问题对应的教程小节；涉及外部服务现行要求时查官方资料或实际页面。核对结论针对的产品、操作与适用范围，分别判断。教程未提及某项要求，只说明这里没有答案；先前模型回复和通用经验也不作为查证结果。',
     '有直接依据': '简短回答，并在每个结论旁给出实际读取的章节、官方链接或页面观察。教程与外部资料分别注明来源，只引用该来源实际写出的内容。不同产品或不同账号的验证各自核对；一般说明不能证明客户当前页面已经要求该项验证。',
@@ -106,10 +105,10 @@ def customer_output(result, state, now):
         messages.append('服务器系统默认选择 **' + SERVER_OS['name'] + '**，DMIT 和搬瓦工都按这一项选择。首次部署前我会读取服务器实际系统核对；已有正常节点继续复用。')
     if key == 'intake':
         result['customer_message'] = (
-            '接下来我会按教程一步步带您把电脑和手机的 Claude 使用环境配好。\n\n'
             '先确认一件事：您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？\n\n'
-            '（先确认这个是因为：如果设备之前登过被封的账号，需要先清理旧残留，避免牵连新账号；如果没登过，我们就能直接跳过清理进入下一步。）'
+            '（如果没有登过，就可以直接跳过旧残留清理进入下一步。）'
         )
+        result['next_action'] = '只确认准备使用的电脑或手机之前有没有登录过被 Claude 封禁的账号（回复有／没有／不确定即可）；先不提前追问具体设备或登录方式，有封禁记录进入 cleanup 阶段再核对。'
     if key == 'cleanup':
         messages.append('如果您的设备是 iPhone，且还装着此前使用的 Claude App，建议删除后重新下载，您可以自行安排。电脑按实际系统处理适用的登录残留。')
         result['next_action'] = ('按 references/04-recovery.md 核对实际使用范围，执行适用的平台清理或浏览器站点清理。仅退出登录（Log out）不等于清理旧账号残留；电脑用过 Claude 桌面版或 Claude Code 时，须先运行 workflow.py run --action cleanup_audit 展示平台清理 Skill 清单并按确认范围处理（提交 outcome=cleaned 须关联本阶段 cleanup_audit 或 cleanup_apply 回执）；仅浏览器或仅手机涉及封禁残留时，处理站点数据或提醒 iPhone 删除重装 App 后提交 cleanup_mode=browser_only 或 phone_only。仅当客户主动提出要申诉解封时才进入申诉。'
@@ -144,9 +143,9 @@ def customer_output(result, state, now):
             else:
                 messages.append(GOOGLE_PURCHASE if channel is None else
                                 '沿用您选择的 [GmailBuy](https://gmailbuy.com/)，默认推荐 **[【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)](https://gmailbuy.com/home/goods.html?id=18&sid=18)**。谷歌账号网站的库存和风控情况有时不确定，我会按您当前的商品页核对价格、库存与售后。')
-                result['next_action'] = ('本轮先明确默认推荐购买 GmailBuy 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」，首次推荐同时给 GmailBuy 与出海91 两家链接并说明谷歌账号网站库存与风控可能不确定。'
-                                         '在当前回复展示 GmailBuy 商品列表入口、该新号直达链接（https://gmailbuy.com/home/goods.html?id=18&sid=18）与选购步骤图；严禁引导客户去 Google 官方注册页自行注册。'
-                                         '重要：默认直接把 id=18&sid=18 直达链接发给用户，由用户在自己打开的商品页核对实时价格与库存；如自行核对库存，必须只看 id=18&sid=18 详情页本身，严禁把首页紧挨着、标题多出「2FA,」字样的 id=22 缺货行看串成推荐档缺货。'
+                result['next_action'] = ('本轮先明确默认推荐购买 GmailBuy 的「【新号】全新美国谷歌账号(首登不弹二维码验证，推荐，不支持GV)」，首次推荐同时给 GmailBuy 与出海91 两家链接并说明谷歌账号网站库存与风控可能不确定，同时客观说明因国内环境官网注册易卡扫码／手机号验证，本流程优先按上述渠道准备账号。'
+                                         '在当前回复展示 GmailBuy 商品列表入口、该新号直达链接（https://gmailbuy.com/home/goods.html?id=18&sid=18）与选购步骤图。'
+                                         '直接把 id=18&sid=18 直达链接发给用户，由用户在自己打开的实时页面核对价格与库存（不以非实时搜索缓存判断缺货，也不要和首页紧挨着、标题多出「2FA,」字样的 id=22 混淆）。'
                                          '客户找不到或没看到图时用 guide --topic gmailbuy 重发；若客户明确选出海91，记录 purchase_channel=chuhai91 并立即给齐出海91 三张原图。')
             result['next_action'] += (' 客户说买好并收到资料时，提交 account_origin=purchased 与 google_account_status=available，无论该套餐有无 2FA 一律默认自动展示首登提醒（先不登 Gmail，全部配完后再直接在 Claude 登录，不改变主流程顺序）、2FA 取码链接及三张原图。'
                                       '若客户后来找回自己的可用账号，明确提交 account_origin=self_used 继续复用。')
@@ -159,7 +158,7 @@ def customer_output(result, state, now):
                 '简短的“有／没有”必须明确是在回答 Google／Gmail 的提问。'
                 '确认自己的 Google／Gmail 能登录时提交 account_origin=self_used 与 google_account_status=available，直接接到 VPS；从未使用 Claude 也可复用。'
                 '客户已明确说这个号关联的 Claude 账号被封禁时，只问「您还有另一个能正常登录的 Google／Gmail 账号吗？」'
-                '只有客户明确确认没有可用 Google 账号，才用 source.kind=user、source.reference=客户原话提交 google_account_status=unavailable，随后按返回内容给出默认购买建议与图解；严禁引导客户自行注册 Google／Gmail 账号。'
+                '只有客户明确确认没有可用 Google 账号，才用 source.kind=user、source.reference=客户原话提交 google_account_status=unavailable，随后按返回内容给出默认购买建议、入口链接与选购图解。'
                 + GOOGLE_TIMING)
     if key == 'login':
         messages.extend([GOOGLE_LOGIN_GUIDANCE, GOOGLE_VERIFICATION_GUIDANCE])

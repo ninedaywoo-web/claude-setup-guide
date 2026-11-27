@@ -19,19 +19,18 @@ GOOGLE_VERIFICATION_GUIDANCE = '取码入口：[2FA 取码工具：https://2fa.r
 from workflow_teaching import CHUHAI_PURCHASE_IMAGES, GOOGLE_IMAGES, attach as attach_teaching
 GOOGLE_ORDER_IMAGES = GOOGLE_IMAGES.copy()
 GOOGLE_VERIFICATION_IMAGES = ['assets/google-account/02-2fa-original.png', 'assets/google-account/03-google-code-original.png']
-CUSTOMER_STYLE = '客户对话先给明确建议，再给当前操作和预期结果，用简短大白话。沿用项目推荐，避免叠加假设性风险、免责声明和重复提醒；实际异常说明具体原因与处理动作，客户主动问风险时准确回答。按当前步骤展示项目要求的等待、网络恢复和付款提醒。'
+CUSTOMER_STYLE = '客户对话先给明确建议，再给当前操作和预期结果，用简短大白话。直接沿用项目推荐与既定顺序推进；遇到实际报错时直接说明原因与下一步处理动作，按当前步骤展示项目要求的等待、网络恢复和付款提醒。'
 TASK_SCOPE = ('保留用户的实际目的、授权范围和真实上下文。'
-              '先区分客户是在提问、补充信息，还是明确要求暂停、结束或改变任务。'
-              '跨阶段问题和题外补充按 question_instruction 简短回应；提问本身不改变当前操作或新增前置条件。'
-              '回应后明确接回控制层当前阶段尚缺的动作。提交进度前，逐项将拟填写的完成字段对应到客户的明确确认或工具实际结果。含糊描述、推测和未回答的条件保留为未确认；没有对应依据的完成字段保持原值，追问当前步骤缺的关键事实后再提交。当前阶段完成后按控制层返回的下一阶段继续。'
-              '客户明确要求改变任务时，按其明确要求处理。'
-              '每轮推进以 workflow.py 返回的当前阶段为准，禁止口头“已记录”跳过控制层；进入 login 阶段前，严禁打开或点击登录 Claude 桌面版、创建账户或代发测试消息，也严禁在普通浏览器（非 AdsPower）登录新 Google 账号或执行 Claude 授权。')
+              '按 workflow.py 返回的当前阶段顺序推进，每项进度均通过 submit 提交实际结果，并在到达 login 阶段后再于已配置的环境中登录或授权 Claude。'
+              '先区分客户是在提问／顾虑，还是明确要求暂停、结束。'
+              '客户提出跨阶段疑问或犹豫（如询问“主要用电脑，手机是否需要配”“时区对不上怎么办”）时，按本教程对应说明简短正面答复，回应后明确接回控制层当前阶段尚缺的动作，保持主流程顺序继续推进。'
+              '提交进度前，逐项将拟填写的完成字段对应到客户的明确确认或工具实际结果；未确认的字段保持原值，追问缺的关键事实后再提交。当前阶段完成后按控制层返回的下一阶段继续。')
 QUESTION_INSTRUCTION = {
-    '核对': '先读取问题对应的教程小节；涉及外部服务现行要求时查官方资料或实际页面。核对结论针对的产品、操作与适用范围，分别判断。教程未提及某项要求，只说明这里没有答案；先前模型回复和通用经验也不作为查证结果。',
-    '有直接依据': '简短回答，并在每个结论旁给出实际读取的章节、官方链接或页面观察。教程与外部资料分别注明来源，只引用该来源实际写出的内容。不同产品或不同账号的验证各自核对；一般说明不能证明客户当前页面已经要求该项验证。',
-    '暂时没有依据': '采用这句简短答复：“这项具体要求还需要核实，到了对应步骤我会按实际要求带您处理。”随后接回当前动作。此分支只表达待核实，不补写需要、不需要、可以、不可以等确定判断，也不添加猜测性解释。',
-    '记录当前结果': '提交 source.reference 时保留客户有关完成项的原话及其中的不确定性。客户表示不记得、不确定或未核实时，相关完成项先保持未确认，追问缺的事实；不能把这类原话概括成客户明确确认完成。已明确的其他信息可以单独记录。',
-    '继续当前流程': '答疑与进度分别处理。当前阶段的真实完成结果照常记录；后续问题仍待核实也不阻塞已具备条件的当前步骤。',
+    '核对': '优先读取问题对应的本教程小节和控制层说明，直接按本教程既定路线与口径解答。仅在遇到外部软件菜单变化、实际页面报错或商家实时价格／库存核对时，查看当前实际页面。',
+    '有直接依据': '用大白话简短回答，直接给出对应原因和本教程做法；回答结束后立即接回当前阶段动作。',
+    '暂时没有依据': '采用这句简短答复：“这项具体细节到了对应步骤我会按实际页面带您处理。”随后接回当前动作。',
+    '记录当前结果': '提交 source.reference 时保留客户有关完成项的原话。客户表示不记得、不确定或未核实时，相关完成项保持未确认，追问缺的事实后再提交。',
+    '继续当前流程': '答疑与进度分别处理。当前阶段的真实完成结果照常记录；提问不改变既定阶段顺序。',
 }
 GOOGLE_TIMING = '现在先准备账号资料，等手机网络配置完成后，再使用 Google 账号登录 Claude。'
 ANDROID_GUIDANCE = """**安卓的适配程度较低，需要您更多地配合手机操作。**本项目的安卓付款备选是外区 Google Pay。先检查支付资料的国家／地区和可用付款方式；地区不合适时再按 Google 的实际页面处理地区设置。外区 Google 邮箱本身不等于已经具备付款条件。我们先确认这条路线，再配置网络；最终付款页实际显示 Google Pay 时继续。"""
@@ -55,7 +54,12 @@ VPS_GUIDANCE = """VPS 就是您租用的一台远程服务器，我们把它配�
 您目前是还没买 VPS、已买但没配置，还是已经有可用的自建节点？已有的可以先核对并复用；没有就跟着下面的图解准备。"""
 from vps_purchase import PURCHASE_GUIDANCE as VPS_PURCHASE_GUIDANCE
 NETWORK_GUIDANCE = '电脑上的代理客户端负责连接 VPS 节点。TUN 负责接管电脑流量，全局模式让流量走选定的节点；我们会先保留旧 VPN，单独测通新节点，再切换并确认 Codex 能继续回复。'
-PHONE_GUIDANCE = '手机主要承担首次登录和订阅付款。我们先给手机配置好网络，再通过 Claude 的 iOS 内购完成订阅，之后回电脑的 Claude 桌面端或 CLI 使用。Apple 负责这笔内购订单，后续需要申请退款，也从 Apple 的入口处理。'
+PHONE_GUIDANCE = (
+    '接下来给手机配好同一条节点。先和您说清楚三件事，心里有底：'
+    '① 手机只用于**首次登录和 Apple 礼品卡内购订阅**（避开国内银行卡网页付款受限的问题，后续如需退款也由 Apple 入口处理）；'
+    '② 订阅完成后，**平时都在电脑的 Claude 桌面端或 Claude Code 使用**；'
+    '③ 手机节点连上后，**下一步立刻把电脑、手机和 AdsPower 的时区统一成一致**，不会出现时间对不上的情况。'
+)
 CHECK_GUIDANCE = '配好后，我会带您用 [NetCoffee](https://ip.net.coffee/claude/)、[Ping0](https://ping0.cc/) 和 [Scamalytics](https://scamalytics.com/ip) 这三个网站检查网络。电脑先检查一次，手机配好后再检查一次，确认两台设备都在使用我们配置的目标线路，再继续登录和订阅。'
 GIFT_GUIDANCE = '礼品卡就是给 Apple 账户充值的卡。接下来的顺序是：购买与 Apple 账户地区对应的礼品卡 → 在 App Store 兑换到账户余额 → 打开 Claude 选择 Pro，用 Apple 余额支付。已有足够余额就直接用；完成后核对订单和会员权益，再回电脑使用。'
 APPLE_PURCHASE_GUIDANCE = '需要购买 Apple 账号时，可选 [出海91](https://chuhai91.cc) 或 [新太科技](https://xintaikeji.eu.org/)，这条内购路线选美区账号，按我们的选购经验优先挑使用时间较长的老号。商家页面和套餐经常变动，按地区、使用时间和售后说明选择。新购买的老号也按刚接手账号安排下面的约两天等待。'
@@ -66,14 +70,14 @@ APPLE_GUIDANCE = """🔴 **新买或新注册的 Apple ID：强烈建议先养�
 
 **根据实际交付反馈，刚拿到账号就立即充值、付款，更容易遇到苹果风控／购买限制。受限后可能需要找苹果人工客服申诉，常见还要等待 72 小时才能重试，很耽误时间；实际时长按本次客服答复。**
 
-约两天是我们的交付经验建议，不是苹果公布的保证。正常使用、留出时间即可，无需专门买东西或反复登录退出。默认按建议等待；如果您明确希望现在继续，我会记录您的选择。"""
+约两天是根据过往交付经验总结的稳妥做法，正常使用、留出时间即可，无需专门买东西或反复登录退出。默认按建议等待；如果您明确希望现在继续，我会记录您的选择。"""
 APPLE_PAYMENT_RECHECK = """🔴 **付款前再确认一次：新注册或新购买的 Apple ID，强烈建议从本人手机 App Store 首次登录成功起等约两天，再充值、购买或订阅。**立即付款可能遇到苹果风控，后续可能需要人工申诉及等待重试。沿用已记录的首次登录时间和您的等待选择。"""
 FINISH_GUIDANCE = """**手机订单和当前账号的 Pro 权益已确认。**手机主要用于登录和订阅，日常在电脑的 Claude 桌面端或 Claude Code／CLI 使用，登录刚才同一个 Google 账号。需要网页登录或授权时，将相关链接放到已配置的 AdsPower 环境完成，再回到桌面端或 CLI。
 
 **使用经验提醒**
-- 可以把每五小时额度约用到 70% 作为个人使用节奏建议；这个比例不是平台公布的封号阈值。
+- 可以把每五小时额度约用到 70% 作为个人使用节奏建议，留出余量更稳。
 - 发送项目或资料前，留意内容里是否包含不必要的精确定位信息，先去掉再分享。
-- 作者对生物医药、网络安全等话题的提醒属于个人使用经验。按平台规则正常使用；这些话题本身不代表会导致封号。
+- 涉及生物医药、网络安全等专业话题时，按平台规则正常讨论即可。
 
 遇到问题先问 Codex；仍需人工帮助时，让它整理当前步骤、报错和已尝试的办法，再把诊断说明发给我们。也可以让 Codex 定位 PDF 对应章节和页码。"""
 
@@ -217,9 +221,19 @@ def customer_output(result, state, now):
     if key == 'browser' and data.get('usage_explained') is not True:
         messages.append(CHECK_GUIDANCE)
     if key == 'browser':
-        result['next_action'] += ' 电脑 AdsPower 验收后提交实际结果，接续 phone_proxy → timezone → phone_network，再完成手机登录和订阅。'
+        result['next_action'] += (
+            ' AdsPower 免费版完全够用，直接按免费版界面点击左上角「新建环境」手动配置（无需开通付费版，也无需打开 API & MCP）；'
+            '点击「确定」保存前一次配齐代理（本机 HTTP 入口并点检查代理）与指纹项（WebRTC 禁用、地理位置禁止、时区、噪音全关、WebGL 元数据／WebGPU／CPU／内存全部选真实），避免保存后折返重改。'
+            '浏览器阶段只验收实际出口、HTTPS、DNS／IPv6／WebRTC 与三站评分，无需再做断线测试（电脑网络阶段已完成）。'
+            '电脑 AdsPower 验收后提交实际结果，接续 phone_proxy → timezone → phone_network，再完成手机登录和订阅。'
+        )
     if key == 'phone_proxy':
         messages.append(PHONE_GUIDANCE if device.get('phone') != 'android' else '接下来把手机连接到电脑使用的同一条节点线路，验收后在手机浏览器登录和订阅。完成后回电脑的 Claude 桌面端或 CLI 使用。')
+        if device.get('phone') != 'android':
+            result['next_action'] += (
+                ' iPhone／iPad 统一使用 Shadowrocket（小火箭），沿用对应小火箭图解推进，不自行替换为其他免费客户端；'
+                '客户询问“主要用电脑，手机是否需要配”或担心时区不一致时，直接用 customer_message 中的三点正面说明，随后继续完成手机配置。'
+            )
     if key == 'phone_network':
         messages.append(CHECK_GUIDANCE)
         if device.get('computer') == 'windows' and device.get('phone') in ('iphone', 'ipad'):
@@ -232,10 +246,10 @@ def customer_output(result, state, now):
                         '- [Ping0](https://ping0.cc/)：记录风险值，参考低于 30、优先低于 25。\n'
                         '- [Scamalytics](https://scamalytics.com/ip)：查询刚才手机实际出口 IP，记录风险值，参考低于 10。')
         messages.append('**请先反馈手机 Ping0 页面截图，并说明现在用的是 Wi-Fi 还是蜂窝网络。**接着逐站提供另外两个检测页面，或清楚告知各站实际分数、检测时间及出口对照结果。截图遮住账号、密码和节点链接；完整 IP 对照留在本机，进度仅保存脱敏结果。手机结果独立记录，电脑分数不代填。')
-        messages.append('三个网站拿到实际结果、出口核对完成后，再补齐手机 DNS、IPv6、排除路由和断线检查。检测打不开或没出分时，先处理当前问题；只显示 VPN 已连接还不算验收完成。切换 Wi-Fi／蜂窝网络后，使用前补检新网络。')
+        messages.append('三个网站拿到实际结果、出口核对完成后，再补齐手机 DNS、IPv6 和排除路由检查（手机阶段无需做断线测试，电脑网络阶段已完成）。检测打不开或没出分时，先处理当前问题；实际出口与三站均达标即可进入下一步。切换 Wi-Fi／蜂窝网络后，使用前补检新网络。')
         result['next_action'] = ('在客户对话展示手机验收步骤和三站链接，先取得手机 Ping0 页面及网络类型，再逐站收集结果。'
                                  '将手机实际出口与电脑 AdsPower、目标 VPS 对照；依据手机页面或用户明确反馈提交，source.reference 写明实际反馈来源。'
-                                 '三站均取得数值、实际出口一致且其余检查完成后继续；缺项留在手机验收。')
+                                 '手机阶段无需做断线测试；三站均取得数值、实际出口一致且 DNS／IPv6／排除路由检查完成后即可进入下一步，缺项留在手机验收。')
     if key in ('phone_proxy', 'phone_network') and device.get('phone') in ('iphone', 'ipad'):
         result['manual_guidance'] = {
             'backup_reference': 'references/02-browser-iphone.md#224-windowsiphone保存配置与按目标恢复',
@@ -260,7 +274,7 @@ def customer_output(result, state, now):
             'action': '先读取恢复步骤，回读当前选中节点保存后的原端口和参数；保留 DNS 与微信规则，按实际模式做代理对照，验证新的 IPv4 HTTPS 请求和出口。仍失败再核对连接日志与服务端当前监听。先恢复已知改动，再考虑 TLS 指纹案例。',
             'status': '完整对话末尾客户确认网页与微信图片恢复；断线测试后恢复失败的具体原因未查明，恢复后参数和最新出口待回读。',
         }
-        result['next_action'] += ' 微信单项异常或为修微信而越调越坏时，读取 application_troubleshooting；当前整体失联先恢复可用网络，再落实微信直连分流。出现 troubleshooting.trigger 时，先读取对应章节并恢复实际连接；恢复后的 HTTPS 与出口核对完成，再记录断线检查结果并继续验收。'
+        result['next_action'] += ' 微信单项异常或为修微信而越调越坏时，读取 application_troubleshooting；当前整体失联先恢复可用网络，再落实微信直连分流。出现 troubleshooting.trigger 时，先读取对应章节并恢复实际连接；恢复后的 HTTPS 与出口核对完成，再继续验收。'
     if key in ('browser', 'phone_network'):
         bands = result.get('score_advice', {})
         if 'unverified' in bands.values():
@@ -268,7 +282,7 @@ def customer_output(result, state, now):
         if 'recheck_recommended' in bands.values():
             messages.append('三站结果有明显偏离。先复查实际出口和检测结果；复查后继续或由您明确选择继续，我会记录处理结果。这些分数是参考值。')
     if key == 'phone_proxy' and device.get('phone') != 'android':
-        messages.append('先确认您是否已有可用的小火箭。有就直接使用，无需重复购买；没有且需要用新 Apple ID 购买，先在 App Store 登录并查看新号等待安排。')
+        messages.append('iPhone／iPad 统一使用 **Shadowrocket（小火箭）**，与整套操作图解和全局路由一致。先确认您手机上是否已有可用的小火箭：有就直接使用，无需重复购买；没有且需要用新美区 Apple ID 购买，先在 App Store 登录并按新号等待安排准备。')
     if key == 'timezone':
         result['next_action'] = ('在客户对话展示当前电脑和手机的时区、定位设置步骤。已有时区选择直接沿用；'
                                  '尚未选择先确认跟随节点或台北，再完成设置、核对电脑／手机／AdsPower 一致，按实际结果提交。')

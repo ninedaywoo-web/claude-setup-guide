@@ -1,217 +1,92 @@
 # 统一交付控制层
 
-适用：从零交付、接续本项目、恢复旧客户进度。阶段顺序和完成判定由 `scripts/workflow.py` 统一管理。各教程章节只提供当前步骤的操作方法；AI 依据控制层返回的当前阶段执行。
+适用：从零交付、接续本项目、恢复旧客户进度。阶段顺序与完成判定统一由 `scripts/workflow.py` 管理，各教程章节提供当前步骤的操作方法。
 
 ## 开始与连续执行
 
-先按 SKILL 完成项目启动和资料读取，然后运行：
+完成启动读取后运行：
 
 ```bash
 python3 scripts/workflow.py init
 python3 scripts/workflow.py next
 ```
 
-`init` 可重复调用，保留已有状态。Windows 使用已验证的 `py -3` 或 `python` 替换 `python3`。第一次返回 `intake`：先问设备是否登录过被 Claude 封禁的账号。已有明确答案直接提交，AI 连续完成可代做动作。
+`init` 可重复调用并保留已有状态（Windows 用已验证的 `py -3` 或 `python` 替换 `python3`）。`next` 返回当前阶段、阅读小节、所需观察字段、缺项、允许的脚本动作和本阶段 `ticket`。每取得一组实际结果即提交 `submit`，由程序合并观察并计算下一步；用户只接手本人验证、付款与工具无法代做的动作。
 
-`next` 返回当前阶段、操作章节、所需观察字段、缺项、已记录结果、允许的脚本动作和本阶段 `ticket`。AI 按当前动作操作，每取得一组结果提交一次；程序合并部分结果并计算下一步。客户只接手本人验证、付款与工具无法代做的具体动作。`devices` 返回 `customer_message` 时，确认电脑和手机类型后将这段设备说明展示在客户对话里，再记录 `setup_explained=true`；接着按阅读版三段话术介绍 PDF，随后进入 Google 账号和 VPS。
+**跨阶段提问与题外补充：**每轮读取控制层的 `task_scope_instruction` 和 `question_instruction`。优先按本教程对应小节和控制层说明直接用大白话正面回答；仅在外部软件菜单变化、实际页面报错或商家实时价格／库存核对时查看当前实际页面。客户提出疑问或犹豫（如“主要用电脑，手机一定要配吗”“时区对不上怎么办”）时，先按本教程原因简短正面说明，再接回当前阶段继续推进；完成字段逐项对应客户明确确认或工具结果。
 
-**跨阶段提问与题外补充：**每轮读取控制层的 `task_scope_instruction` 和 `question_instruction`。先核对对应教程；外部服务现行要求查官方资料或实际页面，按产品、操作和适用范围回答并给出依据。教程未提及、通用经验和先前模型回复均不能证明某项要求存在或不存在。不同产品和账号的验证分别核对；教程段落与外部资料分别标注，只引用它各自直接支持的结论。一般说明不能代替客户当前页面的实际验证要求。暂未查到依据时使用返回的简短待核实答复，再接回当前动作。提问与题外补充不改变阶段；完成字段逐项对应客户明确确认或工具结果；source.reference 保留有关原话及其中的不确定性，含糊信息先澄清。当前阶段完成后按控制层返回的下一阶段继续；客户明确改变任务时按其要求处理。
+## 进入新阶段时先解释用途
 
-## 在客户需要的时候解释用途
+控制层将每阶段的用途说明放入 `customer_message`，首次进入该阶段时直接完整展示给客户，再带做当前操作；同阶段连续操作复用已讲说明。
 
-VPS 阶段按既定商家与默认机房推进，不询问使用国家／地区、所在地或运营商；`node_timezone` 读取所选节点机房城市。已有 VPS 和客户主动提出的需求按实际情况处理。
-
-每次返回的 `communication_instruction` 统一约束客户对话：先给建议和当前动作，简短解释；实际问题按事实处理，按阶段展示必要提醒。`customer_message` 中的选购建议直接展示，商品页和截图追问沿用同一标准。
-
-控制层把下列说明放入对应阶段的 `customer_message`，AI 首次进入该阶段时直接讲给客户，再执行当前动作。同一阶段连续操作复用已讲过的说明，客户追问时再展开；恢复带做时结合对话记录补上尚未讲过的部分。
-
-| 进入阶段 | 当场解释 |
+| 阶段 ID | 首次进入说明与完成内容 |
 | --- | --- |
-| google | 先问有没有能正常登录的 Google／Gmail 账号；客户明确没有可用 Google 账号时，同时展示 GmailBuy 推荐新号（`id=18&sid=18`）与备选出海91链接及选购图。记住选择；收到购买资料后展示首登原因、2FA 推荐链接和原资料图，再继续。已有账号复用；安卓只解释适用的 Google 登录用途。 |
-| vps | VPS 是租来的远程服务器，用来搭建自己的节点；客户购买，Codex 部署。按 [库存核对](18-vps-stock.md) 从 DMIT cart.php 核对 AS3 Premium TINY，参考价 10.90 美元/月，缺货首推搬瓦工。新购买提交 purchase_checks，依据 purchase_decision 继续；其他 DMIT 选项独立验证、说明未交付实践后由客户选择。默认月付／季付，确认实际扣款金额与覆盖时长。家宽问题按网络篇解释搭配与最终出口。 |
-| computer_network | 客户端连接节点，TUN 接管流量，全局走选定节点；保留旧 VPN 测通后再切换。 |
-| browser | 区分 Claude 桌面版、Claude Code 与 AdsPower；电脑浏览器中的 Claude 登录、邮件链接和授权使用 AdsPower，桌面版与 CLI 可正常使用。展示桌面版权限风险说法与已交付用户正常使用反馈，并给出三站链接。 |
-| phone_proxy | iOS 手机负责首次登录与内购，Apple 处理订单及退款申请；安卓使用自己的官网付款路线。 |
-| phone_network | 手机独立检查三站与实际出口，和电脑的目标线路核对后再登录订阅。 |
-| payment_preparation | 说明礼品卡充值 → App Store 余额 → Claude Pro 内购；已有余额复用。先落实账号等待安排，等待或申诉期间展示当前安排，到期后继续充值步骤。 |
-| subscription | 订单及权益确认后，说明回电脑桌面端或 CLI 使用同一账号，网页登录授权仍走 AdsPower。 |
+| `intake` | 询问电脑或手机是否登录过被 Claude 封禁的账号；已有答案直接复用。 |
+| `cleanup` | 有封禁经历时进入，按设备执行适用清理并记录 `outcome` 与 `handled_scope`（桌面端清理须关联 `cleanup_audit`／`cleanup_apply` 回执；仅浏览器或手机可提交 `cleanup_mode=browser_only`／`phone_only`）。 |
+| `devices` | 确认电脑与手机类型，展示设备搭配说明（`setup_explained=true`）与 PDF 阅读版说明（`pdf_explained=true`，另存选择可记 `yes`/`no`/`unanswered`）；安卓另记录路线说明与支付条件。 |
+| `google` | 原样问是否有可用 Google／Gmail 账号；自有账号 `account_origin=self_used` 复用；缺号提交 `google_account_status=unavailable`，同条展示首选 GmailBuy 新号（`id=18&sid=18`）与备选出海91及选购图；收到资料后提交 `account_origin=purchased` 与 `available`，展示首登时机、2FA 科普、`https://2fa.run/` 与三张原图后提交 `materials_explained=true` 与 `materials_images_shown`。 |
+| `vps` | 解释 VPS 是租来的远程服务器，系统默认 Debian 12、洛杉矶机房。当前按 `workflow.py policy` 的推荐直接推进搬瓦工及五张原图；恢复常规核对时按 `references/18-vps-stock.md` 采集并核对。开通且 SSH 就绪后提交 `access_ready=true`。 |
+| `server` | 运行 `server_preflight`、`server_deploy`（或已有本脚本节点用 `server_export`），读回服务状态、Xray 版本与导出节点。 |
+| `computer_network` | 保留旧 VPN 测通新节点（`probe_proxy`）后切换为系统代理关闭 + TUN + 全局并复验（`probe_system`）、确认 Codex 新回复，并在本阶段完成全流程唯一的 1 次断线测试。 |
+| `browser` | 区分 Claude 桌面版、Claude Code 与 AdsPower。使用 **AdsPower 免费版**直接点「新建环境」手动填写，点确定前一次配齐本机 HTTP 代理和真实硬件指纹（WebRTC 禁用、定位禁止、时区、噪音全关、WebGL 元数据／WebGPU／CPU／内存均选真实），验收出口、DNS／IPv6／WebRTC 与三站评分（不做断线测试）。 |
+| `phone_proxy` | 主动讲清“手机只用于首次登录和 Apple 礼品卡内购、日常回电脑用、下一步立刻统一三端时区”；iPhone／iPad 统一使用 **Shadowrocket（小火箭）**，导入同一节点、全局路由选「代理」并开启 VPN（安卓用官网分支）。 |
+| `timezone` | 询问一次“跟随节点（推荐）／台北”，展示对应设备路径完成设置：Mac 关闭自动时区与系统服务“设定时区”（定位总开关保原状，禁止网页位置权限）；Windows 与手机关闭自动时区和定位总开关；核对电脑、手机与 AdsPower 时区一致。 |
+| `phone_network` | 在手机独立验收实际出口、三站评分（NetCoffee／Ping0／Scamalytics）、DNS／IPv6、排除路由与所用 Wi-Fi／蜂窝网络（不做断线测试）。 |
+| `payment_preparation` | Apple 路线核对美区 Apple ID 来源（`self_used`／`newly_registered`／`purchased`，后两者归为新号并展示约两天等待提醒与首次登录起点）；充值礼品卡首推支付宝（`guide --topic gift_alipay` 备忘录直达链接）。安卓记录官网支付条件与风险确认。 |
+| `app` | 保持手机节点开启，下载 Anthropic 官方 Claude App 并核对请求路径（安卓打开官网）。 |
+| `login` | 在手机官方 Claude App 用 Google 账号登录成功（需两步验证时再次给出 `https://2fa.run/` 与原取码回填图），记录本机账号代号。 |
+| `subscription` | 确认手机 Pro 订单与当前账号权益后，展示收尾使用说明与经验，提交 `handoff_explained=true` 完成交付。 |
 
-每阶段的 `task_scope_instruction` 要求结合真实目的与上下文按当前操作判断。Windows 的 `computer_network` 还返回 `troubleshooting`：发生本机 HTTP 已通、TUN 后重复连接 VPS 等现象时读取 Windows 第 6.1 节。该案例仍待客户复测，完成判定沿用实际出口、HTTPS、Codex 回复及原网络检查字段。
+`node_label`、`profile_ref`、`account_ref`、`apple_account_ref` 均填本机代号，账号密码、完整 IP、密钥和节点链接仅保存在 `.local/`。
 
-## Google 购号、资料图解与登录衔接
+## 提交观察与调用脚本
 
-开场使用 `customer_message` 中的 Google／Gmail 原句。客户只谈 Claude 账号或尚未确认 Google 账号能否登录时，保留进度并确认 Google。只有客户明确没有可用 Google 账号时，才记录 `google_account_status=unavailable`，来源用 `source.kind=user` 和客户原话。实际登录 Claude 留到手机网络验收后。
-
-`google_account_status=unavailable` 时同条回复展示 GmailBuy 默认推荐新号（`https://gmailbuy.com/home/goods.html?id=18&sid=18`）与备选出海91链接、选购提示和选购图。客户选择后记录 `purchase_channel=gmailbuy` 或 `chuhai91`；选出海91时，直接嵌入 `customer_message` 中注册、分类和选号三张原图，给出注册页和分类页链接并标明当前操作。客户问购买办法或没看到图时，调用 `guide --topic gmailbuy` 或 `chuhai_purchase` 重发整组。明确索要另一家图时可用 guide 预览，沿用当前渠道。
-
-收到购买资料时提交 `account_origin=purchased`、`google_account_status=available`。程序仍返回 `google`，在 `customer_message` 直接提供 https://2fa.run/，`customer_images` 给出原账号资料、取码与回填三张图。Codex 在同条回复展示说明、链接和图片后，提交 `materials_explained=true` 与 `materials_images_shown` 接续下一阶段。这是展示完成记录，无需用户再确认。未买到账号时展示标记不代替账号准备完成。
-
-已有可用账号提交 `account_origin=self_used`、`google_account_status=available` 直接复用。为接续现有输入，“没有账号”变为“已备妥”时默认走购买资料说明；用户后来找回自己的可用账号时，明确使用 `self_used`。旧进度保留已有 Google 账号结果和选购渠道。
-
-`login` 使用独立的当前登录说明，不再要求等待已经验收的手机网络。Google 页面要求身份验证器验证码时，显示取码链接和 `verification_images` 中的原取码、回填图解；自有账号使用已绑定的验证方式。各图片路径由当前项目目录解析，不保存用户的账号凭据。
-
-## 手机验收对话与结果
-
-`phone_network` 直接输出手机操作、实际出口对照要求和三站链接。Windows＋iPhone 用户先反馈手机 Ping0 页面和 Wi-Fi／蜂窝网络类型，再逐站提供 NetCoffee、Scamalytics 结果；Codex 按页面或用户明确反馈记录实际来源。电脑与手机的 `scores` 均须包含三站实际数值和结果说明，缺失／空值保留在当前阶段。出口不一致也须先解决。已有真实分数偏离参考值时，继续使用原有复查流程。
-
-## Apple 账号来源与付款提醒
-
-进入 Apple 支付准备时直接展示账户来源提问；没有小火箭、需要购买时提前在手机代理阶段展示。`account_origin` 记录 `self_used`／`newly_registered`／`purchased`；后两者自动归为 `account_type=new`，卖家“老号”仍按新接手提醒。新号先展示加粗的两天等待建议、购买限制和人工支持说明，再记录 `apple_reminder_shown=true`；来源和首次登录时间保存在同一账号的进度中，后续复用。
-
-支付准备与正式订阅前直接输出简短复查，不重复计时。同一阶段连续操作不重复播报同一提醒。新号等待和用户明确选择立即继续的规则保持不变；已购买受限进入人工支持流程。
-
-## 更新检查与提醒
-
-主流程每次向 AI 返回结果时自动执行更新检查，24 小时内复用缓存，到期后重新联网。`init`、`next`、`status`、`submit`、`change` 的结果含 `update`；`run` 在返回的 `workflow` 内包含相同信息。内部保存与计算不联网。
-
-发现新版时，更新建议直接追加到 `customer_message`。先处理客户当前步骤，再在本次带做的首个实质回答末尾展示建议；同一段连续带做不重复提醒同一版本，恢复时再次提醒。用户同意后执行返回的 `update.apply_command`，更新保留 `.local` 进度，再重读 Skill 和变更章节。检查失败照常继续当前步骤并简短说明；立即重查使用 `python3 scripts/update.py check --force`。
-
-## 唯一阶段顺序
-
-| 阶段 ID | 当前任务与完成内容 |
-| --- | --- |
-| intake | 设备封禁经历；已有答案复用。 |
-| cleanup | 有封禁经历才进入，记录适用范围及清理结果／客户暂缓选择。 |
-| devices | Mac／Windows 与 iPhone／iPad／Android，完成设备搭配说明。 |
-| google | 展示账号准备说明：已有可用 Google 账号就复用，没有则直接提供购买渠道；账号备妥后继续，实际登录留到手机网络验收后。 |
-| vps | 读取或准备 VPS、SSH 访问、节点标签及节点所在城市时区；已有 VPS 直接复用。 |
-| server | 部署或检查已有节点，读回服务状态与客户端参数。 |
-| computer_network | 系统代理关闭、TUN＋全局、HTTP 入口、新出口及 HTTPS、旧 VPN 交接、Codex 新回复和断线检查。 |
-| browser | AdsPower 环境已保存并打开，代理和指纹设置完成，在该环境实际检测出口、DNS／IPv6／WebRTC、断线行为及三站结果。 |
-| phone_proxy | 手机导入同一节点，开启全局代理与 VPN。 |
-| timezone | 手机代理完成后展示当前平台的时区与定位路径：Mac 关闭系统服务“设定时区”，保留定位总开关原状，禁止 Claude 网页位置权限；Windows 和手机按对应步骤关闭定位。各端时区与 AdsPower 一致；逐项记录完成后进入手机网络验收。 |
-| phone_network | 在手机独立检测出口、HTTPS、DNS／IPv6、排除路由、实际网络类型、断线行为与三站结果。 |
-| payment_preparation | Apple 路线核对美区 Apple ID、商店登录、养号起点与支付准备；Android 记录官网支付条件与路线说明。 |
-| app | 保持手机节点开启，下载 Anthropic 官方 Claude App 并检查请求路径；Android 打开官网。 |
-| login | 使用 Google 账号登录 Claude 成功，记录本机账号代号。 |
-| subscription | 手机订单和同一账号 Pro 权益确认，结束交付。 |
-
-Mac／iPhone 和 Windows／iPad 的具体字段由程序按设备选择生成；Android 采用官网支付字段。Mac 仅关闭时区定位、核对网页位置权限；手机定位和系统服务时区的操作沿用浏览器与 iPhone 章节，Windows 采用对应系统设置。`node_label`、`profile_ref`、`account_ref`、`apple_account_ref` 使用本机代号，不存 IP、节点链接、邮箱或凭据。
-
-## 提交观察
-
-AI 把当前结果写入 `.local/workflow/observation.json`。以开场用户明确回答“没有”为例，`ticket` 取当前 `next` 的实际值：
-
-```json
-{
-  "stage": "intake",
-  "ticket": "当前返回的票据",
-  "source": {"kind": "user", "reference": "本轮用户明确回答没有封禁账号登录经历"},
-  "data": {"banned_login": "no"}
-}
-```
-
-```bash
-python3 scripts/workflow.py submit --input .local/workflow/observation.json
-```
-
-每个阶段的 `required_fields` 和 `submission` 提供字段说明与空模板。只填写已经取得的观察；可分次提交，已取得的字段会合并。尚未取得的内容留到后续操作，程序返回具体缺项。直接填一个 `passed`／`complete` 标记不会推进流程。新阶段只能使用新票据；重复提交同一份结果不会重复推进。
-
-`source.kind` 可为 `tool`（页面／命令结果）、`user`（具体动作反馈）、`legacy`（本次客户的已有详细记录）；`reference` 写对应页面、回执或反馈位置。来源用于追溯，AI 应读取实际结果后提交。UI 事实仍由页面工具或用户反馈提供，控制层检查字段、关联对象和阶段依赖。
-
-浏览器检测的 `checked_profile_ref` 必须对应当前保存的 `profile_ref`；阶段内更换 `profile_ref` 后，程序清空原环境的完成字段，重新收集新环境的结果。手机节点对应 VPS 的 `node_label`。时区采用 IANA 标识，台北为 `Asia/Taipei`，洛杉矶为 `America/Los_Angeles`；Windows 时区名称按规则换算。三站 `scores` 分别记录 `value` 与 `result`；网站暂不可读时保留空值和实际原因，不编造分数；评分建议仍按原三站规则处理。
-
-## 调用现有脚本
-
-先读取 `allowed_actions`，在当前阶段通过统一入口运行：
-
-```bash
-python3 scripts/workflow.py run --action server_preflight
-python3 scripts/workflow.py run --action server_deploy
-# 已有脚本管理的节点使用 server_export，已有其他面板按当前页面检查后提交观察。
-python3 scripts/workflow.py run --action download_karing
-python3 scripts/workflow.py run --action probe_proxy
-python3 scripts/workflow.py run --action probe_system
-python3 scripts/workflow.py run --action browser_scores --input .local/network/observations.json
-```
-
-以上是各阶段动作示例，实际每次执行当前 `allowed_actions` 中的一项。先准备原网络脚本需要的 `.local/network/input.json`，字段见确定性执行层。浏览器评分仅接受 AdsPower 观察，手机评分按实际 iPhone／Android 分支接收。
-
-服务端部署／导出会读回验证，成功回执自动完成服务端阶段。使用了网络脚本的 `probe` 配置时，电脑网络阶段会同时核对当前网络代次和阶段检查批次的两种探针成功回执；更换电脑或重置检查会更新批次，旧回执仅保留为历史。手填通过字段不能覆盖失败回执。代理探针只填它实际测得的项目，TUN、旧 VPN 交接和 Codex 回复仍在设备上观察。下载 Karing 仅完成下载，后续安装和设置继续当前阶段。失败保留当前阶段与错误，按对应修复章节连续排查。
-
-清理阶段可用 `cleanup_audit`／`cleanup_apply`；审计不会完成清理阶段。仅退出登录（Log out）不等于清理旧账号残留；电脑涉及桌面版或 CLI 封禁残留且提交 `outcome=cleaned` 时，须关联本阶段 `cleanup_audit` 或 `cleanup_apply` 的成功回执；仅浏览器或仅手机涉及封禁残留时，完成站点数据清理或提醒 iPhone 删除重装 App 后提交 `cleanup_mode=browser_only` 或 `phone_only`。执行清理时仍由客户在终端完成现有脚本的范围选择和最终确认，控制层不代填确认。Windows 可通过 `--input` 提供 `{ "scope": ["cache", "account", "credentials", "desktop"] }` 中实际选定的范围，Mac 在原交互清单中选择。Windows 恢复使用 `cleanup_restore`，输入文件提供 `backup_directory`，按现有恢复校验和本人确认执行。实际结束后提交所选范围与结果。`cleanup_apply` 在 Mac 调用原交互流程，在 Windows 使用现有 `--apply` 流程。
-
-统一状态存在时，网络部署／检测、Karing 下载、平台清理入口会验证控制层本次执行许可。直接调用这些入口会提示先运行 `workflow.py next`。`network.py status`、`invalidate` 保留诊断用途；失效状态会被控制层同步识别。旧 `login_readiness.py` 在统一流程启用后返回当前流程结果。
-
-## 等待、恢复与变更
-
-新 Apple ID 填写带时区的实际 `first_used_at`，例如 `2026-10-23T09:00:00-07:00`。默认按正常使用约两天（48 小时）计算 `resume_at`。`waiting` 时保存原起点，到期再次运行 `next` 后继续补齐当前缺项；付款准备已齐才进入 App 阶段；长期自用老号按账户实际状态继续。
-
-Apple 准备阶段记录实际商店账号的本机代号 `apple_account_ref`，例如 `apple-main`。更换手机后重新核对商店登录、地区及支付状态；确认仍是同一账号并提交相同代号后，程序从 `account_history` 复用账号类型和首次使用时间。另一账号使用另一代号，按它自己的实际记录计算等待。阶段内切换账号会清除上一账号的设备检查字段；将新号纠正为老号时，程序自动移除当前记录中不再适用的等待字段。
-
-所有正常继续和中断恢复都先运行 `next`。脚本调用失败／中断保持当前阶段，已提交的观察与执行回执保留。账号、养号时间和付款记录独立保存；重新检查网络时继续复用。
-
-```bash
-python3 scripts/workflow.py change --scope node --reason '本次改用新的 VPS 节点'
-python3 scripts/workflow.py change --scope timezone --reason '用户选择台北'
-```
-
-变更范围包括 `intake`、`cleanup`、`devices`、`node`、`network`、`handoff`、`computer`、`browser`、`phone`、`timezone`、`google`、`apple`。更换平台搭配（如 iPhone 改 Android）使用 `devices` 重选平台；同平台更换硬件使用 `computer` 或 `phone`。程序只失效相应设置和检测；重新领取任务后按当前设备操作。网络输入内容或网络脚本检测代次变化在下次调用时自动识别。只有本机探针地址／端口或检测代次变化时复查客户端接管；服务端配置变化才复查服务器。更换手机或 Google 账号时重新核对登录与权益，并保留“已有付款记录”的提示，先处理已有订单归属与权益。
-
-旧 `.local/progress.md` 保留，新的派生进度在 `.local/workflow/progress.md`。恢复旧客户时，AI 读取当前阶段所需的旧记录，能对应到具体实际结果的以 `legacy` 来源提交；只补缺失项目，不重新询问已有答案。笼统的“全部完成”不能自动变成各项观察。旧的 `login-readiness.json` 作为历史观察来源，不再独立决定下一步。
-
-## 执行范围
-
-统一控制层管理本项目阶段、状态和已接入脚本入口。浏览器与手机原生工具由 Codex 宿主提供，AI 将其操作限定在当前返回的阶段，并提交实际结果。该本地项目无法拦截独立宿主里的任意原生工具调用；宿主需要强制约束这些工具时，应在工具调用入口接入相同的阶段许可。
-
-
-## 客户提示与分支（本轮更新）
-
-- `devices`：设备说明后展示 PDF 用途，分别记录 `setup_explained`、`pdf_explained`。PDF 另存选择可为 yes／no／unanswered，不要求客户答复才能继续。安卓额外记录 `android_route_explained` 与 `payment_route_status`（available／needs_setup／unknown），开场先说明付款条件。
-- `browser`：展示电脑使用浏览器提醒后记录 `usage_explained`；`login` 再提醒一次并记录 `browser_notice_shown`。
-- `phone_proxy`：iOS 记录 `client_available`。已有小火箭直接复用；未购买时可先提交 false，再准备 Apple ID。在本阶段也可提交 `apple_account_ref`、`account_type`、`store_signed_in`、`first_used_at`、`apple_reminder_shown`，正式支付阶段复用同一账户的起点。
-- 新号登录完成就返回建议时间；`wait_choice=wait` 或未选择时默认等待。客户明确选择立即继续，用 `source.kind=user` 记录 `wait_choice=continue`，再继续核对其他条件。首次时间须包含时区，不从买号时间算起。
-- 在小火箭准备、Apple 付款准备或实际订阅阶段提交 `purchase_restricted=true`，直接返回人工支持章节。用 `support_case` 记录客服安排，有具体时间时记录 `support_retry_at`；处理完成后再提交实际的购买限制状态。
-- 三站明显偏离时返回 `score_advice`，先复查。提交 `score_review=rechecked` 和实际复查说明，或在客户明确选择继续时用用户来源提交 `score_review=continue` 与说明。轻微偏离保留可继续；换检测结果后重新记录复查处理。
-- 订阅订单与权益确认后直接展示收尾说明和使用经验，提交 `handoff_explained=true`。不增加 Claude Code 教学、重启验收或后续手机重装跟踪。
-- `customer_message` 是需要原样或自然转述到客户对话的内容；工具输出本身不算已展示。已展示且对象未变的说明沿用记录。
-
-## 默认出图与重复求助
-
-默认图集按已知分支给齐：账号来源未确认和自有账号不展示商家发货资料；需要购买账号且渠道已确定后展示该渠道和资料整组图。Apple 注册、改区、商店登录按实际准备状态展示；购买受限时才显示申诉图。已有小火箭时手机节点阶段直接展示节点相关图解。用户主动询问其他图解仍可用 `guide` 解释，教学不改变执行阶段。
-
-
-首次进入阶段，直接完整展示 `customer_message` 中本阶段适用的全部原图，按图组配中文说明，并指出当前起点。商家或渠道确定后立即展示对应分支整套图；搬瓦工一次给四张注册图和一张套餐图，AdsPower 一次给环境、代理和指纹三张图。图解提前给齐，实际登录、充值、付款和阶段验收继续按当前条件推进；等待期间的图解作为预览。
-
-`gallery_topics` 列出当前适用图组，按设备、商家和支付渠道匹配；本阶段整套图集保留原图顺序并去重。`default_teaching` 与 `teaching_topic`、`teaching_step` 记录当前操作位置，不限制首次展示数量。没有配图的操作按现有文字和实际页面说明。
-
-`guide --topic <主题ID>` 默认取得该主题全部原图；`--step <从1开始的图片序号>` 用于后续定位或重讲一张。`guide` 只读，不改变阶段、票据、等待时间或付款状态。用户说不会、找不到、看不懂、图没出来时，直接重讲对应图；主题明确时直接处理，确实无法区分时只补问一个关键问题。
-
-| 用户的意思（不限于这些说法） | 取图与讲解 |
-| --- | --- |
-| 刚买好、账号一串看不懂、谷歌不知道怎么弄 | 结合购号上下文取 `google_materials`，按字段、取码、回填三张原图讲清楚；上下文不足时先确认是资料还是登录页面。 |
-| 那个码怎么用、2FA 密钥是什么、身份验证器验证码哪里拿 | `google_2fa`，直接给 https://2fa.run/ 及原取码、回填图。实际页面要求短信、恢复邮箱或备用码时用 `google_other_verification`。 |
-| 注册好了、分类找不到、买哪个号 | 按当前商家和进度选 `chuhai_register`／`chuhai_category`／`chuhai_product`；GmailBuy 使用 `gmailbuy` 与其实际页面。 |
-| 已到商家注册／套餐／付款页面 | 按商家选 `vps_dmit`／`vps_bandwagon`，首次给齐商家整组图，后续用 `--step` 重讲当前页；已买好就继续部署。 |
-| 浏览器哪个框填什么 | 按当前标签页选 `browser_profile`／`browser_proxy`／`browser_fingerprint`。 |
-| 手机节点、DNS 不知道点哪里 | 按实际问题选 `phone_node`／`phone_dns`／`phone_backup`；配置分流参考用 `phone_config`。没有对应按钮图时读取客户当前页面逐步定位。 |
-| Apple 账号、充值卡不知道在哪里操作 | 按实际操作选 `apple_store`、`gift_official`、`gift_alipay`、`gift_redeem`；已准备好的部分复用。 |
-| 下载哪个 App、在哪里升级、付不了款 | `claude_app`、`claude_subscribe`、`apple_support`，按当前页面分别展示。 |
-
-讲解可以先进行；实际登录、网络切换、充值和付款遵循原阶段和用户选择。等待期间用户问兑换步骤，可以讲图，但保持原等待状态。原图中的设备、账户、价格和配置是示例，按当前实际信息操作。客户说图没出来时，在同条回复重发对应图并保留 guide 返回的单图打开链接或 PDF；图片缺失时用已有链接和当前页面继续说明。保留原图片、箭头、顺序和后续教学正文。
-
-## 当前操作资料与实际回执
-
-`init`、`next`、`submit`、`run` 默认返回精简视图：当前阶段、缺项、提交入口、客户说明与原图、当前阅读小节。完整诊断使用 `next --full`；图解目录使用 `guide`，固定型号、系统和软件版本使用 `policy`。精简只影响返回资料，完整观察、历史和等待安排仍保存在统一状态。
-
-- 新购服务器的服务端阶段要求 `server_deploy` 或 `server_export` 成功读回；`mode=existing` 不能替代本次新购部署验收。已有正常节点沿原复用路径继续。
-- 电脑网络阶段统一要求 `probe_proxy`、`probe_system` 两个实际回执。先按 references/14-scripted-execution.md 填好 `.local/network/input.json` 的本机 HTTP 入口和预期出口，再通过 `run` 检测；缺少检测配置时先补配置。回执分别填写 HTTP 代理、实际出口和 HTTPS 结果，其余界面与手机动作按实际观察或客户反馈提交。
-- VPS 库存先通过 `vps_capture` 采集本次页面，再在观察中引用回执和原文。具体输入、浏览器采集方法见 references/18-vps-stock.md。
-- 需要买礼品卡时首推支付宝，直接调用 `guide --topic gift_alipay`，直接展示原图、完整跳转链接及“复制到 iPhone 备忘录 → 点链接 → 打开支付宝”的步骤。已完成 Apple 账户检查并进入充值准备时主动返回这条路径，省去支付宝内搜索步骤。沿用用户选择的支付宝渠道；跳转异常先查看实际提示，客户选择其他渠道后再切换。
-
-维护时，普通回归继续使用 `python3 -m unittest discover -s tests`。真实模型演练单独运行 `python3 tests/model_replay.py --output .local/model-replay`，使用本机 Codex CLI 的当前模型与登录状态，在临时项目副本中处理真实口语，保存调用日志和客户回复。演练只写临时流程状态，不操作真实设备或支付；常规测试不会调用模型。
-
-
-观察提交可直接使用标准输入，减少中间 JSON 文件：
+可直接用标准输入提交观察（Windows PowerShell 可用 `@' ... '@` 管道输入）：
 
 ```bash
 python3 scripts/workflow.py submit --input - <<'JSON'
-{"stage":"当前阶段","ticket":"next 返回的票据","source":{"kind":"user","reference":"客户本轮具体反馈"},"data":{"填写当前实际观察字段":"实际值"}}
+{"stage":"当前阶段","ticket":"next 返回的票据","source":{"kind":"user","reference":"客户本轮具体反馈"},"data":{"观察字段":"实际值"}}
 JSON
 ```
 
-使用当前票据和真实字段替换示例。`source` 是观察来源说明；检测结果以执行回执为准。
+- 只填已取得的观察，支持分次合并提交；`source.kind` 可为 `tool`、`user`、`legacy`。
+- 浏览器 `checked_profile_ref` 与 `profile_ref` 对应，手机 `node_label` 与 VPS 对应，时区用 IANA 标识（如 `America/Los_Angeles`、`Asia/Taipei`），三站 `scores` 含 `netcoffee`、`ping0`、`scamalytics` 实测值与说明；大幅偏离时复查并记录 `score_review`。
+- 脚本动作统一经当前 `allowed_actions` 调用：
+  ```bash
+  python3 scripts/workflow.py run --action server_preflight
+  python3 scripts/workflow.py run --action server_deploy
+  python3 scripts/workflow.py run --action download_karing
+  python3 scripts/workflow.py run --action probe_proxy
+  python3 scripts/workflow.py run --action probe_system
+  python3 scripts/workflow.py run --action browser_scores --input .local/network/scores-input.json
+  ```
+- 完整诊断用 `next --full`，固定版本与套餐推荐用 `policy`，变更范围用 `workflow.py change --scope <范围> --reason '<原因>'`（支持 `intake`/`cleanup`/`devices`/`node`/`network`/`handoff`/`computer`/`browser`/`phone`/`timezone`/`google`/`apple`）。
 
-连续场景验收用 `python3 tests/model_replay.py --journey gift --journey vps --journey google --journey server --journey network --model <本机可用模型> --output .local/journey-validation`。按本次改动选择相关旅程：礼品卡入口到兑换、库存采集到服务器交接、Google 购买到账号资料和重复求助、系统检查失败后恢复、网络检测失败后复测；每轮保存输入、模型执行日志、实际回复与流程状态。VPS 演练使用固定页面快照；server 和 network 旅程只替换 SSH／网络外部边界，流程控制、系统规则与回执使用真实实现。报告明确区分模拟外部结果与现场检查。真实模型测试完成后逐轮复核回复；普通回归同时覆盖检测回执、失败重试和实际脚本入口。
+## 等待、受限与恢复
 
-Windows PowerShell 提交观察时可用单引号 here-string（`@'` 与 `'@` 各占一行）将 JSON 原文通过管道传给 `python scripts/workflow.py submit --input -`；或继续使用现有 JSON 文件输入。
+- **Apple 新号等待**：填写带时区的手机 App Store 首次登录时间 `first_used_at`，程序自动按 48 小时计算 `resume_at`；到期运行 `next` 继续，客户明确选择现在继续时以 `source.kind=user` 提交 `wait_choice=continue`。
+- **购买受限**：在 `phone_proxy`、`payment_preparation` 或 `subscription` 提交 `purchase_restricted=true` 即切入 `references/07-apple-purchase-support.md` 人工支持流程，记录 `support_case` 与 `support_retry_at`。
+- **更新检查**：`workflow.py` 自动附带 `update`（24 小时缓存）；新版提示在首个实质回答末尾展示，客户同意后执行 `update.apply_command` 保留 `.local/` 进度。
+
+## 默认出图与重复求助
+
+首次进入阶段，将 `customer_message` 中本阶段适用的全部原图按顺序展示齐全，配中文说明和当前起点；商家、账号来源或支付渠道确定后，立即补齐该分支整套图（搬瓦工 5 张、AdsPower 3 张、出海91 3 张、Google 资料 3 张等）。
+
+`guide --topic <主题ID>` 返回该主题整组原图，`--step <序号>` 用于后续定位重讲；`guide` 只读、不改变当前阶段。客户说不会、找不到或图未显示时立即重发对应图及打开链接。
+
+| 客户常见求助 | 对应 `guide` 主题 |
+| --- | --- |
+| 刚买好谷歌号、一串资料看不懂 | `google_materials`（字段、取码、回填三张原图） |
+| 2FA 密钥／动态验证码怎么取 | `google_2fa`（附 `https://2fa.run/`；短信／备用码用 `google_other_verification`） |
+| 出海91 注册、分类、挑号 / GmailBuy | `chuhai_register` / `chuhai_category` / `chuhai_product` / `gmailbuy` |
+| VPS 注册与选套餐页面 | `vps_bandwagon` / `vps_dmit` |
+| AdsPower 哪个框填什么 | `browser_profile` / `browser_proxy` / `browser_fingerprint` |
+| 小火箭扫码、备份、DNS、分流配置 | `phone_node` / `phone_backup` / `phone_dns` / `phone_config` |
+| Apple 登录、支付宝／官网礼品卡、兑换 | `apple_store` / `gift_alipay` / `gift_official` / `gift_redeem` |
+| 下载 Claude App、升级 Pro、申诉支持 | `claude_app` / `claude_subscribe` / `apple_support` |
+
+## 维护测试命令
+
+- 离线单测：`python3 -m unittest discover -s tests`
+- 真实模型演练：`python3 tests/model_replay.py --output .local/model-replay`
+- 连续场景验收：`python3 tests/model_replay.py --journey gift --journey vps --journey google --journey server --journey network --model <模型> --output .local/journey-validation`

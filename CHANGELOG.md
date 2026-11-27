@@ -1,5 +1,12 @@
 # 更新记录
 
+## 1.0.70 · 2026-11-27
+
+- 全流程断线测试大幅瘦身：仅在电脑网络配置（`computer_network`）阶段执行 1 次断线测试，取消 AdsPower 浏览器（`browser`）与手机端（`phone_network`）的强制断线测试（`disconnect_checked` 降级为可选以兼容旧本机状态）。
+- AdsPower 流程提速与确定化：明确写死 **AdsPower 免费版完全够用**，直接点左上角「新建环境」手动填写（无需付费版或 `API & MCP`），点击「确定」前一次性配齐本机 HTTP 代理与全部真实硬件指纹项（含 WebGL 元数据／WebGPU／CPU／内存）；Mac 桌面控制首次启动崩溃在核对权限／重启一次后立即切手动合并步骤。
+- 手机阶段收紧与前置解释：进入 `phone_proxy` 主动讲清“手机只用于首次登录和 Apple 礼品卡内购、日常回电脑用、下一步立刻统一电脑／手机／AdsPower 时区”三点；iPhone／iPad 统一默认使用 Shadowrocket（小火箭），与全套操作图解对齐。
+- 全仓文档深度瘦身与正向精准改写：全面精简 `AGENTS.md`、`SKILL.md`、`README.md`、`scripts/workflow_messages.py` 及全部核心 `references/*.md`，清理防御性、叠加性否定措辞与诱发模型查外部网页改道或泼冷水的免责规则，全部 Prompt 与操作说明统一改为正向精准表达；`README.md` 顶部补充常规稳定模型选择与接续进度提示。
+
 ## 1.0.69 · 2026-11-26
 
 - 移除自动弹开本地网页跳转（删除 `assets/google-account/guide.html` 与 `scripts/open_google_guide.py`，`scripts/workflow.py` 与 `scripts/workflow_definition.py` 恢复至 `v1.0.61` 基线原状），回到原对话内直接带做方式。

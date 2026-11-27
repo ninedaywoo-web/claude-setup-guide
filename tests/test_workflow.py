@@ -451,13 +451,41 @@ class WorkflowTests(unittest.TestCase):
     def test_context_self_check_and_pre_login_redline_are_published(self):
         repo = Path(__file__).resolve().parents[1]
         for rel, needle in (('README.md', '新建一个空白对话'),
+                            ('README.md', '优先选用常规稳定模型'),
                             ('SKILL.md', '启动前上下文自检'),
-                            ('SKILL.md', '到达 `login` 阶段前，严禁打开或点击登录 Claude 桌面版'),
+                            ('SKILL.md', '到达 `login` 阶段后，再在已配置的环境中登录或授权 Claude'),
                             ('references/12-latest-start.md', '启动前上下文自检')):
             self.assertIn(needle, (repo / rel).read_text(encoding='utf-8'))
         view = self.flow.next()
-        self.assertIn('禁止口头“已记录”跳过控制层', view['task_scope_instruction'])
-        self.assertIn('严禁打开或点击登录 Claude 桌面版', view['task_scope_instruction'])
+        self.assertIn('每项进度均通过 submit 提交实际结果', view['task_scope_instruction'])
+        self.assertIn('到达 login 阶段后再于已配置的环境中登录或授权 Claude', view['task_scope_instruction'])
+        self.assertIn('保持主流程顺序继续推进', view['task_scope_instruction'])
+
+    def test_disconnect_check_only_required_in_computer_network(self):
+        self.reach('computer_network')
+        data = self.data('computer_network')
+        data.pop('disconnect_checked')
+        view = self.flow.submit(self.payload(data))
+        self.assertEqual(view['stage'], 'computer_network')
+        self.assertIn('disconnect_checked', view['missing'])
+        self.reach('browser')
+        browser_view = self.flow.next()
+        self.assertNotIn('disconnect_checked', browser_view['missing'])
+        self.assertIn('AdsPower 免费版', browser_view['next_action'])
+        browser_data = self.data('browser')
+        self.assertNotIn('disconnect_checked', browser_data)
+        self.flow.submit(self.payload(browser_data))
+        phone_proxy = self.flow.next()
+        self.assertEqual(phone_proxy['stage'], 'phone_proxy')
+        for phrase in ('Apple 礼品卡内购', '时区统一成一致', 'Shadowrocket（小火箭）'):
+            self.assertIn(phrase, phone_proxy['customer_message'])
+        self.reach('phone_network')
+        phone_view = self.flow.next()
+        self.assertNotIn('disconnect_checked', phone_view['missing'])
+        # Legacy state supplying disconnect_checked remains accepted cleanly.
+        phone_data = self.data('phone_network')
+        phone_data['disconnect_checked'] = True
+        self.assertEqual(self.flow.submit(self.payload(phone_data))['stage'], 'payment_preparation')
 
     def test_windows_restore_batch_uses_existing_confirmation_flow(self):
         self.flow.submit(self.payload({'banned_login': 'yes'}))

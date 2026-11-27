@@ -1,103 +1,44 @@
 # 更好地用上 Claude Max 教学
 
-我们希望帮助用户更好地使用 Claude，把服务器部署、电脑与手机网络配置、登录和订阅操作整理成清楚的步骤。Codex 根据用户的设备和实际进度协助操作、解释原理并排查故障，配套 PDF 提供图文指引；日常使用目标是电脑上的 Claude 桌面端或 CLI。
-
-本地开发中的统一交付控制层：启动读取后运行 `python3 scripts/workflow.py init`，由同一入口管理从开场到订阅完成的阶段。当前实现与使用方法见[统一控制层](references/17-workflow-controller.md)。
-
-这是客户交付的离线图文教程和 AI 带做 Skill。正文、操作配图及 10 份客户阅读版 PDF 均在项目内，不需要打开在线文档。
-
-## 给 AI 的入口
-
-如果用户发来本仓库链接并要求开始或恢复带做，必须先执行[链接交付启动流程](references/12-latest-start.md)：实时读取 main、下载最新完整包、核验文件，再从新目录读取 [SKILL.md](SKILL.md)。不直接复用电脑里同名 Skill、旧目录、网页搜索摘要或旧对话推荐，也不以 24 小时缓存代替本次核对。下载或校验失败先暂停带做，不能改用旧版继续推荐 VPS。成功后先告诉用户已下载并校验的版本，再确认设备和进度。收到链接开始带做已包含下载授权，无需再问是否更新。
-
-只提供本地文件夹时，按 SKILL.md 的本地调用规则执行。用户明确要求审查、解释或其他任务时按其要求处理，不触发下载。
+本项目是一套离线图文教程与 AI 带做程序，帮助用户按清晰步骤完成 VPS 部署、电脑与手机网络配置、登录与订阅。正文、操作配图和 10 份客户阅读版 PDF 均在仓库内；日常使用目标是电脑上的 Claude 桌面端或 Claude Code（CLI），AdsPower 负责网页登录与授权。
 
 ## 开始使用
 
-**开始前请先在 Codex 新建一个空白对话**，不要在聊过其他任务的旧对话里发送链接，避免旧上下文干扰配置顺序。
+**开始前请先在 Codex 新建一个空白对话，并优先选用常规稳定模型执行**（避开会反复追问所在地的模型），避免旧上下文干扰配置顺序。如果配置中途遇到 AI 偏离步骤（例如反复追问你在国内还是国外，或建议跳过手机直接网页登录），切换常规稳定模型、新建空白对话重发链接即可从本机进度无缝继续。
 
-**把本仓库链接发给本机 Codex，它会自动下载、解压并校验最新项目完整包，不需要您先到 GitHub 点击 Code → Download ZIP。**完整包里有两部分：供 Codex 读取执行的程序／流程，以及供您阅读的 PDF 图文教程。下载成功后会告诉您保存位置。
+**把本仓库链接直接发给本机 Codex，它会自动下载、解压并校验最新项目完整包**（包含 AI 执行程序／流程与 `assets/reading/` 下的 10 份阅读版 PDF），并直接带您一步步配置。如果您已经手动下载解压，也可以把完整文件夹交给 Codex，从 [SKILL.md](SKILL.md) 开始。
 
-如果您已经手动下载并解压，也可以把完整文件夹交给 Codex 或其他能读取本地文件的 AI，从 [SKILL.md](SKILL.md) 开始。只上传 SKILL.md 单个文件会缺少配套教程，请保留完整目录。仅能聊天、没有本机文件或下载能力的工具，需要您协助保存，AI 应先说明具体缺少的能力。
+### 给 AI 的启动规则
 
-本次交付默认采用：先问设备是否登录过被封禁的 Claude 账号，安排适用清理 → 设备搭配说明与阅读版介绍 → 确认 Google 账号 → VPS 与 Mac Karing／Windows v2rayN（系统代理关闭、TUN＋全局开启）→ AdsPower → 手机小火箭全局代理 → 电脑／手机时区与定位设置 → 核对美区 Apple ID 和等待安排与客户选择记录 → 保持节点开启，下载 Claude → 手机 Google 登录并订阅 Pro → 订单与手机权益确认 → 展示收尾使用说明与经验，结束交付。上面是 iPhone 路线；安卓网络自检后可用手机浏览器进入官网，按 Google Pay 基础指引继续。手机主要用于登录和订阅，Claude Code 安装与使用教学不在本次交付内。没有 Google 账号时，按[账号与两步验证说明](references/08-google-account.md)准备。
+- 收到本仓库链接开始或恢复带做时，先按[链接交付启动流程](references/12-latest-start.md)实时读取 `main`、下载并校验最新完整包，从返回目录读取 [SKILL.md](SKILL.md) 并运行 `python3 scripts/workflow.py init`，按控制层返回阶段直接带做。
+- 本地文件夹日常继续时，沿用 `SKILL.md` 启动规则；用户明确要求审查、解释或其他任务时按其要求处理。
 
-AI 会先完整读完[纯净魔法从零部署](references/01-network.md)和[指纹浏览器与 iPhone 网络配置](references/02-browser-iphone.md)，再了解你的设备和进度，每次只带一小步。做完发截图或口述结果即可。Apple、退款和申诉在需要时再读。
+## 交付主线一览
 
-准备在 iPhone 使用 Claude 或通过 App Store 订阅时，AI 会主动进入手机网络配置关卡，Mac 优先用 Codex Computer Use 操作 iPhone 镜像，镜像有问题先排查；Windows 默认图解与截图带做，不要求 Apple 原生镜像。小火箭默认使用「全局路由 → 代理」并开启 VPN，随后询问一次时区选择：程序和作者推荐跟随节点，也可选台北（东八区）；Mac、手机和 AdsPower 统一所选时区，主动展示 Mac／手机时区和关闭定位的原攻略设置路径，网络、时区、定位分别验收，通过登录前衔接脚本后进入手机登录和订阅；电脑检查结果不能代替手机。
+1. **开场核对与清理**：先确认设备是否登录过被封禁的 Claude 账号，按需执行内置的 [Mac 端清理 Skill](references/15-mac-cleanup.md) 或 [Windows 端清理 Skill](references/16-windows-cleanup.md)（iPhone 建议删除重装官方 App）。
+2. **设备搭配与阅读版**：说明 Mac＋iPhone（首选）、Windows＋iPhone（可行）、Windows＋Android 的配合方式，介绍并按需另存[客户阅读版 PDF](assets/reading/README.md)。
+3. **Google 账号准备**：自有可用 Gmail 直接复用；缺号默认推荐 GmailBuy 全新美国谷歌新号（`id=18&sid=18`）并提供备选出海91，买完展示首登时机原因与 2FA 取码图解（[详见 08 篇](references/08-google-account.md)）。
+4. **VPS 与电脑网络**：按 `workflow.py policy` 选购并部署 VPS（Debian 12、3x-ui v3.10.2、Xray 26.7.28、REALITY Cloudflare SNI），Mac 使用固定版本 Karing `1.2.25.2802`（Windows 用 v2rayN）。保留旧 VPN 测通新节点后切换为「系统代理关闭 + TUN + 全局」，并在电脑网络阶段完成 1 次断线测试。
+5. **AdsPower 独立环境**：使用 **AdsPower 免费版**直接手动新建环境，配置本机 HTTP 入口与真实硬件指纹，检查实际出口、IPv6／DNS／WebRTC 与三站评分（NetCoffee、Ping0、Scamalytics）。
+6. **iPhone 小火箭、时区与订阅**：iPhone／iPad 统一使用 **Shadowrocket（小火箭）**「全局路由 → 代理」导入同一节点 → 统一电脑、手机和 AdsPower 时区（推荐跟随节点，也可选台北）并设置定位 → 完成手机出口、三站评分与 DNS／IPv6 验收 → 核对美区 Apple ID 与新号约两天等待 → 支付宝快捷买礼品卡充值 → 保持节点开启下载官方 Claude App、Google 登录并订阅 Pro → 确认订单与权益后回电脑使用。（安卓用户走[官网 Google Pay 分支](references/11-android-web-pay.md)。）
 
-Apple 内购遇到购买限制时，按[人工支持带办流程](references/07-apple-purchase-support.md)，由 Codex 进入官方客服并沟通购买问题，用户完成登录和 Support PIN 输入；客服答复、等待起点、具体重试时间和到期跟进记入本机进度。
+## 安装成 Skill（可选）
 
-准备 Apple 内购时，网络自检通过后再单独确认账户新旧。根据客户反馈，新注册或刚接手的成品号会立即收到醒目提醒：先只在自己手机 App Store／“媒体与购买项目”成功登录一次，从实际首次登录使用的时间起正常使用约两天，暂不充值和订阅；不更换 iCloud。AI 会记住等待安排，恢复时接着做。
+直接把项目文件夹交给 AI 即可使用。若希望在 Codex 中长期调用，可将整个 `claude-setup-guide` 目录放到 `~/.agents/skills/`，再用 `$claude-setup-guide` 启动。
 
-初次开始，Codex 的第一个问题是“您准备使用的电脑或手机，之前有没有登录过被 Claude 封禁的账号？”有的话，先按设备提供旧登录残留检查：电脑按系统使用内置的 [Mac 端清理 Skill](references/15-mac-cleanup.md) 或 [Windows 端清理 Skill](references/16-windows-cleanup.md)，iPhone 建议删除并重新下载官方 Claude App。处理或安排好适用事项后，确认电脑和手机类型、当场说明设备搭配并介绍阅读版；准备好 Google 账号后，再解释 VPS 是什么、问您有没有自建节点；没买、买了未配置、已经搭好，分别从对应步骤开始。普通梯子订阅不等于自建 VPS，已有服务器不用重复买。
+## 自动检查更新
 
-项目内附[客户阅读版 PDF](assets/reading/README.md)，共 10 份、77 页，最近更新于 2026-11-15。这些 PDF 已经随程序／流程一起下载到项目的 `assets/reading/` 文件夹。Codex 会先明确告诉您 GitHub 项目本身已经下载好，再简短介绍 PDF 的用途和使用方法：遇到问题先问 Codex；问题还没解决或解释不明白时，可以让 Codex 找出对应 PDF、章节、页码和图示，您自己对照着看，仍不懂的内容可以截图继续问。我们建议您保存一份阅读版到方便打开的位置。讲清楚这些之后，Codex 才会询问是否需要把 PDF 单独保存到“下载”等文件夹；项目内已有文件，会直接复制一份给您，无需重新下载程序。暂时不保存也照常带做。
-
-阅读版以 Mac／iPhone 图解为主，Windows 和 Android 仍按各自专章带做。PDF 随完整项目提供；另存到本地的副本不会自动改变。项目更新带来新版 PDF 时，Codex 会提醒已保存阅读版的客户另存新版，保留旧副本与笔记。
-
-本仓库已公开。任何人都可以直接查看、下载和检查更新，不需要申请访问权限，也不需要登录 GitHub。你可以把仓库链接交给能读取 GitHub 的 AI，让它先完成最新版下载与校验，再从 SKILL.md 开始。链接交付时暂时无法联网就先解决连接，不自动改用旧副本。
-
-购买 VPS 时，AI 会按所选商家主动展示[搬瓦工注册与选购图解](references/09-vps-purchase.md)。也可直接保存[搬瓦工注册 PDF](assets/vps-purchase/bandwagon-registration.pdf) 和 [VPS 选购 PDF](assets/vps-purchase/vps-purchase-guide.pdf)。
-
-Windows 用户还会读取 [Windows 专门流程](references/10-windows.md)：先保留旧 VPN 测试新节点，再切换到 TUN＋全局并复验；Android 用户可按[官网 Google Pay 基础指引](references/11-android-web-pay.md)继续，付款前先了解案例较少及作者反馈的封号后无法退款风险；支付选项以实际页面为准。Windows 真实整机交付验收仍待完成，本次发布不代表已实测跑通。
-
-新交付使用固定组合：Karing **1.2.25.2802**、服务端 Xray **26.7.28**，REALITY 目标与 SNI 统一为 Cloudflare，脚本直接下载、校验并配置。
-
-Karing 连接失败、REALITY 握手报错或切换后 Codex 掉线时，AI 会直接按已有方案修复：适用时先试 gvisor，随后校正参数并应用已有 REALITY 版本与目标组合，每步实测，成功后继续交付。技术判断由 AI 完成；用户只需配合工具无法代做的具体动作。
-
-## 安装成 Skill
-
-可以直接把项目文件夹交给 AI，无需安装。若希望在 Codex 中长期使用，可让 Codex 将整个 `claude-setup-guide` 目录安装到自己的 `~/.agents/skills/` 下，再用 `$claude-setup-guide` 开始。安装位置已有同名目录时先检查，不覆盖已有进度。
-
-## 更新
-
-**收到仓库链接的交付例外：**每次用户重新发链接开始或恢复带做，先下载最新完整包，不走下面的缓存与等待确认规则。以下规则只用于已完成启动后的日常继续，或用户仅提供本地文件夹的情况。
-
-项目包含自动检查更新的程序。AI 在你调用项目、开始或恢复带做时运行检查；24 小时内重复调用复用本地结果，满 24 小时后下次调用再联网。连续带做跨过这个间隔时也会重新检查。没有调用时不运行，不需要安装后台服务或配置系统定时任务。
-
-发现新版本时，AI 会在本次调用的首个回答末尾提醒：
-
-> 已有最新更新（v1.0.10），建议更新。
-
-上面只是格式示例，实际版本号以检查结果为准。同一次连续带做不会在每条回复重复提醒；下次调用时，如果尚未更新，仍会提醒。更新提醒不打断当前操作，你明确同意后才下载更新。更新保留 `.local/` 中的进度，并留下一份旧版本备份。
-
-手动检查：
+主流程 `workflow.py` 运行时会自动检查公开仓库 `version.json`（24 小时缓存），发现新版会在回答末尾提示，征得您同意后执行更新并保留 `.local/` 个人进度。也可手动运行：
 
 ```bash
-python3 scripts/update.py check
+python3 scripts/update.py check          # 常规检查（24 小时缓存）
+python3 scripts/update.py check --force  # 立即联网重查
 ```
 
-更新脚本默认匿名访问公开仓库，无需 GitHub 账号、token 或 GitHub CLI。
+## 目录说明
 
-立即重新联网检查，忽略 24 小时缓存：
-
-```bash
-python3 scripts/update.py check --force
-```
-
-主流程启动、继续及提交结果时会自动检查，返回 `update`；发现新版会把建议追加到客户说明。无需每一步另行运行检查命令。用户同意后按返回命令更新，保留本地进度。
-
-检查记录保存在 `.local/update-check.json`，不会上传。检查失败也会保存本次结果，24 小时内复用并明确标记“未能检查”；需要立即重试可使用 `--force`。只有远端数字版本高于本地才报告新版，本地版本领先时不会建议回退。缓存损坏、系统时间回拨或本地版本变化时重新检查。
-
-同意更新后，让 AI 执行检查结果中的命令；命令锁定刚才检查的提交，避免检查后又更新到别的版本。若本地改过课程文件，脚本会停止覆盖，先保留你的改动。
-
-更新脚本需要 Python 3.9+，不需额外 Python 包。没有 Python 时，可由 AI 直接读取公开仓库中的 `version.json`，再按你确认的版本下载完整 ZIP 并保留进度。
-
-已经下载旧副本的客户，需要先更新一次，才能获得这套检查与末尾提醒规则。安装新规则之后，后续发布的新版本会在客户下次调用时被检查到。维护者发布更新时需要提高 `version.json` 的版本号并更新摘要；只修改正文而不提高版本号，不会触发新版提醒。
-
-## 文件说明
-
-- `SKILL.md`：AI 的带做入口。
-- `references/`：本地说明与完整图文教程，包含登录前自检和 Apple 人工支持带办。
-- `assets/images/`：本地配图。
-- `assets/reading/`：10 份客户阅读版 PDF、阅读目录及供 AI 核对的索引。
-- `assets/progress-template.md`：进度模板。
-- `scripts/network.py`：VPS 部署与节点导出、网络检测、三站评分汇总和执行状态恢复，详见[确定性执行层](references/14-scripted-execution.md)。
-- `scripts/download_karing.py`：下载并校验固定版本的 Mac Karing 安装包。
-- `scripts/cleanup.py`：Mac／Windows 清理入口，默认只读审计。
-- `scripts/update.py`：24 小时检查缓存、回答末尾提醒文本及经确认后的更新；`check --force` 可立即重查。
-- `version.json`、`CHANGELOG.md`：版本与更新记录。
-- `.local/`：使用者自己的进度与设置，不上传。
-
-价格、库存和软件界面随时间变化，AI 到选购阶段会查询当时信息。遇到解决不了的问题，或对 AI 的回答不满意，可以去问博主。
+- `SKILL.md`：AI 带做主入口。
+- `references/`：各阶段图文教程与排查章节，控制层见[统一交付控制层](references/17-workflow-controller.md)。
+- `assets/images/`、`assets/step-guides/`、`assets/reading/`：本地操作配图与 10 份客户阅读版 PDF。
+- `scripts/`：`workflow.py` 控制层、`network.py` 部署与检测、`download_karing.py` 客户端校验下载、`cleanup.py` 平台清理、`update.py` 自动更新。
+- `version.json`、`CHANGELOG.md`：版本与更新日志。

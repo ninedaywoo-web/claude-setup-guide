@@ -1,44 +1,33 @@
 # Claude 退款、封号申诉与旧账号清理
 
-App Store 提示无法购买或购买未完成时，先按[Apple 购买受限人工支持](07-apple-purchase-support.md)请求 Apple 复核。下面的封号申诉处理 Claude 账号；Apple 退款处理已经发生的订阅订单，按实际问题选择对应流程。
+App Store 提示无法购买或购买未完成时，先按[Apple 购买受限人工支持](07-apple-purchase-support.md)联系 Apple 复核；下面依次为开场清理、Apple 退款与封号申诉。
 
 ## 有封禁经历时先处理旧登录残留
 
-本节在开场第一个问题回答“有”时主动读取，早于 VPS 询问；先确认是电脑、手机还是两者曾登录过被 Claude 封禁的账号，以及用过浏览器、Claude App 还是 Claude Code。
+开场第一个问题回答“有”时先读取本节，确认涉及设备（电脑、手机或两者）及使用方式（浏览器、Claude App 或 Claude Code）。
 
 ### 电脑：按系统提供内置清理 Skill
 
-Mac 客户直接展示 [Mac 端清理 Skill](15-mac-cleanup.md)，Windows 客户展示 [Windows 端清理 Skill](16-windows-cleanup.md)，并说明：
+Mac 提供 [Mac 端清理 Skill](15-mac-cleanup.md)，Windows 提供 [Windows 端清理 Skill](16-windows-cleanup.md)，先说明：
 
-> 我们先检查旧账号的本地登录残留。项目已内置适合您电脑系统的清理 Skill，会先列出实际范围，备份后再按您确认的范围处理。
+> 我们先检查旧账号的本地登录残留。项目已内置适合您电脑系统的清理 Skill，会先只读列出范围，备份后再按您确认的范围处理。
 
-对客户使用“Mac 端清理 Skill”“Windows 端清理 Skill”。两端都先只读审计，具体操作与验证范围见对应入口。
-
-先确认实际使用的是 Claude Code、Claude Desktop 还是浏览器。**仅退出登录（Log out）不等于清理旧账号残留**：Mac/Windows 用过桌面版或 CLI 时须先运行 `workflow.py run --action cleanup_audit` 并按平台清理 Skill 处理；只使用浏览器时，按指定浏览器配置档检查并清理站点数据，不清空全部浏览器资料，也不清理未使用过的 CLI。Mac 的钥匙串路径不能套到 Windows；Windows Credential Manager 不自动删除。仅当客户主动要求申诉解封时才进入本章申诉部分。
-
-沿用客户已确认的清理范围，展示实际清单、备份后，由客户在终端做一次最终确认。身份／账号状态单独选择；时区与网络按对应章节处理。结果记录具体已处理项目和备份位置。
+- 用过桌面版或 CLI 时，先运行 `workflow.py run --action cleanup_audit` 展示清理清单，由客户在终端确认范围后执行。
+- 仅用过浏览器时，直接清理对应浏览器配置档的站点数据并提交 `cleanup_mode=browser_only`。
 
 ### iPhone：建议删除，再重新下载 Claude
 
-在客户对话中单独提醒：
+在对话中单独提醒一次（由客户自行安排，仅用过浏览器则清理浏览器站点登录状态；仅手机残留提交 `cleanup_mode=phone_only`）：
 
-> **如果这台 iPhone 用过被封禁的 Claude 账号，建议先删除 Claude App，再从 App Store 重新下载官方版本，之后再登录。这里是删除 App，不是仅从主屏幕移除，也不是“卸载 App、保留文稿与数据”。**
-
-操作前确认用户已保存需要的本地资料，并且后续能从准备使用的 App Store 下载官方 App；开场给出建议后由客户安排，后续不再添加重装跟踪或验收。已有 Apple 订阅不因删除 App 而自动取消，不把重装当作退款或解封。
-
-只用浏览器的 iPhone 客户按实际使用方式处理网站登录状态；不要声称重装未使用过的 App 能清理浏览器记录。Android 不照搬 iPhone 路径，按用户实际使用的 App／浏览器检查。
-
-清理和重装是本地状态排查，不能保证消除设备关联、浏览器指纹、平台记录或解除封禁。记录涉及设备、建议是否已展示、用户选择、已完成／待完成与下一步；未经实际操作不记“指纹已清除”。需要申诉时接回本章申诉部分。
+> **如果这台 iPhone 用过被封禁的 Claude 账号，建议先删除 Claude App，再从 App Store 重新下载官方版本，之后再登录（这里是完整删除 App，包括文稿与数据）。**
 
 ### 清理后接回主流程
 
-适用清理完成后，用 `workflow.py submit` 和当前 `cleanup` 票据提交实际 `outcome`、`handled_scope`，读取返回任务并继续。浏览器站点清理、平台脚本清理，以及客户选择暂不清理，都走同一个衔接入口，按实际情况记录结果。首次交付依次回到设备搭配与阅读版说明 → Google 账号准备 → VPS；恢复交付复用已有结果，只补缺项。
-
-客户说“先配置电脑”时，继续确认尚缺的手机类型，按主流程先电脑后手机。电脑网络和 AdsPower 验收后，继续手机代理、时区与定位、手机网络验收，再衔接手机登录和订阅。
+完成后通过当前 `cleanup` 票据提交 `outcome` 与 `handled_scope`（客户明确选择暂不清理时提交 `outcome=deferred`），按控制层依次接回设备搭配与阅读版 → Google 账号 → VPS。
 
 ## 先核对付款渠道
 
-安卓浏览器在 Claude 官网使用 Google Pay 的订单，不是 Apple 内购，也不等同于 Google Play 内购。按作者目前掌握的渠道反馈，这条路线在 Claude 账号被封后目前无法退款；付款前必须按[安卓订阅指引](11-android-web-pay.md)告知用户，并按费用可能无法退回的风险决定。此为作者反馈，不作为已核实的官方统一政策；用户仍可凭实际订单向 Claude 官方支持核实，不承诺退款，也不带用户去 Apple 入口申请该笔订单。
+Apple 内购订单走下方 Apple 退款流程；安卓官网 Google Pay 订单按[安卓订阅指引](11-android-web-pay.md)的渠道说明处理。
 
 ## 退款申请
 
@@ -375,7 +364,7 @@ Anthropic 支持团队，你们好：
 
 ## 备份资料
 
-这台电脑以前登录过被封禁的 Claude 账号，可以先检查并按需清理本地登录残留；具体范围按上面的开场清理分支处理，不保证清理后就能解除封禁。
+这台电脑以前登录过被封禁的 Claude 账号，先检查并按上面的开场分支清理本地登录残留。
 
 我两台封过号的 MacBook，清完都在正常用。
 
